@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تدبّر القرآن</title>
+<style>
+body {
+  margin: 0;
+  background: #101010;
+  color: #f5ead2;
+  font-family: Arial, sans-serif;
+}
+header {
+  background: #1b1812;
+  padding: 25px;
+  text-align: center;
+  border-bottom: 1px solid #b89550;
+}
+h1 { color: #d5b46a; }
+main { max-width: 850px; margin: auto; padding: 18px; }
+select, input {
+  width: 100%;
+  padding: 14px;
+  margin: 8px 0;
+  background: #242424;
+  color: white;
+  border: 1px solid #92743e;
+  border-radius: 9px;
+  font-size: 17px;
+}
+#status { text-align: center; color: #d5b46a; padding: 15px; }
+.ayah {
+  background: #1c1c1c;
+  border: 1px solid #51432b;
+  border-radius: 12px;
+  padding: 18px;
+  margin: 12px 0;
+}
+.ayah p {
+  font-family: serif;
+  font-size: 27px;
+  line-height: 2.1;
+  text-align: justify;
+}
+.number { color: #d5b46a; font-size: 17px; }
+.basmala {
+  text-align: center;
+  color: #d5b46a;
+  font-size: 27px;
+  padding: 18px;
+}
+</style>
+</head>
+<body>
+
+<header>
+<h1>تدبّر القرآن</h1>
+<p>قرآن کریم با رسم عثمانی</p>
+</header>
+
+<main>
+<select id="surah">
+<option>در حال بارگذاری...</option>
+</select>
+
+<input id="search" placeholder="جست‌وجوی آیه..." />
+
+<div id="status">در حال بارگذاری قرآن...</div>
+<div id="verses"></div>
+</main>
+
+<script>
+const FILE = "./quran-uthmani-structured-v2-min.json";
+
+let Quran = null;
+
+const surahBox = document.getElementById("surah");
+const searchBox = document.getElementById("search");
+const versesBox = document.getElementById("verses");
+const statusBox = document.getElementById("status");
+
+function showVerses() {
+  if (!Quran) return;
+
+  const number = Number(surahBox.value);
+  const word = searchBox.value.trim();
+
+  const info = Quran.surahs.find(
+    s => s.surah === number
+  );
+
+  let verses = Quran.verses.filter(
+    v => v.surah === number
+  );
+
+  if (word) {
+    verses = verses.filter(v =>
+      v.text_uthmani.includes(word) ||
+      String(v.ayah).includes(word)
+    );
+  }
+
+  versesBox.innerHTML = "";
+
+  if (!word && info?.opening_basmala_uthmani) {
+    const b = document.createElement("div");
+    b.className = "basmala";
+    b.textContent = info.opening_basmala_uthmani;
+    versesBox.appendChild(b);
+  }
+
+  verses.forEach(v => {
+    const article = document.createElement("div");
+    article.className = "ayah";
+
+    const p = document.createElement("p");
+    p.textContent = v.text_uthmani + " ";
+
+    const n = document.createElement("span");
+    n.className = "number";
+    n.textContent = "﴿" + v.ayah + "﴾";
+
+    p.appendChild(n);
+    article.appendChild(p);
+    versesBox.appendChild(article);
+  });
+
+  statusBox.textContent =
+    verses.length + " آیه";
+}
+
+fetch(FILE)
+.then(response => {
+  if (!response.ok) throw new Error("فایل قرآن پیدا نشد");
+  return response.json();
+})
+.then(data => {
+  if (!data.verses || !data.surahs)
+    throw new Error("ساختار اطلاعات نامعتبر است");
+
+  Quran = data;
+  surahBox.innerHTML = "";
+
+  data.surahs.forEach(s => {
+    const option = document.createElement("option");
+    option.value = s.surah;
+    option.textContent =
+      s.surah + " - " + s.name_ar;
+    surahBox.appendChild(option);
+  });
+
+  surahBox.value = "1";
+  showVerses();
+})
+.catch(error => {
+  statusBox.textContent =
+    "خطا در بارگذاری قرآن: " + error.message;
+});
+
+surahBox.addEventListener("change", showVerses);
+searchBox.addEventListener("input", showVerses);
+</script>
+
+</body>
+</html>
