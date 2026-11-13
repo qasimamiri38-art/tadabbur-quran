@@ -32,6 +32,18 @@ select{flex:1;min-width:0}input{flex:2;min-width:170px}
 .empty{text-align:center;color:var(--muted);padding:28px}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
 @media(min-width:720px){main{padding:22px}.selectors{display:grid;grid-template-columns:1fr 1fr 1fr}.arabic{font-size:34px}.ayah{padding:22px}}
+.ayah-content{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  align-items:start;
+  direction:rtl;
+}
+.ayah-content .translation{
+  border-top:0;
+  border-right:1px solid var(--line);
+  padding:10px 14px 0 0;
+}
 </style></head>
 <body>
 <header><div class="logo">۞</div><h1>تدبّر القرآن</h1><p>قرآن کریم با رسم عثمانی · مطالعه، ترجمه و تدبّر</p></header>
