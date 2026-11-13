@@ -1,174 +1,139 @@
-
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!doctype html>
+<html lang="fa" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#09251c"><meta name="description" content="قرآن کریم با ترجمه و تفسیر برای تدبر">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
 <title>تدبّر القرآن</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Amiri+Quran&display=swap');
-body {
-  margin: 0;
-  background: #101010;
-  color: #f5ead2;
-  font-family: Arial, sans-serif;
-}
-header {
-  background: #1b1812;
-  padding: 25px;
-  text-align: center;
-  border-bottom: 1px solid #b89550;
-}
-h1 { color: #d5b46a; }
-main { max-width: 850px; margin: auto; padding: 18px; }
-select, input {
-  width: 100%;
-  padding: 14px;
-  margin: 8px 0;
-  background: #242424;
-  color: white;
-  border: 1px solid #92743e;
-  border-radius: 9px;
-  font-size: 17px;
-}
-#status { text-align: center; color: #d5b46a; padding: 15px; }
-.ayah {
-  background: #1c1c1c;
-  border: 1px solid #51432b;
-  border-radius: 12px;
-  padding: 18px;
-  margin: 12px 0;
-}
-.ayah p {
-  font-family: 'Amiri Quran', serif;
-  font-size: 27px;
-  line-height: 2.1;
-  text-align: justify;
-}
-.number { color: #d5b46a; font-size: 17px; }
-.basmala {
-  text-align: center;
-  color: #d5b46a;
-  font-size: 27px;
-  padding: 18px;
-}
-</style>
-</head>
+:root{color-scheme:dark;--bg:#0b100f;--panel:#17211b;--gold:#d8b66b;--ink:#f5eddd;--muted:#a9b3aa;--line:#51452d;--green:#164b36}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#14271e,#0b100f 48rem);color:var(--ink);font-family:Vazirmatn,Arial,sans-serif}
+header{text-align:center;padding:calc(20px + env(safe-area-inset-top)) 16px 18px;background:linear-gradient(135deg,#0e2b20,#142018);border-bottom:1px solid var(--gold)}
+.logo{width:88px;height:88px;margin:auto auto 8px;border:2px solid var(--gold);border-radius:24px;display:grid;place-items:center;background:#080b09;color:var(--gold);font-size:46px}
+h1{color:var(--gold);margin:5px;font-size:30px}header p{margin:4px;color:#d6c9ac}
+main{max-width:1000px;margin:auto;padding:15px}
+nav,.tools,.selectors,.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+nav{padding:12px 0;border-bottom:1px solid var(--line);margin-bottom:14px}
+button,select,input{font:inherit;color:var(--ink);background:#202821;border:1px solid var(--line);border-radius:11px;padding:10px 12px}
+button{cursor:pointer}button.active{border-color:var(--gold);color:var(--gold)}button.primary{background:var(--green);border-color:#39795b}
+select{flex:1;min-width:0}input{flex:2;min-width:170px}
+.tools{margin-top:10px}.status{text-align:center;color:var(--gold);padding:12px;min-height:35px}
+.heading{text-align:center;margin:14px}.heading h2{font:30px "Amiri Quran",serif;color:var(--gold);margin:0}.heading p,.muted{color:var(--muted);font-size:13px}
+.ayah{background:linear-gradient(145deg,#1b241f,#151b17);border:1px solid #55482e;border-radius:15px;padding:16px;margin:12px 0}
+.ayah-top{display:flex;justify-content:space-between;gap:8px;align-items:center;color:var(--gold);font-size:13px}
+.actions button{font-size:12px;padding:6px 9px;background:#222b25}
+.arabic{font:30px/2.15 "Amiri Quran",serif;text-align:justify;margin:12px 0;color:#fff4dd}
+.translation{border-top:1px solid var(--line);padding-top:10px;line-height:2;font-size:17px;color:#e6dcc8}
+.tafsir{margin-top:10px;padding:12px;background:#111a15;border-radius:10px;line-height:2;white-space:pre-wrap;color:#d6dccc}
+.tafsir[hidden],.hidden{display:none!important}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px;margin:12px 0;line-height:2}
+.empty{text-align:center;color:var(--muted);padding:28px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
+@media(min-width:720px){main{padding:22px}.selectors{display:grid;grid-template-columns:1fr 1fr 1fr}.arabic{font-size:34px}.ayah{padding:22px}}
+</style></head>
 <body>
-<div style="text-align:center; padding:20px;">
-  <img
-    src="709AD636-8802-4B08-BF0B-77F9D5DA9E29.PNG"
-    alt="تدبر القرآن"
-    style="width:85%; max-width:360px; border-radius:20px;"
-  >
-</div>
-<header>
-<h1>تدبّر القرآن</h1>
-<p>قرآن کریم با رسم عثمانی</p>
-</header>
-
+<header><div class="logo">۞</div><h1>تدبّر القرآن</h1><p>قرآن کریم با رسم عثمانی · مطالعه، ترجمه و تدبّر</p></header>
 <main>
-<select id="surah">
-<option>در حال بارگذاری...</option>
-</select>
-
-<input id="search" placeholder="جست‌وجوی آیه..." />
-
-<div id="status">در حال بارگذاری قرآن...</div>
-<div id="verses"></div>
-</main>
-
+<div class="tools" style="justify-content:space-between"><span class="muted" id="connection">آمادهٔ مطالعه</span><button id="install" class="primary" hidden>نصب برنامه</button></div>
+<nav><button class="active" data-tab="reader">قرآن کریم</button><button data-tab="saved">آیات نشان‌شده</button><button data-tab="about">درباره و منابع</button></nav>
+<section id="reader">
+<div class="selectors">
+<select id="surah"><option>در حال دریافت فهرست سوره‌ها…</option></select>
+<select id="translation"><option value="">ترجمه فارسی</option></select>
+<select id="tafsir"><option value="">بدون تفسیر</option></select>
+</div>
+<div class="tools"><input id="search" type="search" placeholder="جست‌وجو در آیات این سوره…"><button id="smaller">A−</button><button id="larger">A+</button><button id="resume">ادامه مطالعه</button></div>
+<div id="status" class="status" role="status">در حال بارگذاری قرآن…</div><div id="heading" class="heading"></div><div id="verses"></div>
+</section>
+<section id="saved" class="hidden"><div class="panel"><h2 style="color:var(--gold)">آیات نشان‌شده</h2><div id="savedList" class="empty">هنوز آیه‌ای نشان نشده است.</div></div></section>
+<section id="about" class="hidden"><div class="panel">
+<h2 style="color:var(--gold)">درباره برنامه</h2>
+<p>این نسخه متن عربی قرآن، ترجمه‌های فارسی و تفسیرهای فارسیِ موجود در منبع داده را نمایش می‌دهد. انتخاب مترجم و مفسر از فهرست سرویس انجام می‌شود.</p>
+<p>ترجمه، برگردان انسانی معناست و جایگزین متن عربی قرآن نیست. برای مطالعه علمی، نام مترجم یا مفسر و منبع هر متن را بررسی کنید.</p>
+<p><a style="color:var(--gold)" href="https://alquran.cloud/api" target="_blank" rel="noopener">منبع داده و مستندات AlQuran Cloud</a></p>
+<p class="muted">برای دریافت نخستین داده‌ها اینترنت لازم است. داده‌هایی که قبلاً بارگیری شده‌اند ممکن است از حافظه مرورگر در دسترس بمانند.</p>
+</div></section>
+</main><footer>به نیت فهم، تدبّر و عمل به آیات قرآن کریم</footer>
 <script>
-const FILE = "./quran-uthmani-structured-v2-min.json";
-
-let Quran = null;
-
-const surahBox = document.getElementById("surah");
-const searchBox = document.getElementById("search");
-const versesBox = document.getElementById("verses");
-const statusBox = document.getElementById("status");
-
-function showVerses() {
-  if (!Quran) return;
-
-  const number = Number(surahBox.value);
-  const word = searchBox.value.trim();
-
-  const info = Quran.surahs.find(
-    s => s.surah === number
-  );
-
-  let verses = Quran.verses.filter(
-    v => v.surah === number
-  );
-
-  if (word) {
-    verses = verses.filter(v =>
-      v.text_uthmani.includes(word) ||
-      String(v.ayah).includes(word)
-    );
-  }
-
-  versesBox.innerHTML = "";
-
-  if (!word && info?.opening_basmala_uthmani) {
-    const b = document.createElement("div");
-    b.className = "basmala";
-    b.textContent = info.opening_basmala_uthmani;
-    versesBox.appendChild(b);
-  }
-
-  verses.forEach(v => {
-    const article = document.createElement("div");
-    article.className = "ayah";
-
-    const p = document.createElement("p");
-    p.textContent = v.text_uthmani + " ";
-
-    const n = document.createElement("span");
-    n.className = "number";
-    n.textContent = "﴿" + v.ayah + "﴾";
-
-    p.appendChild(n);
-    article.appendChild(p);
-    versesBox.appendChild(article);
-  });
-
-  statusBox.textContent =
-    verses.length + " آیه";
+const API="https://api.alquran.cloud/v1", $=id=>document.getElementById(id);
+let surahs=[], verses=[], translationId="", tafsirId="", fontSize=30, verseObserver=null;
+const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
+const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+async function api(path){const r=await fetch(API+path);if(!r.ok)throw Error("خطای ارتباط "+r.status);const j=await r.json();if(j.code!==200)throw Error(j.status||"پاسخ نامعتبر");return j.data}
+function status(t){$("status").textContent=t}
+function option(sel,v,t){const o=document.createElement("option");o.value=v;o.textContent=t;sel.append(o)}
+async function initEditions(){
+ const [tr,tf]=await Promise.allSettled([api("/edition?format=text&language=fa&type=translation"),api("/edition?format=text&language=fa&type=tafsir")]);
+ $("translation").replaceChildren();
+ if(tr.status==="fulfilled"&&tr.value.length){tr.value.forEach(e=>option($("translation"),e.identifier,e.name+" · "+e.englishName));translationId=tr.value[0].identifier;$("translation").value=translationId}
+ else{$("translation").disabled=true;option($("translation"),"","ترجمه فارسی در منبع پیدا نشد")}
+ $("tafsir").replaceChildren();option($("tafsir"),"","بدون نمایش تفسیر");
+ if(tf.status==="fulfilled"&&tf.value.length)tf.value.forEach(e=>option($("tafsir"),e.identifier,e.name+" · "+e.englishName));
+ else{$("tafsir").disabled=true;$("tafsir").options[0].textContent="تفسیر فارسی در منبع پیدا نشد"}
 }
-
-fetch(FILE)
-.then(response => {
-  if (!response.ok) throw new Error("فایل قرآن پیدا نشد");
-  return response.json();
-})
-.then(data => {
-  if (!data.verses || !data.surahs)
-    throw new Error("ساختار اطلاعات نامعتبر است");
-
-  Quran = data;
-  surahBox.innerHTML = "";
-
-  data.surahs.forEach(s => {
-    const option = document.createElement("option");
-    option.value = s.surah;
-    option.textContent =
-      s.surah + " - " + s.name_ar;
-    surahBox.appendChild(option);
-  });
-
-  surahBox.value = "1";
-  showVerses();
-})
-.catch(error => {
-  statusBox.textContent =
-    "خطا در بارگذاری قرآن: " + error.message;
-});
-
-surahBox.addEventListener("change", showVerses);
-searchBox.addEventListener("input", showVerses);
-</script>
-
-</body>
-</html>
+async function initSurahs(){
+ surahs=await api("/surah");$("surah").replaceChildren();
+ surahs.forEach(s=>option($("surah"),s.number,s.number+" ـ "+s.name+" ("+s.englishName+")"));
+ const last=read("tadabbur-last",null);$("surah").value=String(last?.surah||1);
+}
+async function loadSurah(){
+ const n=Number($("surah").value);if(!n)return;
+ status("در حال دریافت آیات سوره…");$("verses").replaceChildren();
+ try{
+  const ids=["quran-uthmani",translationId,tafsirId].filter(Boolean);
+  const data=await api("/surah/"+n+"/editions/"+ids.map(encodeURIComponent).join(","));
+  const editions=Array.isArray(data)?data:[data];
+  const ar=editions.find(x=>x.edition?.identifier==="quran-uthmani")||editions[0];
+  const tr=editions.find(x=>x.edition?.identifier===translationId),tf=editions.find(x=>x.edition?.identifier===tafsirId);
+  verses=(ar.ayahs||[]).map((a,i)=>({global:a.number,n:a.numberInSurah,surah:n,arabic:a.text,translation:tr?.ayahs?.[i]?.text||"",tafsir:tf?.ayahs?.[i]?.text||""}));
+  $("heading").replaceChildren();const h=document.createElement("h2");h.textContent=ar.name||surahs[n-1].name;const p=document.createElement("p");p.textContent=(ar.englishName||surahs[n-1].englishName)+" · "+verses.length+" آیه";$("heading").append(h,p);
+  render();write("tadabbur-last",{surah:n,ayah:1});$("connection").textContent="اطلاعات سوره دریافت شد";
+ }catch(e){status("دریافت نشد: "+e.message+"؛ اتصال اینترنت را بررسی کنید.");$("verses").innerHTML='<div class="empty">متن سوره فعلاً در دسترس نیست. دوباره تلاش کنید.</div>'}
+}
+function render(){
+ const q=$("search").value.trim(), list=verses.filter(v=>!q||v.arabic.includes(q)||v.translation.includes(q)||String(v.n)===q);
+ $("verses").replaceChildren();if(!list.length){$("verses").innerHTML='<div class="empty">آیه‌ای پیدا نشد.</div>';status("۰ آیه");return}
+ const saved=read("tadabbur-saved",[]);
+ list.forEach(v=>{
+  const card=document.createElement("article");card.className="ayah";card.id="ayah-"+v.surah+"-"+v.n;
+  const top=document.createElement("div");top.className="ayah-top";const label=document.createElement("span");label.textContent="سوره "+v.surah+" · آیه "+v.n;
+  const actions=document.createElement("div");actions.className="actions";
+  const mark=document.createElement("button");mark.textContent=saved.some(x=>x.surah===v.surah&&x.ayah===v.n)?"★ نشان‌شده":"☆ نشان";mark.onclick=()=>toggle(v);
+  const play=document.createElement("button");play.textContent="▶ پخش";play.onclick=()=>playAudio(v.global);
+  actions.append(mark,play);top.append(label,actions);
+  const ar=document.createElement("p");ar.className="arabic";ar.style.fontSize=fontSize+"px";ar.textContent=v.arabic+" ۞";card.append(top,ar);
+  if(v.translation){const t=document.createElement("div");t.className="translation";t.textContent=v.translation;card.append(t)}
+  if(tafsirId){const b=document.createElement("button");b.style.marginTop="10px";b.textContent="نمایش تفسیر";const t=document.createElement("div");t.className="tafsir";t.hidden=true;t.textContent=v.tafsir||"متن تفسیر برای این آیه در پاسخ منبع موجود نیست.";b.onclick=()=>{t.hidden=!t.hidden;b.textContent=t.hidden?"نمایش تفسیر":"بستن تفسیر"};card.append(b,t)}
+  $("verses").append(card);
+ });
+ if(verseObserver)verseObserver.disconnect();
+ if("IntersectionObserver" in window){
+  verseObserver=new IntersectionObserver(entries=>{
+   const visible=entries.filter(x=>x.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+   if(visible){const v=verses.find(x=>"ayah-"+x.surah+"-"+x.n===visible.target.id);if(v)write("tadabbur-last",{surah:v.surah,ayah:v.n})}
+  },{threshold:[0.55]});
+  document.querySelectorAll("#verses .ayah").forEach(el=>verseObserver.observe(el));
+ }
+ status(list.length+" آیه نمایش داده شد");
+}
+function toggle(v){let a=read("tadabbur-saved",[]),i=a.findIndex(x=>x.surah===v.surah&&x.ayah===v.n);if(i>=0)a.splice(i,1);else a.push({surah:v.surah,ayah:v.n,arabic:v.arabic,translation:v.translation});write("tadabbur-saved",a);render();renderSaved()}
+function renderSaved(){
+ const box=$("savedList"),a=read("tadabbur-saved",[]);box.replaceChildren();box.className=a.length?"":"empty";
+ if(!a.length){box.textContent="هنوز آیه‌ای نشان نشده است.";return}
+ a.forEach(v=>{const card=document.createElement("article");card.className="ayah";const ar=document.createElement("p");ar.className="arabic";ar.textContent=v.arabic;const tr=document.createElement("p");tr.textContent=v.translation;const go=document.createElement("button");go.textContent="رفتن به آیه";go.onclick=async()=>{document.querySelector('[data-tab="reader"]').click();$("surah").value=v.surah;await loadSurah();$("ayah-"+v.surah+"-"+v.ayah)?.scrollIntoView({behavior:"smooth"})};card.append(ar,tr,go);box.append(card)})
+}
+async function playAudio(number){try{const d=await api("/ayah/"+number+"/ar.alafasy");if(!d.audio)throw Error("فایل صوتی موجود نیست");let a=$("audio");if(!a){a=document.createElement("audio");a.id="audio";a.controls=true;a.style.width="100%";$("status").after(a)}a.src=d.audio;await a.play();status("در حال پخش تلاوت");}catch(e){status("پخش صوت ممکن نشد: "+e.message)}}
+document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("active",x===b));["reader","saved","about"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab));if(b.dataset.tab==="saved")renderSaved()});
+$("surah").onchange=()=>{$("search").value="";loadSurah()};
+$("translation").onchange=()=>{translationId=$("translation").value;loadSurah()};
+$("tafsir").onchange=()=>{tafsirId=$("tafsir").value;loadSurah()};
+$("search").oninput=render;$("larger").onclick=()=>{fontSize=Math.min(46,fontSize+2);document.querySelectorAll(".arabic").forEach(x=>x.style.fontSize=fontSize+"px")};
+$("smaller").onclick=()=>{fontSize=Math.max(22,fontSize-2);document.querySelectorAll(".arabic").forEach(x=>x.style.fontSize=fontSize+"px")};
+$("resume").onclick=()=>{const x=read("tadabbur-last",null);if(x){$("surah").value=x.surah;loadSurah().then(()=>document.getElementById("ayah-"+x.surah+"-"+x.ayah)?.scrollIntoView({behavior:"smooth"}))}};
+let installEvent=null;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvent=e;$("install").hidden=false});
+$("install").onclick=async()=>{if(installEvent){installEvent.prompt();await installEvent.userChoice;installEvent=null;$("install").hidden=true}};
+(async()=>{try{await initEditions();await initSurahs();await loadSurah()}catch(e){status("اتصال به منبع قرآن برقرار نشد: "+e.message)}})();
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+</script></body></html>

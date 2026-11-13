@@ -1,0 +1,12 @@
+{
+  "name": "تدبّر القرآن",
+  "short_name": "تدبر القرآن",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b100f",
+  "theme_color": "#09251c",
+  "description": "قرآن کریم با متن عثمانی، ترجمه و تفسیر"
+}
