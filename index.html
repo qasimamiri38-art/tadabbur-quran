@@ -1,4 +1,4 @@
-<!doctype html>
+  <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
 <title>تدبّر القرآن</title>
-<style>
+<style
 :root{color-scheme:dark;--bg:#0b100f;--panel:#17211b;--gold:#d8b66b;--ink:#f5eddd;--muted:#a9b3aa;--line:#51452d;--green:#164b36}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#14271e,#0b100f 48rem);color:var(--ink);font-family:Vazirmatn,Arial,sans-serif}
 header{text-align:center;padding:calc(20px + env(safe-area-inset-top)) 16px 18px;background:linear-gradient(135deg,#0e2b20,#142018);border-bottom:1px solid var(--gold)}
@@ -59,6 +59,10 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
 <script>
 const API="https://api.alquran.cloud/v1", $=id=>document.getElementById(id);
 let surahs=[], verses=[], translationId="", tafsirId="", fontSize=30, verseObserver=null;
+const localTafsir={
+1:"«الم» از حروف مقطعهٔ آغاز سوره است. مفسران دربارهٔ معنای آن دیدگاه‌های گوناگون دارند و علم کامل به مراد نهایی آن نزد خداوند است.",
+2:"این کتاب بر پیامبر نازل شده است. آیه پیامبر را به استواری در رساندن پیام وحی دعوت می‌کند. قرآن برای هشدار دادن به مردم و یادآوری برای مؤمنان نازل شده است. پیام آن مسئولیت، آگاهی و پایداری در راه حق است."
+};
 const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
 const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 async function api(path){const r=await fetch(API+path);if(!r.ok)throw Error("خطای ارتباط "+r.status);const j=await r.json();if(j.code!==200)throw Error(j.status||"پاسخ نامعتبر");return j.data}
@@ -71,7 +75,9 @@ async function initEditions(){
  else{$("translation").disabled=true;option($("translation"),"","ترجمه فارسی در منبع پیدا نشد")}
  $("tafsir").replaceChildren();option($("tafsir"),"","بدون نمایش تفسیر");
  if(tf.status==="fulfilled"&&tf.value.length)tf.value.forEach(e=>option($("tafsir"),e.identifier,e.name+" · "+e.englishName));
- else{$("tafsir").disabled=true;$("tafsir").options[0].textContent="تفسیر فارسی در منبع پیدا نشد"}
+ else{$("tafsir").disabled=false}
+option($("tafsir"),"local-araf-1-2","تدبر فارسی · اعراف ۱ و ۲");
+tafsirId="local-araf-1-2";$("tafsir").value=tafsirId;
 }
 async function initSurahs(){
  surahs=await api("/surah");$("surah").replaceChildren();
@@ -82,12 +88,12 @@ async function loadSurah(){
  const n=Number($("surah").value);if(!n)return;
  status("در حال دریافت آیات سوره…");$("verses").replaceChildren();
  try{
-  const ids=["quran-uthmani",translationId,tafsirId].filter(Boolean);
+  const ids=["quran-uthmani",translationId,...(tafsirId==="local-araf-1-2"?[]:[tafsirId])].filter(Boolean);
   const data=await api("/surah/"+n+"/editions/"+ids.map(encodeURIComponent).join(","));
   const editions=Array.isArray(data)?data:[data];
   const ar=editions.find(x=>x.edition?.identifier==="quran-uthmani")||editions[0];
   const tr=editions.find(x=>x.edition?.identifier===translationId),tf=editions.find(x=>x.edition?.identifier===tafsirId);
-  verses=(ar.ayahs||[]).map((a,i)=>({global:a.number,n:a.numberInSurah,surah:n,arabic:a.text,translation:tr?.ayahs?.[i]?.text||"",tafsir:tf?.ayahs?.[i]?.text||""}));
+  verses=(ar.ayahs||[]).map((a,i)=>({global:a.number,n:a.numberInSurah,surah:n,arabic:a.text,translation:tr?.ayahs?.[i]?.text||"",tafsir:tf?.ayahs?.[i]?.text||localTafsir[String(a.numberInSurah)]||""
   $("heading").replaceChildren();const h=document.createElement("h2");h.textContent=ar.name||surahs[n-1].name;const p=document.createElement("p");p.textContent=(ar.englishName||surahs[n-1].englishName)+" · "+verses.length+" آیه";$("heading").append(h,p);
   render();write("tadabbur-last",{surah:n,ayah:1});$("connection").textContent="اطلاعات سوره دریافت شد";
  }catch(e){status("دریافت نشد: "+e.message+"؛ اتصال اینترنت را بررسی کنید.");$("verses").innerHTML='<div class="empty">متن سوره فعلاً در دسترس نیست. دوباره تلاش کنید.</div>'}
