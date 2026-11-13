@@ -93,7 +93,7 @@ async function loadSurah(){
   const editions=Array.isArray(data)?data:[data];
   const ar=editions.find(x=>x.edition?.identifier==="quran-uthmani")||editions[0];
   const tr=editions.find(x=>x.edition?.identifier===translationId),tf=editions.find(x=>x.edition?.identifier===tafsirId);
-  verses=(ar.ayahs||[]).map((a,i)=>({global:a.number,n:a.numberInSurah,surah:n,arabic:a.text,translation:tr?.ayahs?.[i]?.text||"",tafsir:tf?.ayahs?.[i]?.text||localTafsir[String(a.numberInSurah)]||""
+  verses=(ar.ayahs||[]).map((a,i)=>({global:a.number,n:a.numberInSurah,surah:n,arabic:a.text,translation:tr?.ayahs?.[i]?.text||"",tafsir:tf?.ayahs?.[i]?.text||localTafsir[String(a.numberInSurah)]||""}));
   $("heading").replaceChildren();const h=document.createElement("h2");h.textContent=ar.name||surahs[n-1].name;const p=document.createElement("p");p.textContent=(ar.englishName||surahs[n-1].englishName)+" · "+verses.length+" آیه";$("heading").append(h,p);
   render();write("tadabbur-last",{surah:n,ayah:1});$("connection").textContent="اطلاعات سوره دریافت شد";
  }catch(e){status("دریافت نشد: "+e.message+"؛ اتصال اینترنت را بررسی کنید.");$("verses").innerHTML='<div class="empty">متن سوره فعلاً در دسترس نیست. دوباره تلاش کنید.</div>'}
