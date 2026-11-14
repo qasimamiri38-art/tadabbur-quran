@@ -46,6 +46,28 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
   border-right:1px solid var(--line);
   padding:10px 14px 0 0;
 }
+/* تبلت و کمپیوتر */
+@media (min-width: 1000px) {
+  main { max-width: 1200px; padding: 28px; }
+  .ayah { padding: 26px; margin: 18px 0; }
+  .arabic { font-size: 38px; }
+  .translation, .tafsir { font-size: 19px; }
+}
+
+/* تلویزیون */
+@media (min-width: 1400px) {
+  main { max-width: 1500px; padding: 36px; }
+  h1 { font-size: 42px; }
+  .arabic { font-size: 46px; line-height: 2.3; }
+  .translation, .tafsir { font-size: 23px; }
+  button, select, input { font-size: 20px; padding: 14px; }
+}
+
+/* کنترل با ریموت */
+button:focus-visible, select:focus-visible, input:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 4px;
+}
 </style></head>
 <body>
 <header><div class="logo" aria-label="نشان تدبر القرآن"><svg viewBox="0 0 100 100" width="68" height="68" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"><path d="M50 5 62 22 84 16 78 38 95 50 78 62 84 84 62 78 50 95 38 78 16 84 22 62 5 50 22 38 16 16 38 22Z"/><path d="M50 25 75 50 50 75 25 50Z"/><circle cx="50" cy="50" r="7"/><path d="M35 38 50 27 65 38M35 62 50 73 65 62"/></svg></div><h1>تدبّر القرآن</h1><p>قرآن کریم با رسم عثمانی · مطالعه، ترجمه و تدبّر</p></header>
