@@ -68,6 +68,11 @@ button:focus-visible, select:focus-visible, input:focus-visible {
   outline: 3px solid var(--gold);
   outline-offset: 4px;
 }
+header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+}
 </style></head>
 <body>
 <header><div class="logo" aria-label="نشان تدبر القرآن"><svg viewBox="0 0 100 100" width="68" height="68" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"><path d="M50 5 62 22 84 16 78 38 95 50 78 62 84 84 62 78 50 95 38 78 16 84 22 62 5 50 22 38 16 16 38 22Z"/><path d="M50 25 75 50 50 75 25 50Z"/><circle cx="50" cy="50" r="7"/><path d="M35 38 50 27 65 38M35 62 50 73 65 62"/></svg></div><h1>تدبّر القرآن</h1><p>قرآن کریم با رسم عثمانی · مطالعه، ترجمه و تدبّر</p></header>
@@ -185,7 +190,12 @@ async function loadSurah(){
 function render(){
  const q=$("search").value.trim(), list=verses.filter(v=>!q||v.arabic.includes(q)||v.translation.includes(q)||String(v.n)===q);
  $("verses").replaceChildren();if(!list.length){$("verses").innerHTML='<div class="empty">آیه‌ای پیدا نشد.</div>';status("۰ آیه");return}
- const saved=read("tadabbur-saved",[]);
+ const saved=read("tadabbur-saved",[]);if(Number($("surah").value)!==1 && Number($("surah").value)!==9){
+  const basmala=document.createElement("div");
+  basmala.className="basmala";
+  basmala.textContent="بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ";
+  $("verses").append(basmala);
+}
  list.forEach(v=>{
   const card=document.createElement("article");card.className="ayah";card.id="ayah-"+v.surah+"-"+v.n;
   const top=document.createElement("div");top.className="ayah-top";const label=document.createElement("span");label.textContent="سوره "+v.surah+" · آیه "+v.n;
