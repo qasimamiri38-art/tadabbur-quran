@@ -148,6 +148,7 @@ function renderSaved(){
 async function playAudio(number){
   try{
     let a=$("audio");
+
     if(!a){
       a=document.createElement("audio");
       a.id="audio";
@@ -156,15 +157,45 @@ async function playAudio(number){
       $("status").after(a);
     }
 
-    const start=verses.findIndex(
+    let index=verses.findIndex(
       v=>Number(v.global)===Number(number)
     );
 
-    if(start<0) throw Error("آیه پیدا نشد");
+    if(index<0) throw Error("آیه پیدا نشد");
 
-    for(let i=start;i<verses.length;i++){
-      const d=await api(
-        "/ayah/"+verses[i].global+"/ar.alafasy"
+    async function playNext(){
+      if(index>=verses.length){
+        a.onended=null;
+        status("تلاوت سوره پایان یافت");
+        return;
+      }
+
+      const v=verses[index];
+      const d=await api("/ayah/"+v.global+"/ar.alafasy");
+
+      if(!d.audio) throw Error("فایل صوتی موجود نیست");
+
+      a.onended=()=>{
+        index++;
+        playNext().catch(e=>{
+          a.onended=null;
+          status("خطا در ادامه تلاوت: "+e.message);
+        });
+      };
+
+      a.src=d.audio;
+      await a.play();
+      status("در حال پخش آیه "+v.n);
+    }
+
+    a.onended=null;
+    await playNext();
+
+  }catch(e){
+    status("پخش صوت ممکن نشد: "+e.message);
+  }
+}
+
       );
 
       if(!d.audio) throw Error("فایل صوتی موجود نیست");
