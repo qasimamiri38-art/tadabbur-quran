@@ -290,4 +290,129 @@ let installEvent=null;window.addEventListener("beforeinstallprompt",e=>{e.preven
 $("install").onclick=async()=>{if(installEvent){installEvent.prompt();await installEvent.userChoice;installEvent=null;$("install").hidden=true}};
 (async()=>{try{await initEditions();await initSurahs();await loadSurah()}catch(e){status("اتصال به منبع قرآن برقرار نشد: "+e.message)}})();
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
-</script></body></html>
+</
+// بازی تعاملی حفظ قرآن
+(function () {
+  let countOne = 0;
+  let countTwo = 0;
+  let score = 0;
+  let quizPassed = false;
+
+  const words = ["قُلْ", "أَعُوذُ", "بِرَبِّ", "النَّاسِ"];
+  let selectedWords = [];
+
+  function updateProgress() {
+    document.getElementById("memorizeProgress").textContent =
+      "امتیاز: " + score +
+      " | تکرار آیه اول: " + countOne +
+      " | تکرار آیه دوم: " + countTwo;
+  }
+
+  // شمارنده تکرار آیه اول
+  document.getElementById("repeatOne").onclick = function () {
+    countOne++;
+    document.getElementById("countOne").textContent =
+      "تعداد تکرار: " + countOne;
+    score++;
+    updateProgress();
+  };
+
+  // شمارنده تکرار آیه دوم
+  document.getElementById("repeatTwo").onclick = function () {
+    countTwo++;
+    document.getElementById("countTwo").textContent =
+      "تعداد تکرار: " + countTwo;
+    score++;
+    updateProgress();
+  };
+
+  // پنهان کردن و نمایش آیه اول
+  document.getElementById("hideOne").onclick = function () {
+    const card = this.closest(".ayah");
+    const hidden = card.querySelector(".arabic").hidden;
+    card.querySelector(".arabic").hidden = !hidden;
+    card.querySelector(".translation").hidden = !hidden;
+    this.textContent = hidden ? "پنهان‌کردن آیه" : "نمایش آیه";
+  };
+
+  // پنهان کردن و نمایش آیه دوم
+  document.getElementById("hideTwo").onclick = function () {
+    const card = this.closest(".ayah");
+    const hidden = card.querySelector(".arabic").hidden;
+    card.querySelector(".arabic").hidden = !hidden;
+    card.querySelector(".translation").hidden = !hidden;
+    this.textContent = hidden ? "پنهان‌کردن آیه" : "نمایش آیه";
+  };
+
+  // ساخت بازی کلمات
+  function shuffleWords() {
+    selectedWords = [];
+    const shuffled = [...words].sort(() => Math.random() - 0.5);
+    const area = document.getElementById("wordGame");
+    area.replaceChildren();
+
+    shuffled.forEach(word => {
+      const button = document.createElement("button");
+      button.textContent = word;
+      button.onclick = function () {
+        if (selectedWords.includes(word)) return;
+        selectedWords.push(word);
+        button.disabled = true;
+        document.getElementById("gameAnswer").textContent =
+          "انتخاب شما: " + selectedWords.join(" ");
+      };
+      area.appendChild(button);
+    });
+
+    document.getElementById("gameAnswer").textContent =
+      "کلمات را به ترتیب درست انتخاب کن.";
+    quizPassed = false;
+  }
+
+  // بررسی پاسخ
+  document.getElementById("checkWords").onclick = function () {
+    const correct = selectedWords.join(" ") === words.join(" ");
+
+    if (correct) {
+      if (!quizPassed) {
+        score += 10;
+        quizPassed = true;
+      }
+      document.getElementById("gameAnswer").textContent =
+        "آفرین! پاسخ درست است. ۱۰ امتیاز گرفتی ⭐";
+    } else {
+      document.getElementById("gameAnswer").textContent =
+        "هنوز درست نیست. دوباره تلاش کن.";
+    }
+
+    updateProgress();
+  };
+
+  // شروع دوباره بازی
+  document.getElementById("resetWords").onclick = shuffleWords;
+
+  // پایان درس
+  document.getElementById("finishLesson").onclick = function () {
+    const stars = Math.min(
+      3,
+      (countOne >= 3 ? 1 : 0) +
+      (countTwo >= 3 ? 1 : 0) +
+      (quizPassed ? 1 : 0)
+    );
+
+    document.getElementById("memorizeStars").textContent =
+      "⭐".repeat(stars) || "هنوز ستاره‌ای نگرفته‌ای.";
+
+    document.getElementById("lessonResult").textContent =
+      stars === 3
+        ? "تبریک! درس امروز را کامل کردی."
+        : "آفرین! برای گرفتن ستاره‌های بیشتر تمرین را ادامه بده.";
+
+    localStorage.setItem("nasLessonScore", score);
+    localStorage.setItem("nasLessonStars", stars);
+  };
+
+  shuffleWords();
+  updateProgress();
+})();
+script></body></html>
