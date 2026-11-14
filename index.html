@@ -85,48 +85,50 @@ button:focus-visible, select:focus-visible, input:focus-visible {
 </section>
 <section id="memorize" class="hidden">
 <div class="panel">
-<h2 style="color:var(--gold)">استاد حفظ القرآن</h2>
-<h3>درس اول: سورهٔ ناس</h3>
-<p>هدف امروز: حفظ دو آیهٔ نخست</p>
-<audio controls preload="none" style="width:100%; margin:16px 0;">
-  <source src="https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/114.mp3" type="audio/mpeg">
-</audio>
-<article class="ayah">
-<p class="arabic">قُلْ أَعُوذُ بِرَبِّ النَّاسِ</p>
-<p class="translation">بگو: به پروردگار مردم پناه می‌برم.</p>
-</article>
+  <h2 style="color:var(--gold)">🎓 استاد حفظ القرآن</h2>
+  <h3>درس اول: سورهٔ ناس</h3>
+  <p>هدف درس: حفظ دو آیهٔ نخست با تلاوت مشاری العفاسی</p>
 
-<article class="ayah">
-<p class="arabic">مَلِكِ النَّاسِ</p>
-<p class="translation">پادشاه مردم.</p>
-</article>
+  <audio id="memorizeAudio" controls preload="none" style="width:100%;margin:12px 0">
+    <source src="https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/114.mp3" type="audio/mpeg">
+  </audio>
 
-<article class="ayah">
-<p class="arabic">إِلَٰهِ النَّاسِ</p>
-<p class="translation">معبود مردم.</p>
-</article>
+  <div class="ayah">
+    <div class="ayah-top"><span>آیهٔ اول</span><span>۱ از ۲</span></div>
+    <p class="arabic">قُلْ أَعُوذُ بِرَبِّ النَّاسِ</p>
+    <p class="translation">بگو: به پروردگار مردم پناه می‌برم.</p>
+    <button id="repeatOne" class="primary">تکرار آیهٔ اول</button>
+    <button id="hideOne">پنهان‌کردن آیه</button>
+    <p id="countOne">تعداد تکرار: ۰</p>
+  </div>
 
-<article class="ayah">
-<p class="arabic">مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ</p>
-<p class="translation">از شر وسوسه‌گر پنهان‌شونده.</p>
-</article>
+  <div class="ayah">
+    <div class="ayah-top"><span>آیهٔ دوم</span><span>۲ از ۲</span></div>
+    <p class="arabic">مَلِكِ النَّاسِ</p>
+    <p class="translation">پادشاه مردم.</p>
+    <button id="repeatTwo" class="primary">تکرار آیهٔ دوم</button>
+    <button id="hideTwo">پنهان‌کردن آیه</button>
+    <p id="countTwo">تعداد تکرار: ۰</p>
+  </div>
 
-<article class="ayah">
-<p class="arabic">الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ</p>
-<p class="translation">همان که در سینه‌های مردم وسوسه می‌کند.</p>
-</article>
+  <div class="panel">
+    <h3>🧠 آزمون حافظه</h3>
+    <p>کلمات آیهٔ اول را به ترتیب درست انتخاب کن:</p>
+    <div id="wordGame" class="tools"></div>
+    <p id="gameAnswer" class="status">هنوز شروع نکرده‌ای.</p>
+    <button id="checkWords" class="primary">بررسی پاسخ</button>
+    <button id="resetWords">شروع دوباره</button>
+  </div>
 
-<article class="ayah">
-<p class="arabic">مِنَ الْجِنَّةِ وَالنَّاسِ</p>
-<p class="translation">چه از جن باشد و چه از انسان.</p>
-</article>
-
-<div class="panel">
-<h3>تمرین امروز</h3>
-<p>۱. آیهٔ اول را سه بار بخوان.</p>
-<p>۲. آیهٔ دوم را سه بار تکرار کن.</p>
-<p>۳. متن را بپوشان و هر دو آیه را از حفظ بخوان.</p>
-<p>۴. فردا دوباره مرور کن.</p>
+  <div class="panel">
+    <h3>⭐ پیشرفت درس</h3>
+    <p id="memorizeProgress">امتیاز: ۰</p>
+    <p id="memorizeStars">هنوز ستاره‌ای نگرفته‌ای.</p>
+    <button id="finishLesson" class="primary">پایان تمرین امروز</button>
+    <p id="lessonResult" class="status">با تمرین شروع کن!</p>
+  </div>
+</div>
+</section>
 </div>
 </div>
 </section><section id="saved" class="hidden"><div class="panel"><h2 style="color:var(--gold)">آیات نشان‌شده</h2><div id="savedList" class="empty">هنوز آیه‌ای نشان نشده است.</div></div></section>
