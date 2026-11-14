@@ -193,7 +193,7 @@ function render(){
   const mark=document.createElement("button");mark.textContent=saved.some(x=>x.surah===v.surah&&x.ayah===v.n)?"★ نشان‌شده":"☆ نشان";mark.onclick=()=>toggle(v);
   const play=document.createElement("button");play.textContent="▶ پخش";play.onclick=()=>playAudio(v.global);
   actions.append(mark,play);top.append(label,actions);
-  coconst content=document.createElement("div");
+  const content=document.createElement("div");
 content.className="ayah-content";
 
 const ar=document.createElement("p");
