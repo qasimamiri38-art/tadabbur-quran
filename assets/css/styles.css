@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#09251c"><meta name="description" content="قرآن کریم با ترجمه و تفسیر برای تدبر">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./assets/css/styles.css">
+<title>تدبّر القرآن</title>
+</head>
+<body>
+<div class="logo" aria-label="نشان تدبر القرآن">
+  <img src="./icon-512.png" alt="تدبر القرآن" style="width:100%;height:100%;object-fit:contain;border-radius:20px;">
+</div>
+<main>
+<div class="tools" style="justify-content:space-between"><span class="muted" id="connection">آمادهٔ مطالعه</span><button id="install" class="primary" hidden>نصب برنامه</button></div>
+<nav><button class="active" data-tab="reader">قرآن کریم</button><button data-tab="memorize">استاد حفظ القرآن</button><button data-tab="saved">آیات نشان‌شده</button><button data-tab="about">درباره</button></nav>
+<section id="reader">
+<div class="selectors">
+<select id="surah"><option>در حال دریافت فهرست سوره‌ها…</option></select>
+<select id="translation"><option value="">ترجمه فارسی</option></select>
+<select id="tafsir"><option value="">بدون تفسیر</option></select>
+</div>
+<div class="tools"><input id="search" type="search" placeholder="جست‌وجو در آیات این سوره…"><button id="smaller">A−</button><button id="larger">A+</button><button id="resume">ادامه</button><button id="playSurah" class="primary">پخش سوره</button></div>
+<div id="status" class="status" role="status">در حال بارگذاری قرآن…</div><div id="heading" class="heading"></div><div id="verses"></div>
+</section>
+<section id="memorize" class="hidden">
+<div class="panel">
+  <h2 style="color:var(--gold)">🎓 استاد حفظ القرآن</h2>
+  <h3>درس اول: سورهٔ ناس</h3>
+  <p>هدف درس: حفظ دو آیهٔ نخست با تلاوت مشاری العفاسی</p>
+
+  <audio id="memorizeAudio" controls preload="none" style="width:100%;margin:12px 0">
+    <source src="https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/114.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="ayah">
+    <div class="ayah-top"><span>آیهٔ اول</span><span>۱ از ۲</span></div>
+    <p class="arabic">قُلْ أَعُوذُ بِرَبِّ النَّاسِ</p>
+    <p class="translation">بگو: به پروردگار مردم پناه می‌برم.</p>
+    <button id="repeatOne" class="primary">تکرار آیهٔ اول</button>
+    <button id="hideOne">پنهان‌کردن آیه</button>
+    <p id="countOne">تعداد تکرار: ۰</p>
+  </div>
+
+  <div class="ayah">
+    <div class="ayah-top"><span>آیهٔ دوم</span><span>۲ از ۲</span></div>
+    <p class="arabic">مَلِكِ النَّاسِ</p>
+    <p class="translation">پادشاه مردم.</p>
+    <button id="repeatTwo" class="primary">تکرار آیهٔ دوم</button>
+    <button id="hideTwo">پنهان‌کردن آیه</button>
+    <p id="countTwo">تعداد تکرار: ۰</p>
+  </div>
+
+  <div class="panel">
+    <h3>🧠 آزمون حافظه</h3>
+    <p>کلمات آیهٔ اول را به ترتیب درست انتخاب کن:</p>
+    <div id="wordGame" class="tools"></div>
+    <p id="gameAnswer" class="status">هنوز شروع نکرده‌ای.</p>
+    <button id="checkWords" class="primary">بررسی پاسخ</button>
+    <button id="resetWords">شروع دوباره</button>
+  </div>
+
+  <div class="panel">
+    <h3>⭐ پیشرفت درس</h3>
+    <p id="memorizeProgress">امتیاز: ۰</p>
+    <p id="memorizeStars">هنوز ستاره‌ای نگرفته‌ای.</p>
+    <button id="finishLesson" class="primary">پایان تمرین امروز</button>
+    <p id="lessonResult" class="status">با تمرین شروع کن!</p>
+  </div>
+</div>
+</section>
+</div>
+</div>
+</section><section id="saved" class="hidden"><div class="panel"><h2 style="color:var(--gold)">آیات نشان‌شده</h2><div id="savedList" class="empty">هنوز آیه‌ای نشان نشده است.</div></div></section>
+<section id="about" class="hidden"><div class="panel">
+<h2 style="color:var(--gold)">درباره برنامه</h2>
+<p>این نسخه متن عربی قرآن، ترجمه‌های فارسی و تفسیرهای فارسیِ موجود در منبع داده را نمایش می‌دهد. انتخاب مترجم، تفسیر و فهرست سوره‌ها از API رسمی می‌آید.</p>
+<p>ترجمه، برگردان انسانی معناست و جایگزین متن عربی قرآن نیست. برای مطالعه علمی، نام مترجم یا مفسر و منبع هر متن باید بررسی شود.</p>
+<p><a style="color:var(--gold)" href="https://alquran.cloud/api" target="_blank" rel="noopener">منبع داده و مستندات AlQuran Cloud</a></p>
+<p class="muted">برای دریافت نخستین داده‌ها اینترنت لازم است. داده‌هایی که قبلاً بارگیری شده‌اند ممکن است از حافظهٔ مرورگر استفاده کنند.</p>
+</div></section>
+</main><footer>به نیت فهم، تدبّر و عمل به آیات قرآن کریم</footer>
+<script src="./assets/js/app.js"></script></body></html>
