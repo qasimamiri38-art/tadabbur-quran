@@ -1,0 +1,18 @@
+# Dependencies and generated output (none are required by the current static app)
+node_modules/
+dist/
+build/
+
+# Local environment and editor files
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
