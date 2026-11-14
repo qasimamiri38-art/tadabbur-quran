@@ -257,7 +257,7 @@ async function playAudio(number){
         return;
       }
 
-      const v=verses[index];
+      const v=verses[index];document.getElementById("ayah-"+v.surah+"-"+v.n)?.scrollIntoView({behavior:"smooth",block:"center"});
       const d=await api("/ayah/"+v.global+"/ar.alafasy");
 
       if(!d.audio) throw Error("فایل صوتی موجود نیست");
