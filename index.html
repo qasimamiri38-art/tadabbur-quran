@@ -290,7 +290,6 @@ let installEvent=null;window.addEventListener("beforeinstallprompt",e=>{e.preven
 $("install").onclick=async()=>{if(installEvent){installEvent.prompt();await installEvent.userChoice;installEvent=null;$("install").hidden=true}};
 (async()=>{try{await initEditions();await initSurahs();await loadSurah()}catch(e){status("اتصال به منبع قرآن برقرار نشد: "+e.message)}})();
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
-</
 // بازی تعاملی حفظ قرآن
 (function () {
   let countOne = 0;
@@ -415,4 +414,4 @@ if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.ser
   shuffleWords();
   updateProgress();
 })();
-script></body></html>
+</script></body></html>
