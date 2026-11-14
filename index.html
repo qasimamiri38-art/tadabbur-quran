@@ -193,8 +193,23 @@ function render(){
   const mark=document.createElement("button");mark.textContent=saved.some(x=>x.surah===v.surah&&x.ayah===v.n)?"★ نشان‌شده":"☆ نشان";mark.onclick=()=>toggle(v);
   const play=document.createElement("button");play.textContent="▶ پخش";play.onclick=()=>playAudio(v.global);
   actions.append(mark,play);top.append(label,actions);
-  const ar=document.createElement("p");ar.className="arabic";ar.style.fontSize=fontSize+"px";ar.textContent=v.arabic+" ۞";card.append(top,ar);
-  if(v.translation){const t=document.createElement("div");t.className="translation";t.textContent=v.translation;card.append(t)}
+  coconst content=document.createElement("div");
+content.className="ayah-content";
+
+const ar=document.createElement("p");
+ar.className="arabic";
+ar.style.fontSize=fontSize+"px";
+ar.textContent=v.arabic+" ۞";
+content.append(ar);
+
+if(v.translation){
+  const t=document.createElement("div");
+  t.className="translation";
+  t.textContent=v.translation;
+  content.append(t);
+}
+
+card.append(top,content);
   if(tafsirId){const b=document.createElement("button");b.style.marginTop="10px";b.textContent="نمایش تفسیر";const t=document.createElement("div");t.className="tafsir";t.hidden=true;t.textContent=v.tafsir||"متن تفسیر برای این آیه در پاسخ منبع موجود نیست.";b.onclick=()=>{t.hidden=!t.hidden;b.textContent=t.hidden?"نمایش تفسیر":"بستن تفسیر"};card.append(b,t)}
   $("verses").append(card);
  });
