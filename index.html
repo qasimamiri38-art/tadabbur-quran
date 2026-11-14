@@ -144,11 +144,9 @@ function renderSaved(){
 }
 
 
+
 async function playAudio(number){
   try{
-    const d=await api("/ayah/"+number+"/ar.alafasy");
-    if(!d.audio) throw Error("فایل صوتی موجود نیست");
-
     let a=$("audio");
     if(!a){
       a=document.createElement("audio");
@@ -158,13 +156,36 @@ async function playAudio(number){
       $("status").after(a);
     }
 
-    a.src=d.audio;
-    await a.play();
-    status("در حال پخش تلاوت");
+    const start=verses.findIndex(
+      v=>Number(v.global)===Number(number)
+    );
+
+    if(start<0) throw Error("آیه پیدا نشد");
+
+    for(let i=start;i<verses.length;i++){
+      const d=await api(
+        "/ayah/"+verses[i].global+"/ar.alafasy"
+      );
+
+      if(!d.audio) throw Error("فایل صوتی موجود نیست");
+
+      const ended=new Promise((resolve,reject)=>{
+        a.onended=resolve;
+        a.onerror=()=>reject(Error("خطا در پخش صوت"));
+      });
+
+      a.src=d.audio;
+      status("در حال پخش آیه "+verses[i].n);
+      await a.play();
+      await ended;
+    }
+
+    status("تلاوت سوره پایان یافت");
   }catch(e){
     status("پخش صوت ممکن نشد: "+e.message);
   }
 }
+
 
 
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("active",x===b));["reader","saved","about"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab));if(b.dataset.tab==="saved")renderSaved()});
