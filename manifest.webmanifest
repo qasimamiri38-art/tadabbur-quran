@@ -1,5 +1,5 @@
 {
-  "name": "تدبّر القرآن",
+  "name": "تدبر القرآن",
   "short_name": "تدبر القرآن",
   "lang": "fa",
   "dir": "rtl",
@@ -8,5 +8,13 @@
   "display": "standalone",
   "background_color": "#0b100f",
   "theme_color": "#09251c",
+  "icons": [
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
   "description": "قرآن کریم با متن عثمانی، ترجمه و تفسیر"
 }
