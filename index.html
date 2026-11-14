@@ -186,6 +186,17 @@ async function playAudio(number){
       };
 
       a.src=d.audio;
+if("mediaSession" in navigator){
+ navigator.mediaSession.metadata=new MediaMetadata({
+  title:"تلاوت قرآن کریم",
+  artist:"تدبّر القرآن",
+  album:"قرآن کریم"
+ });
+ navigator.mediaSession.setActionHandler("play",()=>a.play());
+ navigator.mediaSession.setActionHandler("pause",()=>a.pause());
+ navigator.mediaSession.playbackState="playing";
+}
+
       await a.play();
       status("در حال پخش آیه "+v.n);
     }
