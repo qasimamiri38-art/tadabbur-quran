@@ -142,7 +142,62 @@ function renderSaved(){
  if(!a.length){box.textContent="هنوز آیه‌ای نشان نشده است.";return}
  a.forEach(v=>{const card=document.createElement("article");card.className="ayah";const ar=document.createElement("p");ar.className="arabic";ar.textContent=v.arabic;const tr=document.createElement("p");tr.textContent=v.translation;const go=document.createElement("button");go.textContent="رفتن به آیه";go.onclick=async()=>{document.querySelector('[data-tab="reader"]').click();$("surah").value=v.surah;await loadSurah();$("ayah-"+v.surah+"-"+v.ayah)?.scrollIntoView({behavior:"smooth"})};card.append(ar,tr,go);box.append(card)})
 }
-async function playAudio(number){try{const d=await api("/ayah/"+number+"/ar.alafasy");if(!d.audio)throw Error("فایل صوتی موجود نیست");let a=$("audio");if(!a){a=document.createElement("audio");a.id="audio";a.controls=true;a.style.width="100%";$("status").after(a)}a.src=d.audio;await a.play();status("در حال پخش تلاوت");}catch(e){status("پخش صوت ممکن نشد: "+e.message)}}
+
+async function playAudio(number){
+ try{
+  let a=$("audio");
+  if(!a){
+   a=document.createElement("audio");
+   a.id="audio";
+   a.controls=true;
+   a.style.width="100%";
+   $("status").after(a);
+  }
+
+  const current=verses.find(
+   v=>Number(v.global)===Number(number)
+  );
+
+  const d=await api("/ayah/"+number+"/ar.alafasy");
+  if(!d.audio) throw Error("فایل صوتی موجود نیست");
+
+  const needsBasmala=current &&
+   current.n===1 &&
+   current.surah!==1 &&
+   current.surah!==9;
+
+  let basmala=null;
+
+  if(needsBasmala){
+   const b=await api("/ayah/1/ar.alafasy");
+   if(!b.audio) throw Error("صوت بسم‌الله موجود نیست");
+   basmala=b.audio;
+  }
+
+  const playClip=url=>new Promise((resolve,reject)=>{
+   a.onended=()=>resolve();
+   a.onerror=()=>reject(Error("خطا در پخش صوت"));
+   a.src=url;
+   a.currentTime=0;
+   const p=a.play();
+   if(p) p.catch(reject);
+  });
+
+  if(basmala){
+   status("در حال تلاوت بسم‌الله...");
+   await playClip(basmala);
+  }
+
+  status("در حال پخش تلاوت...");
+  await playClip(d.audio);
+
+  status("پایان تلاوت آیه");
+
+ }catch(e){
+  status("پخش صوت ممکن نشد: "+e.message);
+ }
+}
+
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("active",x===b));["reader","saved","about"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab));if(b.dataset.tab==="saved")renderSaved()});
 $("surah").onchange=()=>{$("search").value="";loadSurah()};
 $("translation").onchange=()=>{translationId=$("translation").value;loadSurah()};
