@@ -275,7 +275,7 @@ status("پخش صوت ممکن نشد: "+e.message);
 }
 }
 
-document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("active",x===b));["reader","saved","about"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab));if(b.dataset.tab==="saved")renderSaved()});
+document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("active",x===b));["reader","memorize","saved","about"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab));if(b.dataset.tab==="saved")renderSaved()});
 $("surah").onchange=()=>{$("search").value="";loadSurah()};
 $("translation").onchange=()=>{translationId=$("translation").value;loadSurah()};
 $("tafsir").onchange=()=>{tafsirId=$("tafsir").value;loadSurah()};
