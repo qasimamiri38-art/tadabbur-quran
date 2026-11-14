@@ -192,32 +192,9 @@ async function playAudio(number){
     await playNext();
 
   }catch(e){
-    status("پخش صوت ممکن نشد: "+e.message);
-  }
+status("پخش صوت ممکن نشد: "+e.message);
 }
-
-      );
-
-      if(!d.audio) throw Error("فایل صوتی موجود نیست");
-
-      const ended=new Promise((resolve,reject)=>{
-        a.onended=resolve;
-        a.onerror=()=>reject(Error("خطا در پخش صوت"));
-      });
-
-      a.src=d.audio;
-      status("در حال پخش آیه "+verses[i].n);
-      await a.play();
-      await ended;
-    }
-
-    status("تلاوت سوره پایان یافت");
-  }catch(e){
-    status("پخش صوت ممکن نشد: "+e.message);
-  }
 }
-
-
 
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("active",x===b));["reader","saved","about"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab));if(b.dataset.tab==="saved")renderSaved()});
 $("surah").onchange=()=>{$("search").value="";loadSurah()};
