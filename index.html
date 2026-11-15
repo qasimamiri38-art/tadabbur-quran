@@ -315,6 +315,7 @@ $("translation").onchange=()=>{translationId=$("translation").value;loadSurah()}
 $("tafsir").onchange=()=>{tafsirId=$("tafsir").value;loadSurah()};
 $("search").oninput=render;$("larger").onclick=()=>{fontSize=Math.min(46,fontSize+2);document.querySelectorAll(".arabic").forEach(x=>x.style.fontSize=fontSize+"px")};
 $("smaller").onclick=()=>{fontSize=Math.max(22,fontSize-2);document.querySelectorAll(".arabic").forEach(x=>x.style.fontSize=fontSize+"px")};
+$("playSurah").onclick=()=>{if(!verses.length){status("ابتدا سوره را بارگذاری کنید.");return;}playAudio(verses[0].global)};
 $("resume").onclick=()=>{const x=read("tadabbur-last",null);if(x){$("surah").value=x.surah;loadSurah().then(()=>document.getElementById("ayah-"+x.surah+"-"+x.ayah)?.scrollIntoView({behavior:"smooth"}))}};
 let installEvent=null;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvent=e;$("install").hidden=false});
 $("install").onclick=async()=>{if(installEvent){installEvent.prompt();await installEvent.userChoice;installEvent=null;$("install").hidden=true}};
