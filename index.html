@@ -208,12 +208,7 @@ async function loadSurah(){
 function render(){
  const q=$("search").value.trim(), list=verses.filter(v=>!q||v.arabic.includes(q)||v.translation.includes(q)||String(v.n)===q);
  $("verses").replaceChildren();if(!list.length){$("verses").innerHTML='<div class="empty">آیه‌ای پیدا نشد.</div>';status("۰ آیه");return}
- const saved=read("tadabbur-saved",[]);if(Number($("surah").value)!==1 && Number($("surah").value)!==9){
-  const basmala=document.createElement("div");
-  basmala.className="basmala";
-  basmala.textContent="بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ";
-  $("verses").append(basmala);
-}
+const saved=read("tadabbur-saved",[]);
  list.forEach(v=>{
   const card=document.createElement("article");card.className="ayah";card.id="ayah-"+v.surah+"-"+v.n;
   const top=document.createElement("div");top.className="ayah-top";const label=document.createElement("span");label.textContent="سوره "+v.surah+" · آیه "+v.n;
