@@ -295,8 +295,41 @@ const localTafsir={
 };
 const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
 const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-async function api(path){const r=await fetch(API+path);if(!r.ok)throw Error("خطای ارتباط "+r.status);const j=await r.json();if(j.code!==200)throw Error(j.status||"پاسخ نامعتبر");return j.data}const DARI_TRANSLATION_ID = "dari_badkhashani";
+async function api(path) {
+  const r = await fetch(API + path);
+  if (!r.ok) throw Error("خطای ارتباط " + r.status);
+  const j = await r.json();
+  if (j.code !== 200) throw Error(j.status || "پاسخ نامعتبر");
+  return j.data;
+}
 
+const DARI_TRANSLATION_ID = "dari_badkhashani";
+
+async function fetchDariSurah(suraNumber) {
+  const url =
+    "https://quranenc.com/api/v1/translation/sura/" +
+    DARI_TRANSLATION_ID + "/" + suraNumber;
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error("ترجمه دری دریافت نشد: " + response.status);
+  }
+
+  const data = await response.json();
+
+  const rows = Array.isArray(data)
+    ? data
+    : (data.result || data.translations || data.data?.result || data.data || []);
+
+  if (!Array.isArray(rows) || !rows.length) {
+    throw new Error("ترجمه دری پیدا نشد");
+  }
+
+  return new Map(
+    rows.map(row => [Number(row.aya), row.translation || ""])
+  );
+}
 async function fetchDariSurah(suraNumber) {
   const url =
     "https://quranenc.com/api/v1/translation/sura/" +
