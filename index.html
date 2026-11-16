@@ -288,6 +288,10 @@ z-index: 998;
 </main><footer>به نیت فهم، تدبّر و عمل به آیات قرآن کریم</footer>
 <script>
 const API="https://api.alquran.cloud/v1", $=id=>document.getElementById(id);
+function status(message){
+  const el=$("status");
+  if(el) el.textContent=message;
+}
 let surahs=[], verses=[], translationId="", tafsirId="", fontSize=30, verseObserver=null;
 const localTafsir={
 1:"«الم» از حروف مقطعهٔ آغاز سوره است. مفسران دربارهٔ معنای آن دیدگاه‌های گوناگون دارند و علم کامل به مراد نهایی آن نزد خداوند است.",
