@@ -138,9 +138,21 @@ z-index: 998;
 </div>
 
 <div class="selectors">
-<select id="surah"><option>در حال دریافت فهرست سوره‌ها…</option></select>
-<select id="translation"><option value="">ترجمه فارسی</option></select>
-<select id="tafsir"><option value="">بدون تفسیر</option></select>
+  <select id="surah">
+    <option>در حال دریافت فهرست سوره‌ها…</option>
+  </select>
+
+  <select id="language" aria-label="زبان ترجمه">
+    <option value="">در حال دریافت زبان‌ها…</option>
+  </select>
+
+  <select id="translation">
+    <option value="">در حال دریافت ترجمه‌ها…</option>
+  </select>
+
+  <select id="tafsir">
+    <option value="">بدون تفسیر</option>
+  </select>
 </div>
 <div class="tools"><input id="search" type="search" placeholder="جست‌وجو در آیات این سوره…"><button id="smaller">A−</button><button id="larger">A+</button><button id="resume">ادامه مطالعه</button><button id="playSurah" class="primary">▶ پخش کامل سوره</button></div>
 <div id="status" class="status" role="status">در حال بارگذاری قرآن…</div><div id="heading" class="heading"></div><div id="verses"></div>
