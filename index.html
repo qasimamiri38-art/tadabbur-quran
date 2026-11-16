@@ -123,8 +123,21 @@ nav {
 <div class="tools"><input id="search" type="search" placeholder="جست‌وجو در آیات این سوره…"><button id="smaller">A−</button><button id="larger">A+</button><button id="resume">ادامه مطالعه</button><button id="playSurah" class="primary">▶ پخش کامل سوره</button></div>
 <div id="status" class="status" role="status">در حال بارگذاری قرآن…</div><div id="heading" class="heading"></div><div id="verses"></div>
 </section>
-<section id="memorize" class="hidden">
-<div class="panel">
+<section id="memorize" class="hidden"><section id="memorize" class="hidden"> 
+<div class="panel"><div class="panel" id="allSurahMemorize">
+  <h2 style="color:var(--gold)">📖 حفظ تمام سوره‌های قرآن</h2>
+  <p>سوره مورد نظر را انتخاب کن تا متن عربی، ترجمه و تلاوت آن نمایش داده شود.</p>
+
+  <select id="memorizeSurah">
+    <option value="">انتخاب سوره</option>
+  </select>
+
+  <audio id="allSurahAudio" controls preload="none"
+         style="width:100%;margin:12px 0">
+  </audio>
+
+  <div id="allSurahAyahs"></div>
+</div>o
   <h2 style="color:var(--gold)">🎓 استاد حفظ القرآن</h2>
   <h3>درس اول: سورهٔ ناس</h3>
   <p>هدف درس: حفظ دو آیهٔ نخست با تلاوت مشاری العفاسی</p>
@@ -191,6 +204,123 @@ const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{retur
 const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 async function api(path){const r=await fetch(API+path);if(!r.ok)throw Error("خطای ارتباط "+r.status);const j=await r.json();if(j.code!==200)throw Error(j.status||"پاسخ نامعتبر");return j.data}
 function status(t){$("status").textContent=t}
+async function initAllSurahMemorize(){
+  const select = $("memorizeSurah");
+  select.replaceChildren();
+
+  surahs.forEach(s=>{
+    option(select,s.number,
+      s.number+" ـ "+s.name+" ("+s.englishName+")"
+    );
+  });
+
+  select.value="114";
+  select.onchange=loadAllSurahMemorize;
+
+  await loadAllSurahMemorize();
+}
+async function loadAllSurahMemorize(){
+  const n=Number($("memorizeSurah").value);
+  if(!n)return;
+
+  const box=$("allSurahAyahs");
+  const audio=$("allSurahAudio");
+
+  box.textContent="در حال دریافت آیات سوره...";
+
+  try{
+    const ids=["quran-uthmani",translationId].filter(Boolean);
+    const data=await api(
+      "/surah/"+n+"/editions/"+
+      ids.map(encodeURIComponent).join(",")
+    );
+
+    const editions=Array.isArray(data)?data:[data];
+    const ar=editions.find(x=>
+      x.edition.identifier==="quran-uthmani"
+    );
+    const tr=editions.find(x=>
+      x.edition.identifier===translationId
+    );
+
+    if(!ar)throw Error("متن عربی دریافت نشد");
+
+    audio.src=
+      "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/"+n+".mp3";
+
+    box.replaceChildren();
+
+    ar.ayahs.forEach((a,i)=>{
+      const card=document.createElement("div");
+      card.className="ayah";
+
+      const arabic=document.createElement("p");
+      arabic.className="arabic";
+      arabic.textContent=a.text;
+
+      const translation=document.createElement("p");
+      translation.className="translation";
+      translation.textContent=tr?.ayahs?.[i]?.text||"";
+
+      card.append(arabic,translation);
+      box.append(card);
+    });
+
+  }catch(e){
+    box.textContent="خطا در دریافت سوره: "+e.message;
+  }
+}
+async function loadAllSurahMemorize(){
+  const n=Number($("memorizeSurah").value);
+  if(!n)return;
+
+  const box=$("allSurahAyahs");
+  const audio=$("allSurahAudio");
+
+  box.textContent="در حال دریافت آیات سوره...";
+
+  try{
+    const ids=["quran-uthmani",translationId].filter(Boolean);
+    const data=await api(
+      "/surah/"+n+"/editions/"+
+      ids.map(encodeURIComponent).join(",")
+    );
+
+    const editions=Array.isArray(data)?data:[data];
+    const ar=editions.find(x=>
+      x.edition.identifier==="quran-uthmani"
+    );
+    const tr=editions.find(x=>
+      x.edition.identifier===translationId
+    );
+
+    if(!ar)throw Error("متن عربی دریافت نشد");
+
+    audio.src=
+      "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/"+n+".mp3";
+
+    box.replaceChildren();
+
+    ar.ayahs.forEach((a,i)=>{
+      const card=document.createElement("div");
+      card.className="ayah";
+
+      const arabic=document.createElement("p");
+      arabic.className="arabic";
+      arabic.textContent=a.text;
+
+      const translation=document.createElement("p");
+      translation.className="translation";
+      translation.textContent=tr?.ayahs?.[i]?.text||"";
+
+      card.append(arabic,translation);
+      box.append(card);
+    });
+
+  }catch(e){
+    box.textContent="خطا در دریافت سوره: "+e.message;
+  }
+}
 function option(sel,v,t){const o=document.createElement("option");o.value=v;o.textContent=t;sel.append(o)}
 async function initEditions(){
  const [tr,tf]=await Promise.allSettled([api("/edition?format=text&language=fa&type=translation"),api("/edition?format=text&language=fa&type=tafsir")]);
@@ -344,7 +474,7 @@ $("playSurah").onclick=()=>{const n=Number($("surah").value);if(!n)return;let a=
 $("resume").onclick=()=>{const x=read("tadabbur-last",null);if(x){$("surah").value=x.surah;loadSurah().then(()=>document.getElementById("ayah-"+x.surah+"-"+x.ayah)?.scrollIntoView({behavior:"smooth"}))}};
 let installEvent=null;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvent=e;$("install").hidden=false});
 $("install").onclick=async()=>{if(installEvent){installEvent.prompt();await installEvent.userChoice;installEvent=null;$("install").hidden=true}};
-(async()=>{try{await initEditions();await initSurahs();await loadSurah()}catch(e){status("اتصال به منبع قرآن برقرار نشد: "+e.message)}})();
+(async()=>{try{await initEditions();await initSurahs();await initAllSurahMemorize();await loadSurah()}catch(e){status("اتصال به منبع قرآن برقرار نشد: "+e.message)}})();
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 // بازی تعاملی حفظ قرآن
 (function () {
