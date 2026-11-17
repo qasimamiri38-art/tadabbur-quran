@@ -671,8 +671,21 @@ status("پخش صوت ممکن نشد: "+e.message);
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("active",x===b));["reader","reciters","memorize","saved","about"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab));if(b.dataset.tab==="saved")renderSaved()});
 
 $("surah").onchange=()=>{$("search").value="";loadSurah()};
-$("translation").onchange=()=>{translationId=$("translation").value;loadSurah()};
-$("tafsir").onchange=()=>{tafsirId=$("tafsir").value;loadSurah()};
+const translationControl=$("translation");
+if(translationControl){
+  translationControl.onchange=()=>{
+    translationId=translationControl.value;
+    loadSurah();
+  };
+}
+
+const tafsirControl=$("tafsir");
+if(tafsirControl){
+  tafsirControl.onchange=()=>{
+    tafsirId=tafsirControl.value;
+    loadSurah();
+  };
+}
 $("search").oninput=render;$("larger").onclick=()=>{fontSize=Math.min(46,fontSize+2);document.querySelectorAll(".arabic").forEach(x=>x.style.fontSize=fontSize+"px")};
 $("smaller").onclick=()=>{fontSize=Math.max(22,fontSize-2);document.querySelectorAll(".arabic").forEach(x=>x.style.fontSize=fontSize+"px")};
 $("playSurah").onclick=async()=>{
