@@ -99,7 +99,17 @@ z-index: 998;
   width: 100%;
   min-width: 0;
 }
-
+/* صفحه اصلی تدبر القرآن */
+#home{padding:10px 0 24px}
+.home-welcome{padding:22px;background:linear-gradient(120deg,#0d3928,#174b36);border:1px solid #327d5b;border-radius:20px;margin:12px 0}
+.home-welcome h2{color:#f7e8c1}
+.home-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:26px 0}
+.home-tile{background:#20372a;border:1px solid #42684e;border-radius:16px;padding:16px 5px;text-align:center}
+.home-tile span{display:block;font-size:30px;margin-bottom:8px}
+.home-panel{background:#18231d;border:1px solid #31533e;border-radius:18px;padding:16px;margin:12px 0}
+.home-panel[hidden]{display:none}
+.home-button{background:#078e5d;border:1px solid #1ac58a;color:white;border-radius:12px;padding:10px 15px}
+@media(max-width:600px){.home-tiles{gap:6px}.home-tile{font-size:12px;padding:12px 3px}}
 </style></head>
 <body>
 <header>
@@ -113,7 +123,13 @@ z-index: 998;
 </header>
 <main>
 <div class="tools" style="justify-content:space-between"><span class="muted" id="connection">آمادهٔ مطالعه</span><button id="install" class="primary" hidden>نصب برنامه</button></div>
-<nav><button class="active" data-tab="reader">قرآن کریم</button><button data-tab="reciters">🎙️ کتابخانه قاریان</button><button data-tab="memorize">استاد حفظ القرآن</button><button data-tab="saved">آیات نشان‌شده</button><button data-tab="about">درباره و منابع</button></nav>
+<nav><button data-tab="home">🏠 خانه</button>button class="active" data-tab="reader">قرآن کریم</button><button data-tab="reciters">🎙️ کتابخانه قاریان</button><button data-tab="memorize">استاد حفظ القرآن</button><button data-tab="saved">آیات نشان‌شده</button><button data-tab="about">درباره و منابع</button></nav>
+<section id="home">
+  <div class="home-welcome">
+    <h2>السلام علیکم 🌙</h2>
+    <p>به خانهٔ تدبّر القرآن خوش آمدید</p>
+  </div>
+</section>
 <section id="reader">
   
 <div class="panel">
@@ -514,7 +530,7 @@ async function loadSurah() {
       '<div class="empty">متن سوره فعلاً در دسترس نیست. اتصال اینترنت را بررسی کنید.</div>';
   }
   }
-
+  }
 function render() {
  const q=$("search").value.trim(), list=verses.filter(v=>!q||v.arabic.includes(q)||v.translation.includes(q)||String(v.n)===q);
  $("verses").replaceChildren();if(!list.length){$("verses").innerHTML='<div class="empty">آیه‌ای پیدا نشد.</div>';status("۰ آیه");return}
