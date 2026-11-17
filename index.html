@@ -293,6 +293,33 @@ function status(message){
   if(el) el.textContent=message;
 }
 let surahs=[], verses=[], translationId="", tafsirId="", fontSize=30, verseObserver=null;
+
+let selectedReciter = localStorage.getItem("selectedReciter") || "ar.alafasy";
+
+const reciterNames = {
+  "عبدالباسط عبدالصمد": "ar.abdulbasitmurattal",
+  "مشاری العفاسی": "ar.alafasy",
+  "محمود خلیل الحصری": "ar.husary"
+};
+
+document.querySelectorAll(".reciter-choice").forEach(button => {
+  button.onclick = function () {
+    const name = this.dataset.reciter;
+
+    if (name === "برکت‌الله سلیم") {
+      window.open("https://bayyinat.org/?page_id=336", "_blank");
+      return;
+    }
+
+    selectedReciter = reciterNames[name];
+    localStorage.setItem("selectedReciter", selectedReciter);
+
+    document.getElementById("selectedReciter").textContent =
+      "قاری انتخاب‌شده: " + name;
+
+    alert("قاری انتخاب شد: " + name);
+  };
+});
 const localTafsir={
 1:"«الم» از حروف مقطعهٔ آغاز سوره است. مفسران دربارهٔ معنای آن دیدگاه‌های گوناگون دارند و علم کامل به مراد نهایی آن نزد خداوند است.",
 2:"این کتاب بر پیامبر نازل شده است. آیه پیامبر را به استواری در رساندن پیام وحی دعوت می‌کند. قرآن برای هشدار دادن به مردم و یادآوری برای مؤمنان نازل شده است. پیام آن مسئولیت، آگاهی و پایداری در راه حق است."
@@ -564,7 +591,7 @@ async function playAudio(number){
       }
 
       const v=verses[index];document.getElementById("ayah-"+v.surah+"-"+v.n)?.scrollIntoView({behavior:"smooth",block:"center"});
-      const d=await api("/ayah/"+v.global+"/ar.alafasy");
+      const d=await api("/ayah/"+v.global+"/"+selectedReciter);
 
       if(!d.audio) throw Error("فایل صوتی موجود نیست");
 
