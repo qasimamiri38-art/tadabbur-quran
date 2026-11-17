@@ -430,16 +430,41 @@ async function loadAllSurahMemorize() {
 
 
 function option(sel,v,t){const o=document.createElement("option");o.value=v;o.textContent=t;sel.append(o)}
-async function initEditions(){
- const [tr,tf]=await Promise.allSettled([api("/edition?format=text&language=fa&type=translation"),api("/edition?format=text&language=fa&type=tafsir")]);
- $("translation").replaceChildren();
- if(tr.status==="fulfilled"&&tr.value.length){tr.value.forEach(e=>option($("translation"),e.identifier,e.name+" · "+e.englishName));translationId=tr.value[0].identifier;$("translation").value=translationId}
- else{$("translation").disabled=true;option($("translation"),"","ترجمه فارسی در منبع پیدا نشد")}
- $("tafsir").replaceChildren();option($("tafsir"),"","بدون نمایش تفسیر");
- if(tf.status==="fulfilled"&&tf.value.length)tf.value.forEach(e=>option($("tafsir"),e.identifier,e.name+" · "+e.englishName));
- else{$("tafsir").disabled=false}
-option($("tafsir"),"local-araf-1-2","تدبر فارسی · اعراف ۱ و ۲");
-tafsirId="local-araf-1-2";$("tafsir").value=tafsirId;
+async function initEditions() {
+  const translationSelect = $("translation");
+  const tafsirSelect = $("tafsir");
+
+  const [tr, tf] = await Promise.allSettled([
+    api("/edition?format=text&language=fa&type=translation"),
+    api("/edition?format=text&language=fa&type=tafsir")
+  ]);
+
+  if (translationSelect) {
+    translationSelect.replaceChildren();
+
+    if (tr.status === "fulfilled" && tr.value.length) {
+      tr.value.forEach(e =>
+        option(translationSelect, e.identifier, e.name)
+      );
+      translationId = tr.value[0].identifier;
+    }
+  }
+
+  if (tafsirSelect) {
+    tafsirSelect.replaceChildren();
+    option(tafsirSelect, "", "بدون نمایش تفسیر");
+
+    if (tf.status === "fulfilled" && tf.value.length) {
+      tf.value.forEach(e =>
+        option(tafsirSelect, e.identifier, e.name)
+      );
+    }
+
+    option(tafsirSelect, "local-araf-1-2", "تدبر اعراف ۱ و ۲");
+    tafsirSelect.value = "local-araf-1-2";
+  }
+
+  tafsirId = "local-araf-1-2";
 }
 async function initSurahs(){
  surahs=await api("/surah");$("surah").replaceChildren();
