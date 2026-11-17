@@ -530,7 +530,6 @@ async function loadSurah() {
       '<div class="empty">متن سوره فعلاً در دسترس نیست. اتصال اینترنت را بررسی کنید.</div>';
   }
   }
-  }
 function render() {
  const q=$("search").value.trim(), list=verses.filter(v=>!q||v.arabic.includes(q)||v.translation.includes(q)||String(v.n)===q);
  $("verses").replaceChildren();if(!list.length){$("verses").innerHTML='<div class="empty">آیه‌ای پیدا نشد.</div>';status("۰ آیه");return}
