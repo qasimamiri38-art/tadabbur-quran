@@ -305,8 +305,33 @@ z-index: 998;
     <button class="primary reciter-choice" data-reciter="برکت‌الله سلیم">انتخاب این قاری</button>
   </div>
 </section>
-
-</main><footer>به نیت فهم، تدبّر و عمل به آیات قرآن کریم</footer>
+<section id="prayer" class="hidden">
+  <div class="panel">
+    <h2 style="color:var(--gold)">🕌 اوقات نماز و اذان</h2>
+    <p class="muted">برای محاسبهٔ اوقات نماز، موقعیت مکانی را فعال کن.</p>
+    <button id="prayerLocate" class="primary">📍 دریافت اوقات نماز</button>
+    <p id="prayerStatus" class="status">منتظر دریافت موقعیت</p>
+    <div id="prayerTimes" hidden>
+      <p>صبح: <b id="pt-Fajr"></b></p>
+      <p>طلوع آفتاب: <b id="pt-Sunrise"></b></p>
+      <p>ظهر: <b id="pt-Dhuhr"></b></p>
+      <p>عصر: <b id="pt-Asr"></b></p>
+      <p>مغرب: <b id="pt-Maghrib"></b></p>
+      <p>عشا: <b id="pt-Isha"></b></p>
+    </div>
+  </div>
+  <div class="panel">
+    <h2 style="color:var(--gold)">🧭 قطب‌نمای قبله</h2>
+    <button id="compassStart" class="primary">فعال‌کردن قطب‌نما</button>
+    <p id="qiblaStatus" class="status">ابتدا موقعیت را دریافت کن.</p>
+    <div style="text-align:center;font-size:65px;color:var(--gold)">
+      🧭
+    </div>
+    <p id="qiblaDegrees" class="status"></p>
+  </div>
+</section>
+</main>
+<footer>به نیت فهم، تدبّر و عمل به آیات قرآن کریم</footer>
 <script>
 const API="https://api.alquran.cloud/v1", $=id=>document.getElementById(id);
 function status(message){
@@ -834,6 +859,100 @@ if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.ser
   shuffleWords();
   updateProgress();
 })();
+
+// اوقات نماز و جهت قبله
+(() => {
+  const locate = document.getElementById("prayerLocate");
+  const status = document.getElementById("prayerStatus");
+  const timesBox = document.getElementById("prayerTimes");
+  const qiblaStatus = document.getElementById("qiblaStatus");
+  const qiblaDegrees = document.getElementById("qiblaDegrees");
+  const compass = document.getElementById("compassStart");
+
+  if (!locate || !status) return;
+
+  let direction = null;
+
+  locate.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      status.textContent = "موقعیت مکانی در این مرورگر پشتیبانی نمی‌شود.";
+      return;
+    }
+
+    status.textContent = "در حال دریافت موقعیت و محاسبه...";
+    locate.disabled = true;
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+
+      try {
+        const url = `https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=2&school=1`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Prayer API error");
+
+        const result = await response.json();
+        const timings = result.data.timings;
+
+        ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"].forEach((name) => {
+          const el = document.getElementById("pt-" + name);
+          if (el) el.textContent = timings[name] || "—";
+        });
+
+        timesBox.hidden = false;
+        status.textContent = "اوقات نماز بر اساس موقعیت شما محاسبه شد.";
+
+        const qResponse = await fetch(
+          `https://api.aladhan.com/v1/qibla/${lat}/${lon}`
+        );
+        if (!qResponse.ok) throw new Error("Qibla API error");
+
+        const qResult = await qResponse.json();
+        direction = qResult.data.direction;
+
+        qiblaDegrees.textContent =
+          "جهت قبله: " + direction.toFixed(1) + " درجه از شمال";
+
+        qiblaStatus.textContent =
+          "برای استفاده از قطب‌نما، دکمهٔ فعال‌سازی را بزنید.";
+
+      } catch (error) {
+        status.textContent = "محاسبه انجام نشد؛ اتصال اینترنت را بررسی کنید.";
+      } finally {
+        locate.disabled = false;
+      }
+    }, () => {
+      status.textContent = "اجازهٔ دسترسی به موقعیت مکانی را فعال کنید.";
+      locate.disabled = false;
+    }, { enableHighAccuracy: true, timeout: 15000 });
+  });
+
+  compass.addEventListener("click", async () => {
+    if (direction === null) {
+      qiblaStatus.textContent = "ابتدا اوقات نماز و موقعیت را دریافت کنید.";
+      return;
+    }
+
+    if (typeof DeviceOrientationEvent === "undefined") {
+      qiblaStatus.textContent = "قطب‌نمای این دستگاه پشتیبانی نمی‌شود.";
+      return;
+    }
+
+    if (typeof DeviceOrientationEvent.requestPermission === "function") {
+      try {
+        const permission = await DeviceOrientationEvent.requestPermission();
+        if (permission !== "granted") throw new Error("Permission denied");
+      } catch {
+        qiblaStatus.textContent = "اجازهٔ قطب‌نما داده نشد.";
+        return;
+      }
+    }
+
+    qiblaStatus.textContent =
+      "جهت قبله نسبت به شمال: " + direction.toFixed(1) + " درجه";
+  });
+})();
+
 </script><script>/* Tadabbur Quran – Reciter Library Add-on
    Paste this file's contents into index.html immediately before </body>.
    It rebuilds the navigation and the large four-reciter photo gallery. */
@@ -979,7 +1098,7 @@ if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.ser
   if (connectionBar) connectionBar.after(nav);
   else main.prepend(nav);
 
-  const pageIds = ["home", "reader", "prayer", "reciters", "memorize", "saved", "about"];
+  const pageIds = ["home", "reader", "prayer", "reciters", "memorize", "saved", "about";]
   function showPage(pageId) {
     pageIds.forEach((id) => {
       const section = byId(id);
