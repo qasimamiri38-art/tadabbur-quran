@@ -1000,6 +1000,30 @@ if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.ser
 
   // Add a direct route from the welcome screen to the large reciter gallery.
   const home = byId("home");
+if (home && !home.querySelector("#homeAirPlay")) {
+  const tvButton = document.createElement("button");
+  tvButton.id = "homeAirPlay";
+  tvButton.type = "button";
+  tvButton.textContent = "📺 انتقال به تلویزیون · AirPlay";
+
+  tvButton.style.cssText =
+    "display:block;width:100%;padding:17px;margin:16px 0;" +
+    "background:#174b36;color:#e5c477;border:2px solid #c9a653;" +
+    "border-radius:16px;font-size:18px;font-weight:bold;";
+
+  tvButton.onclick = () => {
+    alert(
+      "برای انتقال تدبر القرآن به تلویزیون:\n\n" +
+      "۱. از گوشه بالای راست آیفون به پایین بکش.\n" +
+      "۲. Screen Mirroring را انتخاب کن.\n" +
+      "۳. تلویزیون خود را انتخاب کن.\n" +
+      "۴. حالا صفحه اپ روی تلویزیون نمایش داده می‌شود."
+    );
+  };
+
+  home.appendChild(tvButton);
+}
+
   if (home && !home.querySelector(".home-reciter-link")) {
     const shortcut = document.createElement("div");
     shortcut.className = "home-reciter-link";
