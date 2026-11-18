@@ -974,12 +974,12 @@ if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.ser
     <button type="button" data-page="memorize">استاد حفظ القرآن</button>
     <button type="button" data-page="saved">☆ آیات نشان‌شده</button>
     <button type="button" data-page="about">درباره و منابع</button>
-  `;
+  `;<button type="button" data-page="prayer">🕌 اذان و قبله</button>
   const connectionBar = main.querySelector("#connection")?.closest(".tools");
   if (connectionBar) connectionBar.after(nav);
   else main.prepend(nav);
 
-  const pageIds = ["home", "reader", "reciters", "memorize", "saved", "about"];
+  const pageIds = ["home", "reader", "prayer", "reciters", "memorize", "saved", "about"];
   function showPage(pageId) {
     pageIds.forEach((id) => {
       const section = byId(id);
