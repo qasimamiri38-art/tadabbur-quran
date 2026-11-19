@@ -27,7 +27,8 @@
 
       const section = document.getElementById("reciters");
       const status = document.getElementById("reciterStatus");
-
+const reader = document.getElementById("reader");
+document.querySelector('#tadabburNavigation button[data-page="reader"]')?.click();
       section.querySelectorAll(".reciter-card").forEach(item => {
         item.classList.toggle("selected", item === card);
       });
@@ -73,7 +74,7 @@
         audio.style.width = "100%";
 
         player.append(title, select, audio);
-        section.appendChild(player);
+        reader.insertBefore(player, reader.querySelector(".selectors"));
 
         const playJuz = () => {
           const juz = select.value;
