@@ -155,3 +155,22 @@
     }
   }, true);
 })();
+/* فقط یک تلاوت در هر زمان */
+(function () {
+  "use strict";
+
+  if (window.__tadabburSingleAudioGuard) return;
+  window.__tadabburSingleAudioGuard = true;
+
+  document.addEventListener("play", function (event) {
+    const playingAudio = event.target;
+
+    if (!playingAudio || playingAudio.tagName !== "AUDIO") return;
+
+    document.querySelectorAll("audio").forEach(function (audio) {
+      if (audio !== playingAudio && !audio.paused) {
+        audio.pause();
+      }
+    });
+  }, true);
+})();
