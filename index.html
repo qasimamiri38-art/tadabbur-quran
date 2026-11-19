@@ -998,20 +998,30 @@ if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.ser
       border:1px solid var(--gold,#d8b66b);
       background:linear-gradient(135deg,#123b2b,#17211b);
     }
-    nav.innerHTML = `
-  <button type="button" data-page="home" class="active">🏠 خانه</button>
-  <button type="button" data-page="reader">📖 قرآن کریم</button>
-  <button type="button" data-page="prayer">🕌 اذان و قبله</button>
-  <button type="button" data-page="reciters">🎙️ کتابخانه قاریان</button>
-  <button type="button" data-page="memorize">استاد حفظ القرآن</button>
-  <button type="button" data-page="saved">☆ آیات نشان‌شده</button>
-  <button type="button" data-page="about">درباره و منابع</button>
-`;
-const connectionBar = main.querySelector("#connection")?.closest(".tools");
-if (connectionBar) connectionBar.after(nav);
-else main.prepend(nav);
+      `;
+  document.head.appendChild(style);
 
-const pageIds = ["home", "reader", "prayer", "reciters", "memorize", "saved", "about"];
+  const oldNav = main.querySelector("#tadabburNavigation");
+  if (oldNav) oldNav.remove();
+
+  const nav = document.createElement("nav");
+  nav.id = "tadabburNavigation";
+
+  nav.innerHTML = `
+    <button type="button" data-page="home" class="active">🏠 خانه</button>
+    <button type="button" data-page="reader">📖 قرآن کریم</button>
+    <button type="button" data-page="prayer">🕌 اذان و قبله</button>
+    <button type="button" data-page="reciters">🎙️ کتابخانه قاریان</button>
+    <button type="button" data-page="memorize">استاد حفظ القرآن</button>
+    <button type="button" data-page="saved">☆ آیات نشان‌شده</button>
+    <button type="button" data-page="about">درباره و منابع</button>
+  `;
+
+  const connectionBar = main.querySelector("#connection")?.closest(".tools");
+  if (connectionBar) connectionBar.after(nav);
+  else main.prepend(nav);
+
+  const pageIds = ["home", "reader", "prayer", "reciters", "memorize", "saved", "about"];
   
   function showPage(pageId) {
     pageIds.forEach((id) => {
