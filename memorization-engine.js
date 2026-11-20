@@ -204,7 +204,7 @@ if (allSurahPanel) root.append(allSurahPanel);
         counts[i] = (counts[i] || 0) + 1;
         count.textContent = "تکرار: " + counts[i];
         updateScore();
-        playVerse(i, 1);
+        playVerse(i, 3);
       };
 
       const toggle = document.createElement("button");
