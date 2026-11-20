@@ -1164,11 +1164,62 @@ if (home && !home.querySelector("#homeAirPlay")) {
       const edition = card.dataset.edition;
       const name = card.dataset.name;
 
-      if (edition === "barakatullah") {
-        message.textContent = "منبع بینات باز می‌شود؛ در آن‌جا یکی از ۳۰ سپارهٔ تلاوت همراه ترجمهٔ دری را انتخاب کن.";
-        window.open("https://bayyinat.org/?page_id=336", "_blank", "noopener");
-        return;
-      }
+      
+if (edition === "barakatullah") {
+  cards.forEach((other) =>
+    other.classList.toggle("selected", other === card)
+  );
+
+  localStorage.setItem("selectedReciter", edition);
+
+  let juzSelect = document.getElementById("barakatJuzSelect");
+
+  if (!juzSelect) {
+    juzSelect = document.createElement("select");
+    juzSelect.id = "barakatJuzSelect";
+    juzSelect.style.cssText =
+      "display:block;width:100%;padding:12px;margin:12px 0;border-radius:12px;background:#183126;color:white;border:1px solid #8c7540;font-size:16px;";
+
+    juzSelect.innerHTML =
+      '<option value="">انتخاب سپاره</option>';
+
+    for (let i = 1; i <= 30; i++) {
+      const option = document.createElement("option");
+      option.value = i;
+      option.textContent = "سپاره " + i;
+      juzSelect.appendChild(option);
+    }
+
+    audio.parentElement.insertBefore(juzSelect, audio);
+
+    juzSelect.addEventListener("change", () => {
+      const juz = Number(juzSelect.value);
+      if (!juz) return;
+
+      audio.pause();
+      audio.src =
+        "https://bayyinat.org/Surah/Quran/Juz" +
+        String(juz).padStart(2, "0") + ".mp3";
+
+      audio.load();
+
+      message.textContent =
+        "تلاوت استاد برکت‌الله سلیم · سپاره " + juz;
+
+      audio.play().catch(() => {
+        message.textContent =
+          "برای آغاز تلاوت، دکمهٔ پخش را لمس کن.";
+      });
+    });
+  }
+
+  juzSelect.value = "";
+  message.textContent = "استاد برکت‌الله سلیم انتخاب شد؛ سپارهٔ مورد نظر را انتخاب کن.";
+  return;
+}
+
+document.getElementById("barakatJuzSelect")?.remove();
+
 
       cards.forEach((other) => other.classList.toggle("selected", other === card));
       localStorage.setItem("selectedReciter", edition);
