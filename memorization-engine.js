@@ -48,7 +48,7 @@ root.innerHTML = `
         <p id="memSaved" class="status">پیشرفت پس از پایان تمرین در همین دستگاه ثبت می‌شود.</p>
       </div>
     </div>`;
-if (allSurahPanel) root.prepend(allSurahPanel);
+if (allSurahPanel) root.append(allSurahPanel);
   const mode = $("memMode"), source = $("memSource"), audio = $("memAudio");
 
   async function getData(url) {
