@@ -148,9 +148,9 @@ nav {
     <option value="">در حال دریافت زبان‌ها…</option>
   </select>
 
-  <select id="translation">
-    <option value="">در حال دریافت ترجمه‌ها…</option>
-  </select>
+  <select id="translation" disabled>
+  <option value="dari_badkhashani">ترجمه دری بدخشیانی</option>
+</select>
 
   <select id="tafsir">
     <option value="">بدون تفسیر</option>
@@ -453,15 +453,9 @@ async function initEditions() {
   ]);
 
   if (translationSelect) {
-    translationSelect.replaceChildren();
-
-    if (tr.status === "fulfilled" && tr.value.length) {
-      tr.value.forEach(e =>
-        option(translationSelect, e.identifier, e.name)
-      );
-      translationId = tr.value[0].identifier;
-    }
-  }
+  translationSelect.value = DARI_TRANSLATION_ID;
+  translationId = DARI_TRANSLATION_ID;
+}
 
   if (tafsirSelect) {
     tafsirSelect.replaceChildren();
