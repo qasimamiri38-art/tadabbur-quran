@@ -613,7 +613,9 @@ function toggle(v){let a=read("tadabbur-saved",[]),i=a.findIndex(x=>x.surah===v.
 function renderSaved(){
  const box=$("savedList"),a=read("tadabbur-saved",[]);box.replaceChildren();box.className=a.length?"":"empty";
  if(!a.length){box.textContent="هنوز آیه‌ای نشان نشده است.";return}
- a.forEach(v=>{const card=document.createElement("article");card.className="ayah";const ar=document.createElement("p");ar.className="arabic";ar.textContent=v.arabic;const tr=document.createElement("p");tr.textContent=v.translation;const go=document.createElement("button");go.textContent="رفتن به آیه";go.onclick=async()=>{document.querySelector('[data-tab="reader"]').click();$("surah").value=v.surah;await loadSurah();$("ayah-"+v.surah+"-"+v.ayah)?.scrollIntoView({behavior:"smooth"})};card.append(ar,tr,go);box.append(card)})
+ 
+ a.forEach(v=>{const card=document.createElement("article");card.className="ayah";const ar=document.createElement("p");ar.className="arabic";ar.textContent=v.arabic;const tr=document.createElement("p");tr.textContent=v.translation;const go=document.createElement("button");go.textContent="رفتن به آیه";go.onclick=async()=>{document.querySelector('#tadabburNavigation button[data-page="reader"]')?.click();$("surah").value=v.surah;await loadSurah();$("ayah-"+v.surah+"-"+v.ayah)?.scrollIntoView({behavior:"smooth"})};card.append(ar,tr,go);box.append(card)})
+
 }
 
 
