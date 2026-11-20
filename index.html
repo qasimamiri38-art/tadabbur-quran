@@ -27,7 +27,7 @@ select{flex:1;min-width:0}input{flex:2;min-width:170px}
 
 .arabic{font:30px/2.15 "Amiri Quran",serif;text-align:justify;margin:12px 0;color:var(--arabic-color)}
 .translation{border-top:1px solid var(--line);padding-top:10px;line-height:2;font-size:17px;color:var(--translation-color)}
-.tafsir{margin-top:10px;padding:12px;background:#111a15;border-radius:10px;line-height:2;white-space:pre-wrap;color:var(--tafsir-color)}
+.tafsir{margin-top:10px;padding:12px;background:#111a15;borvder-radius:10px;line-height:2;white-space:pre-wrap;color:var(--tafsir-color)}
 
 .tafsir[hidden],.hidden{display:none!important}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px;margin:12px 0;line-height:2}
@@ -672,8 +672,41 @@ if("mediaSession" in navigator){
       status("در حال پخش آیه "+v.n);
     }
 
-    a.onended=null;
-    await playNext();
+a.onended = null;
+
+// پخش بسم‌الله پیش از شروع سوره
+const firstVerse = verses[index];
+
+if (
+  Number(firstVerse.n) === 1 &&
+  Number(firstVerse.surah) !== 1 &&
+  Number(firstVerse.surah) !== 9
+) {
+  const basmala = await api("/ayah/1/" + selectedReciter);
+
+  if (!basmala.audio) {
+    throw Error("صدای بسم‌الله پیدا نشد");
+  }
+
+  status("در حال پخش بسم‌الله الرحمن الرحیم");
+
+  await new Promise((resolve, reject) => {
+    a.onended = resolve;
+    a.onerror = () => reject(Error("پخش بسم‌الله ناموفق بود"));
+    a.src = basmala.audio;
+    a.load();
+
+    const request = a.play();
+    if (request && request.catch) {
+      request.catch(reject);
+    }
+  });
+
+  a.onended = null;
+  a.onerror = null;
+}
+
+await playNext();
 
   }catch(e){
 status("پخش صوت ممکن نشد: "+e.message);
