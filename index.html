@@ -303,6 +303,91 @@ nav {
       <p>عشا: <b id="pt-Isha"></b></p>
     </div>
   </div>
+<div class="panel" id="adhanSettings">
+  <h2 style="color:var(--gold)">🔔 تنظیمات اذان و اعلان</h2>
+  <p class="muted">برای هر نماز، نوع اعلان و صدای دلخواه را جداگانه انتخاب کنید.</p>
+
+  <div id="adhanPrayerOptions">
+    <div class="adhan-row">
+      <h3>نماز صبح</h3>
+      <label><input type="checkbox" id="adhan-enabled-Fajr" checked> فعال باشد</label>
+      <label>نوع اعلان</label>
+      <select id="adhan-type-Fajr">
+        <option value="full">اذان کامل</option>
+        <option value="takbeer">تکبیر</option>
+        <option value="call">اعلان صوتی</option>
+        <option value="default">صدای پیش‌فرض</option>
+        <option value="beep">بوق طولانی</option>
+        <option value="vibration">فقط لرزش</option>
+        <option value="silent">اعلان بی‌صدا</option>
+        <option value="none">بدون اعلان</option>
+      </select>
+      <label>صدای مؤذن</label>
+      <select id="adhan-sound-Fajr">
+        <option value="mishary">مشاری العفاسی</option>
+        <option value="madinah">مدینه</option>
+        <option value="makkah">مکه</option>
+        <option value="istanbul">استانبول</option>
+        <option value="alaqsa">مسجدالاقصی</option>
+        <option value="abdulrahman">عبدالرحمن اندونیزی</option>
+      </select>
+    </div>
+
+    <div class="adhan-row">
+      <h3>نماز ظهر</h3>
+      <label><input type="checkbox" id="adhan-enabled-Dhuhr" checked> فعال باشد</label>
+      <label>نوع اعلان</label>
+      <select id="adhan-type-Dhuhr">
+        <option value="full">اذان کامل</option><option value="takbeer">تکبیر</option><option value="call">اعلان صوتی</option><option value="default">صدای پیش‌فرض</option><option value="beep">بوق طولانی</option><option value="vibration">فقط لرزش</option><option value="silent">اعلان بی‌صدا</option><option value="none">بدون اعلان</option>
+      </select>
+      <label>صدای مؤذن</label>
+      <select id="adhan-sound-Dhuhr">
+        <option value="mishary">مشاری العفاسی</option><option value="madinah">مدینه</option><option value="makkah">مکه</option><option value="istanbul">استانبول</option><option value="alaqsa">مسجدالاقصی</option><option value="abdulrahman">عبدالرحمن اندونیزی</option>
+      </select>
+    </div>
+
+    <div class="adhan-row">
+      <h3>نماز عصر</h3>
+      <label><input type="checkbox" id="adhan-enabled-Asr" checked> فعال باشد</label>
+      <label>نوع اعلان</label>
+      <select id="adhan-type-Asr">
+        <option value="full">اذان کامل</option><option value="takbeer">تکبیر</option><option value="call">اعلان صوتی</option><option value="default">صدای پیش‌فرض</option><option value="beep">بوق طولانی</option><option value="vibration">فقط لرزش</option><option value="silent">اعلان بی‌صدا</option><option value="none">بدون اعلان</option>
+      </select>
+      <label>صدای مؤذن</label>
+      <select id="adhan-sound-Asr">
+        <option value="mishary">مشاری العفاسی</option><option value="madinah">مدینه</option><option value="makkah">مکه</option><option value="istanbul">استانبول</option><option value="alaqsa">مسجدالاقصی</option><option value="abdulrahman">عبدالرحمن اندونیزی</option>
+      </select>
+    </div>
+
+    <div class="adhan-row">
+      <h3>نماز مغرب</h3>
+      <label><input type="checkbox" id="adhan-enabled-Maghrib" checked> فعال باشد</label>
+      <label>نوع اعلان</label>
+      <select id="adhan-type-Maghrib">
+        <option value="full">اذان کامل</option><option value="takbeer">تکبیر</option><option value="call">اعلان صوتی</option><option value="default">صدای پیش‌فرض</option><option value="beep">بوق طولانی</option><option value="vibration">فقط لرزش</option><option value="silent">اعلان بی‌صدا</option><option value="none">بدون اعلان</option>
+      </select>
+      <label>صدای مؤذن</label>
+      <select id="adhan-sound-Maghrib">
+        <option value="mishary">مشاری العفاسی</option><option value="madinah">مدینه</option><option value="makkah">مکه</option><option value="istanbul">استانبول</option><option value="alaqsa">مسجدالاقصی</option><option value="abdulrahman">عبدالرحمن اندونیزی</option>
+      </select>
+    </div>
+
+    <div class="adhan-row">
+      <h3>نماز عشا</h3>
+      <label><input type="checkbox" id="adhan-enabled-Isha" checked> فعال باشد</label>
+      <label>نوع اعلان</label>
+      <select id="adhan-type-Isha">
+        <option value="full">اذان کامل</option><option value="takbeer">تکبیر</option><option value="call">اعلان صوتی</option><option value="default">صدای پیش‌فرض</option><option value="beep">بوق طولانی</option><option value="vibration">فقط لرزش</option><option value="silent">اعلان بی‌صدا</option><option value="none">بدون اعلان</option>
+      </select>
+      <label>صدای مؤذن</label>
+      <select id="adhan-sound-Isha">
+        <option value="mishary">مشاری العفاسی</option><option value="madinah">مدینه</option><option value="makkah">مکه</option><option value="istanbul">استانبول</option><option value="alaqsa">مسجدالاقصی</option><option value="abdulrahman">عبدالرحمن اندونیزی</option>
+      </select>
+    </div>
+  </div>
+  <p class="muted">تنظیمات هر نماز مستقل است.</p><p id="adhanSaveStatus" class="muted">تنظیمات اذان آماده است.</p>
+</div>
+
   <div class="panel">
     <h2 style="color:var(--gold)">🧭 قطب‌نمای قبله</h2>
     <button id="compassStart" class="primary">فعال‌کردن قطب‌نما</button>
@@ -1299,5 +1384,57 @@ document.getElementById("barakatJuzSelect")?.remove();
 <script src="./qibla-compass-fix.js"></script>
 <script src="./reading-mode.js"></script>
 <script src="./memorization-engine.js"></script>
-</body>
-</html>
+<script>
+(function () {
+  const prayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+  const storageKey = "tadabburAdhanSettings";
+
+  function loadSettings() {
+    try {
+      return JSON.parse(localStorage.getItem(storageKey)) || {};
+    } catch {
+      return {};
+    }
+  }
+
+  const settings = loadSettings();
+
+  prayers.forEach(prayer => {
+    const enabled = document.getElementById("adhan-enabled-" + prayer);
+    const type = document.getElementById("adhan-type-" + prayer);
+    const sound = document.getElementById("adhan-sound-" + prayer);
+
+    if (!enabled || !type || !sound) return;
+
+    const saved = settings[prayer] || {};
+
+    if (typeof saved.enabled === "boolean") {
+      enabled.checked = saved.enabled;
+    }
+
+    if (saved.type) type.value = saved.type;
+    if (saved.sound) sound.value = saved.sound;
+
+    function saveSettings() {
+      settings[prayer] = {
+        enabled: enabled.checked,
+        type: type.value,
+        sound: sound.value
+      };
+
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(settings));
+        const status = document.getElementById("adhanSaveStatus");
+        if (status) status.textContent = "تنظیمات اذان ذخیره شد.";
+      } catch {
+        const status = document.getElementById("adhanSaveStatus");
+        if (status) status.textContent = "ذخیره‌سازی انجام نشد.";
+      }
+    }
+
+    enabled.addEventListener("change", saveSettings);
+    type.addEventListener("change", saveSettings);
+    sound.addEventListener("change", saveSettings);
+  });
+})();
+</script>
