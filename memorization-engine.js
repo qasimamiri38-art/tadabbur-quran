@@ -10,7 +10,9 @@
   const $ = id => document.getElementById(id);
   let verses = [], counts = {}, hidden = new Set(), playAll = false;
 
-  root.innerHTML = `
+  const allSurahPanel = document.getElementById("allSurahMemorize");
+if (allSurahPanel) allSurahPanel.remove();
+root.innerHTML = `
     <div class="panel">
       <h2 style="color:var(--gold)">🎓 استاد حفظ القرآن</h2>
       <p>تمام قرآن را از راه سوره‌ها یا ۳۰ سپاره انتخاب کن و درس حفظ بساز.</p>
@@ -46,7 +48,7 @@
         <p id="memSaved" class="status">پیشرفت پس از پایان تمرین در همین دستگاه ثبت می‌شود.</p>
       </div>
     </div>`;
-
+if (allSurahPanel) root.prepend(allSurahPanel);
   const mode = $("memMode"), source = $("memSource"), audio = $("memAudio");
 
   async function getData(url) {
