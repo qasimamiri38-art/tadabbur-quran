@@ -541,7 +541,7 @@ async function loadSurah() {
         dariByAya.get(Number(a.numberInSurah)) || "",
       tafsir:
         tf?.ayahs?.[i]?.text ||
-        localTafsir[String(a.numberInSurah)] ||
+        (n === 7 && tafsirId === "local-araf-1-2" ? localTafsir[String(a.numberInSurah)] : "") ||
         ""
     }));
 
