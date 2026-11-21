@@ -108,7 +108,24 @@ nav {
 .home-panel[hidden]{display:none}
 .home-button{background:#078e5d;border:1px solid #1ac58a;color:white;border-radius:12px;padding:10px 15px}
 @media(max-width:600px){.home-tiles{gap:6px}.home-tile{font-size:12px;padding:12px 3px}}
-</style></head>
+</style>
+
+<!-- OneSignal -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "APP_ID_HERE",
+      serviceWorkerPath: "sw.js",
+      serviceWorkerParam: {
+        scope: "/tadabbur-quran/"
+      }
+    });
+  });
+</script>
+
+</head>
 <body>
 <header>
   <div class="logo">
