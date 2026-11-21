@@ -1438,3 +1438,50 @@ document.getElementById("barakatJuzSelect")?.remove();
   });
 })();
 </script>
+<script>
+(function () {
+  const files = {
+    Fajr: "https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_01_Fajr_Adhan.mp3",
+    Dhuhr: "https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_02_Dhuhr_Adhan.mp3",
+    Asr: "https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_03_Asr_Adhan.mp3",
+    Maghrib: "https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_04_Maghrib_Adhan.mp3",
+    Isha: "https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_05_Isha_Adhan.mp3"
+  };
+
+  const panel = document.getElementById("adhanSettings");
+  if (!panel) return;
+
+  const player = document.createElement("audio");
+  player.controls = true;
+  player.preload = "none";
+  player.style.cssText = "width:100%;margin:12px 0";
+
+  const title = document.createElement("p");
+  title.textContent = "شنیدن نمونهٔ اذان (مجموعهٔ دوحه)";
+
+  panel.append(title, player);
+
+  Object.entries(files).forEach(([prayer, url]) => {
+    const select = document.getElementById("adhan-sound-" + prayer);
+    if (!select) return;
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "▶ شنیدن نمونه";
+    btn.style.margin = "6px";
+
+    btn.addEventListener("click", () => {
+      player.pause();
+      player.src = url;
+      player.load();
+      player.play().catch(() => {
+        title.textContent = "برای شنیدن، دکمهٔ پخش را لمس کن.";
+      });
+      player.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+
+    select.insertAdjacentElement("afterend", btn);
+  });
+})();
+</script>
+</body>
