@@ -121,6 +121,32 @@ nav {
       serviceWorkerParam: {
         scope: "/tadabbur-quran/"
       }
+        const enableButton = document.getElementById("enableAdhanNotifications");
+    const statusText = document.getElementById("onesignalStatus");
+
+    if (enableButton && statusText) {
+      enableButton.addEventListener("click", async function() {
+        enableButton.disabled = true;
+        statusText.textContent = "در حال درخواست اجازه اعلان...";
+
+        try {
+          if (!OneSignal.Notifications.isPushSupported()) {
+            statusText.textContent = "اعلان در این دستگاه پشتیبانی نمی‌شود.";
+            return;
+          }
+
+          const granted = await OneSignal.Notifications.requestPermission();
+
+          statusText.textContent = granted
+            ? "اجازه اعلان داده شد. ثبت اشتراک را بررسی می‌کنیم."
+            : "اجازه اعلان داده نشد. تنظیمات دستگاه را بررسی کنید.";
+
+        } catch (error) {
+          statusText.textContent = "خطا در فعال‌سازی اعلان. دوباره تلاش کنید.";
+        } finally {
+          enableButton.disabled = false;
+        }
+      });
     });
   });
 </script>
