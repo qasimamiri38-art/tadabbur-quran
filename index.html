@@ -115,42 +115,64 @@ nav {
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
 
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "f47577a6-ffad-430c-840e-05618c1b6312",
-      serviceWorkerPath: "/tadabbur-quran/sw.js",
-      serviceWorkerParam: {
-        scope: "/tadabbur-quran/"
-      }
-    });
+  let resolveOneSignal;
+  let rejectOneSignal;
 
-    const enableButton = document.getElementById("enableAdhanNotifications");
-    const statusText = document.getElementById("onesignalStatus");
+  const oneSignalReady = new Promise((resolve, reject) => {
+    resolveOneSignal = resolve;
+    rejectOneSignal = reject;
+  });
 
-    if (enableButton && statusText) {
-      enableButton.addEventListener("click", async function() {
-        enableButton.disabled = true;
-        statusText.textContent = "در حال درخواست اجازه اعلان...";
-
-        try {
-          if (!OneSignal.Notifications.isPushSupported()) {
-            statusText.textContent = "اعلان در این دستگاه پشتیبانی نمی‌شود.";
-            return;
-          }
-
-          const granted = await OneSignal.Notifications.requestPermission();
-
-          statusText.textContent = granted
-            ? "اجازه اعلان داده شد."
-            : "اجازه اعلان داده نشد. تنظیمات دستگاه را بررسی کنید.";
-
-        } catch (error) {
-          statusText.textContent = "خطا در فعال‌سازی اعلان. دوباره تلاش کنید.";
-        } finally {
-          enableButton.disabled = false;
+  window.OneSignalDeferred.push(async function(OneSignal) {
+    try {
+      await OneSignal.init({
+        appId: "f47577a6-ffad-430c-840e-05618c1b6312",
+        serviceWorkerPath: "/tadabbur-quran/sw.js",
+        serviceWorkerParam: {
+          scope: "/tadabbur-quran/"
         }
       });
+
+      resolveOneSignal(OneSignal);
+    } catch (error) {
+      rejectOneSignal(error);
     }
+  });
+document.addEventListener("DOMContentLoaded", function() {
+  const enableButton = document.getElementById("enableAdhanNotifications");
+  const statusText = document.getElementById("onesignalStatus");
+
+  if (enableButton && statusText) {
+    enableButton.addEventListener("click", async function() {
+      enableButton.disabled = true;
+      statusText.textContent = "در حال اتصال به سامانه اعلان...";
+
+      try {
+        const OneSignal = await Promise.race([
+          oneSignalReady,
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("زمان اتصال تمام شد")), 15000)
+          )
+        ]);
+
+        if (!OneSignal.Notifications.isPushSupported()) {
+          statusText.textContent = "اعلان در این دستگاه پشتیبانی نمی‌شود.";
+          return;
+        }
+
+        const granted =
+          await OneSignal.Notifications.requestPermission();
+
+        statusText.textContent = granted
+          ? "اجازه اعلان داده شد."
+          : "اجازه اعلان داده نشد. تنظیمات دستگاه را بررسی کنید.";
+
+      } catch (error) {
+    statusText.textContent = "اتصال به سامانه اعلان موفق نشد: " + error.message;
+        enableButton.disabled = false;
+      }
+    });
+  }
   });
 </script>
 
