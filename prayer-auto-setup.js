@@ -63,43 +63,46 @@
   }
 
   // Queue behind the existing OneSignal initialization in index.html.
-  let oneSignalResolve;
-  let oneSignalReject;
-  let oneSignalQueueStarted = false;
-  const oneSignalReady = new Promise((resolve, reject) => {
-    oneSignalResolve = resolve;
-    oneSignalReject = reject;
-  });
 
-  function queueOneSignalReady() {
-    if (oneSignalQueueStarted) return;
-    oneSignalQueueStarted = true;
+  // Wait for the existing OneSignal initialization in index.html.
+  function getPrayerOneSignal() {
+    return new Promise((resolve, reject) => {
+      let completed = false;
 
-    if (!window.OneSignalDeferred) window.OneSignalDeferred = [];
-    window.OneSignalDeferred.push((OneSignal) => {
-      oneSignalResolve(OneSignal);
+      const timer = setTimeout(() => {
+        if (!completed) {
+          completed = true;
+          reject(new Error("OneSignal بارگذاری نشد؛ اتصال اینترنت را بررسی کن."));
+        }
+      }, 15000);
+
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+      window.OneSignalDeferred.push((OneSignal) => {
+        if (completed) return;
+        completed = true;
+        clearTimeout(timer);
+        resolve(OneSignal);
+      });
     });
-
-    // Avoid leaving calls pending forever if the SDK is blocked or offline.
-    setTimeout(() => {
-      oneSignalReject(new Error("OneSignal بارگذاری نشد؛ اتصال اینترنت را بررسی کن."));
-    }, 15000);
   }
 
   async function syncOneSignalTags() {
     const saved = getPrayerRecord();
     if (!saved) return { synced: false, reason: "no-times" };
 
-    queueOneSignalReady();
-    const OneSignal = await oneSignalReady;
-    if (!OneSignal || typeof OneSignal.login !== "function" || !OneSignal.User) {
-      throw new Error("نسخهٔ OneSignal آماده نیست.");
+    const OneSignalInstance = await getPrayerOneSignal();
+
+    if (
+      !OneSignalInstance ||
+      !OneSignalInstance.User ||
+      typeof OneSignalInstance.User.addTags !== "function"
+    ) {
+      throw new Error("OneSignal هنوز آماده نیست.");
     }
 
-    // Stable anonymous app-scoped ID. No name, phone number, or GPS coordinates.
-    await OneSignal.login("tadabbur-" + getDeviceId());
-
     const settings = safeRead(SETTINGS_KEY);
+
     const tags = {
       prayer_timezone: String(saved.timeZone),
       prayer_date: String(saved.date || ""),
@@ -109,22 +112,30 @@
 
     DISPLAY_TIMES.forEach((prayer) => {
       const value = saved.timings[prayer];
-      if (value) tags["prayer_time_" + prayer.toLowerCase()] = String(value).slice(0, 5);
+      if (value) {
+        tags["prayer_time_" + prayer.toLowerCase()] =
+          String(value).slice(0, 5);
+      }
     });
 
     PRAYERS.forEach((prayer) => {
       const item = settings[prayer] || {};
       const suffix = prayer.toLowerCase();
-      tags["prayer_enabled_" + suffix] = item.enabled === false ? "0" : "1";
-      tags["prayer_type_" + suffix] = typeof item.type === "string" ? item.type : "silent";
-      tags["prayer_sound_" + suffix] = typeof item.sound === "string" ? item.sound : "mishary";
+
+      tags["prayer_enabled_" + suffix] =
+        item.enabled === false ? "0" : "1";
+
+      tags["prayer_type_" + suffix] =
+        typeof item.type === "string" ? item.type : "silent";
+
+      tags["prayer_sound_" + suffix] =
+        typeof item.sound === "string" ? item.sound : "mishary";
     });
 
-    // In SDK v16, login must happen before adding User tags.
-    OneSignal.User.addTags(tags);
+    await OneSignalInstance.User.addTags(tags);
+
     return { synced: true };
   }
-
   // Expose a safe hook so the existing controls can re-sync after a user changes settings.
   window.tadabburSyncOneSignalPrayer = syncOneSignalTags;
 
