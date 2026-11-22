@@ -123,13 +123,15 @@ nav {
     rejectOneSignal = reject;
   });
 
-  window.OneSignalDeferred.push(async function(OneSignal) {
+  const oneSignalAppBase = new URL("./", window.location.href);
+const oneSignalWorkerPath = new URL("sw.js", oneSignalAppBase).pathname;
     try {
       await OneSignal.init({
         appId: "f47577a6-ffad-430c-840e-05618c1b6312",
-        serviceWorkerPath: "/tadabbur-quran/sw.js",
-        serviceWorkerParam: {
-          scope: "/tadabbur-quran/"
+        serviceWorkerPath: oneSignalWorkerPath,
+serviceWorkerParam: {
+  scope: oneSignalAppBase.pathname
+}
         }
       });
 
