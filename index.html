@@ -126,15 +126,14 @@ function updateOneSignalButton() {
   const status = document.getElementById("onesignalStatus");
   if (!button || !status) return;
 
+  button.disabled = false;
+
   if (oneSignalInstance) {
-    button.disabled = false;
-    status.textContent = "سامانه اعلان آماده است؛ برای ثبت دستگاه دکمه را بزنید.";
+    status.textContent = "سامانه اعلان آماده است؛ دکمه را بزنید.";
   } else if (oneSignalInitError) {
-    button.disabled = true;
-    status.textContent = "اتصال OneSignal آماده نشد: " + oneSignalInitError.message;
+    status.textContent = "خطای اتصال: " + oneSignalInitError.message;
   } else {
-    button.disabled = true;
-    status.textContent = "در حال آماده‌سازی سامانه اعلان...";
+    status.textContent = "سامانه اعلان هنوز آماده نشده است؛ برای بررسی دکمه را بزنید.";
   }
 }
 
