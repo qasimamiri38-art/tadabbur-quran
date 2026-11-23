@@ -124,6 +124,7 @@ let oneSignalInitError = null;
 function updateOneSignalButton() {
   const button = document.getElementById("enableAdhanNotifications");
   const status = document.getElementById("onesignalStatus");
+
   if (!button || !status) return;
 
   button.disabled = false;
@@ -133,7 +134,7 @@ function updateOneSignalButton() {
   } else if (oneSignalInitError) {
     status.textContent = "خطای اتصال: " + oneSignalInitError.message;
   } else {
-    status.textContent = "سامانه اعلان هنوز آماده نشده است؛ برای بررسی دکمه را بزنید.";
+    status.textContent = "سامانه اعلان در حال آماده‌سازی است.";
   }
 }
 
