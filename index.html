@@ -118,12 +118,25 @@ window.OneSignalDeferred = window.OneSignalDeferred || [];
 
 const appBase = new URL("./", window.location.href);
 const workerPath = new URL("sw.js", appBase).pathname;
+let oneSignalInstance = null;
+let oneSignalInitError = null;
 
-let resolveReady, rejectReady;
-const oneSignalReady = new Promise((resolve, reject) => {
-  resolveReady = resolve;
-  rejectReady = reject;
-});
+function updateOneSignalButton() {
+  const button = document.getElementById("enableAdhanNotifications");
+  const status = document.getElementById("onesignalStatus");
+  if (!button || !status) return;
+
+  if (oneSignalInstance) {
+    button.disabled = false;
+    status.textContent = "سامانه اعلان آماده است؛ برای ثبت دستگاه دکمه را بزنید.";
+  } else if (oneSignalInitError) {
+    button.disabled = true;
+    status.textContent = "اتصال OneSignal آماده نشد: " + oneSignalInitError.message;
+  } else {
+    button.disabled = true;
+    status.textContent = "در حال آماده‌سازی سامانه اعلان...";
+  }
+}
 
 window.OneSignalDeferred.push(async (OneSignal) => {
   try {
@@ -132,9 +145,12 @@ window.OneSignalDeferred.push(async (OneSignal) => {
       serviceWorkerPath: workerPath,
       serviceWorkerParam: { scope: appBase.pathname }
     });
-    resolveReady(OneSignal);
+    oneSignalInstance = OneSignal;
+    updateOneSignalButton();
   } catch (error) {
-    rejectReady(error);
+    oneSignalInitError = error;
+    console.error("OneSignal initialization:", error);
+    updateOneSignalButton();
   }
 });
 
@@ -143,27 +159,36 @@ document.addEventListener("DOMContentLoaded", () => {
   const status = document.getElementById("onesignalStatus");
   if (!button || !status) return;
 
+  updateOneSignalButton();
+
   button.addEventListener("click", async () => {
+    const OneSignal = oneSignalInstance;
+
+    if (!OneSignal) {
+      status.textContent = "سامانه اعلان هنوز آماده نیست؛ صفحه را تازه‌سازی کن.";
+      return;
+    }
+
+    if (!OneSignal.Notifications.isPushSupported()) {
+      status.textContent = "اعلان در این دستگاه یا حالت مرورگر پشتیبانی نمی‌شود.";
+      return;
+    }
+
     button.disabled = true;
-    status.textContent = "در حال ثبت اشتراک اعلان...";
+    status.textContent = "در حال درخواست اجازهٔ اعلان از آیفون...";
 
     try {
-      const OneSignal = await Promise.race([
-        oneSignalReady,
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("زمان اتصال تمام شد.")), 20000)
-        )
-      ]);
+      const permissionRequest =
+        OneSignal.Notifications.requestPermission();
 
-      if (!OneSignal.Notifications.isPushSupported()) {
-        throw new Error("اعلان در این دستگاه پشتیبانی نمی‌شود.");
+      const granted = await permissionRequest;
+
+      if (!granted ||
+          OneSignal.Notifications.permissionNative !== "granted") {
+        throw new Error("اجازهٔ اعلان داده نشد؛ تنظیمات آیفون را بررسی کن.");
       }
 
-      const granted = await OneSignal.Notifications.requestPermission();
-
-      if (!granted || OneSignal.Notifications.permissionNative !== "granted") {
-        throw new Error("اجازهٔ اعلان داده نشد.");
-      }
+      status.textContent = "اجازه داده شد؛ در حال ثبت اشتراک دستگاه...";
 
       await OneSignal.User.PushSubscription.optIn();
 
@@ -171,11 +196,26 @@ document.addEventListener("DOMContentLoaded", () => {
       const started = Date.now();
 
       while (!(sub.optedIn === true && sub.id && sub.token)) {
-        if (Date.now() - started > 15000) {
-          throw new Error("اشتراک دستگاه از OneSignal تأیید نشد.");
+        if (Date.now() - started > 20000) {
+          throw new Error("شناسه و توکن اشتراک از OneSignal دریافت نشد.");
         }
         await new Promise(resolve => setTimeout(resolve, 300));
       }
+
+      status.textContent =
+        "اشتراک اعلان این دستگاه با موفقیت تأیید شد. زمان‌بندی اذان هنوز به سرویس سرور نیاز دارد.";
+
+    } catch (error) {
+      console.error("OneSignal registration:", error);
+      status.textContent =
+        "ثبت دستگاه انجام نشد: " +
+        (error && error.message ? error.message : "خطای نامشخص");
+    } finally {
+      button.disabled = false;
+    }
+  });
+});
+</script>
 
       status.textContent =
         "ثبت اشتراک اعلان این دستگاه موفقانه تأیید شد. زمان‌بندی اذان هنوز به سرویس سرور نیاز دارد.";
