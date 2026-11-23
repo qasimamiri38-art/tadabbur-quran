@@ -232,7 +232,8 @@ document.addEventListener("DOMContentLoaded", () => {
           );
         }
 
-        await new Promise(resolve => setTimeout(resolve, 300));
+          new Promise(resolve => setTimeout(resolve, 300));
+        
       }
 
       status.textContent =
@@ -240,7 +241,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     } catch (error) {
       console.error("OneSignal registration:", error);
-      status.textContent = "ثبت دستگاه ناموفق بود: " + error.message;
+      status.textContent =
+        "ثبت دستگاه ناموفق بود: " + error.message;
 
     } finally {
       button.disabled = false;
@@ -256,6 +258,10 @@ setTimeout(() => {
     updateOneSignalButton();
   }
 }, 15000);
+
+      
+
+      
 </script>
 
   <div class="logo">
