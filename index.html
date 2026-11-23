@@ -110,73 +110,86 @@ nav {
 @media(max-width:600px){.home-tiles{gap:6px}.home-tile{font-size:12px;padding:12px 3px}}
 </style>
 
-<!-- OneSignal -->
+
+<!-- OneSignal Web Push SDK v16 -->
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
+window.OneSignalDeferred = window.OneSignalDeferred || [];
 
-  let resolveOneSignal;
-  let rejectOneSignal;
+const appBase = new URL("./", window.location.href);
+const workerPath = new URL("sw.js", appBase).pathname;
 
-  const oneSignalReady = new Promise((resolve, reject) => {
-    resolveOneSignal = resolve;
-    rejectOneSignal = reject;
-  });
+let resolveReady, rejectReady;
+const oneSignalReady = new Promise((resolve, reject) => {
+  resolveReady = resolve;
+  rejectReady = reject;
+});
 
-  const oneSignalAppBase = new URL("./", window.location.href);
-const oneSignalWorkerPath = new URL("sw.js", oneSignalAppBase).pathname;
+window.OneSignalDeferred.push(async (OneSignal) => {
+  try {
+    await OneSignal.init({
+      appId: "f47577a6-ffad-430c-840e-05618c1b6312",
+      serviceWorkerPath: workerPath,
+      serviceWorkerParam: { scope: appBase.pathname }
+    });
+    resolveReady(OneSignal);
+  } catch (error) {
+    rejectReady(error);
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const button = document.getElementById("enableAdhanNotifications");
+  const status = document.getElementById("onesignalStatus");
+  if (!button || !status) return;
+
+  button.addEventListener("click", async () => {
+    button.disabled = true;
+    status.textContent = "در حال ثبت اشتراک اعلان...";
+
     try {
-      await OneSignal.init({
-        appId: "f47577a6-ffad-430c-840e-05618c1b6312",
-        serviceWorkerPath: oneSignalWorkerPath,
-serviceWorkerParam: {
-  scope: oneSignalAppBase.pathname
-}
-        }
-      });
+      const OneSignal = await Promise.race([
+        oneSignalReady,
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("زمان اتصال تمام شد.")), 20000)
+        )
+      ]);
 
-      resolveOneSignal(OneSignal);
+      if (!OneSignal.Notifications.isPushSupported()) {
+        throw new Error("اعلان در این دستگاه پشتیبانی نمی‌شود.");
+      }
+
+      const granted = await OneSignal.Notifications.requestPermission();
+
+      if (!granted || OneSignal.Notifications.permissionNative !== "granted") {
+        throw new Error("اجازهٔ اعلان داده نشد.");
+      }
+
+      await OneSignal.User.PushSubscription.optIn();
+
+      const sub = OneSignal.User.PushSubscription;
+      const started = Date.now();
+
+      while (!(sub.optedIn === true && sub.id && sub.token)) {
+        if (Date.now() - started > 15000) {
+          throw new Error("اشتراک دستگاه از OneSignal تأیید نشد.");
+        }
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+
+      status.textContent =
+        "ثبت اشتراک اعلان این دستگاه موفقانه تأیید شد. زمان‌بندی اذان هنوز به سرویس سرور نیاز دارد.";
+
     } catch (error) {
-      rejectOneSignal(error);
+      console.error("OneSignal registration:", error);
+      status.textContent = "ثبت دستگاه انجام نشد: " + error.message;
+    } finally {
+      button.disabled = false;
     }
   });
-document.addEventListener("DOMContentLoaded", function() {
-  const enableButton = document.getElementById("enableAdhanNotifications");
-  const statusText = document.getElementById("onesignalStatus");
-
-  if (enableButton && statusText) {
-    enableButton.addEventListener("click", async function() {
-      enableButton.disabled = true;
-      statusText.textContent = "در حال اتصال به سامانه اعلان...";
-
-      try {
-        const OneSignal = await Promise.race([
-          oneSignalReady,
-          new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("زمان اتصال تمام شد")), 15000)
-          )
-        ]);
-
-        if (!OneSignal.Notifications.isPushSupported()) {
-          statusText.textContent = "اعلان در این دستگاه پشتیبانی نمی‌شود.";
-          return;
-        }
-
-        const granted =
-          await OneSignal.Notifications.requestPermission();
-
-        statusText.textContent = granted
-          ? "اجازه اعلان داده شد."
-          : "اجازه اعلان داده نشد. تنظیمات دستگاه را بررسی کنید.";
-
-      } catch (error) {
-    statusText.textContent = "اتصال به سامانه اعلان موفق نشد: " + error.message;
-        enableButton.disabled = false;
-      }
-    });
-  }
-  });
+});
 </script>
+
 
 </head>
 <body>
