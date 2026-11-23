@@ -164,6 +164,52 @@ document.addEventListener("DOMContentLoaded", () => {
   button.addEventListener("click", async () => {
     const OneSignal = oneSignalInstance;
 
+    if (!OneSignal) {
+      status.textContent = "سامانه اعلان هنوز آماده نیست؛ صفحه را تازه‌سازی کن.";
+      return;
+    }
+
+    if (!OneSignal.Notifications.isPushSupported()) {
+      status.textContent = "اعلان در این دستگاه پشتیبانی نمی‌شود.";
+      return;
+    }
+
+    button.disabled = true;
+    status.textContent = "در حال درخواست اجازه اعلان...";
+
+    try {
+      const permissionRequest = OneSignal.Notifications.requestPermission();
+      const granted = await permissionRequest;
+
+      if (!granted || OneSignal.Notifications.permissionNative !== "granted") {
+        throw new Error("اجازه اعلان داده نشد.");
+      }
+
+      status.textContent = "اجازه داده شد؛ در حال ثبت اشتراک دستگاه...";
+      await OneSignal.User.PushSubscription.optIn();
+
+      const sub = OneSignal.User.PushSubscription;
+      const started = Date.now();
+
+      while (!(sub.optedIn === true && sub.id && sub.token)) {
+        if (Date.now() - started > 20000) {
+          throw new Error("اشتراک دستگاه از OneSignal تأیید نشد.");
+        }
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+
+      status.textContent = "اشتراک اعلان دستگاه تأیید شد.";
+    } catch (error) {
+      console.error("OneSignal registration:", error);
+      status.textContent = "ثبت دستگاه انجام نشد: " + error.message;
+    } finally {
+      button.disabled = false;
+    }
+  });
+});
+</script>
+</head>
+
 <body>
 <header>
   <div class="logo">
