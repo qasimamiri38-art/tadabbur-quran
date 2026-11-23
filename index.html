@@ -1613,15 +1613,17 @@ document.getElementById("barakatJuzSelect")?.remove();
   });
 })();
 </script>
+
 <script>
 (function () {
-const files = {
-  Fajr: "https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_01_Fajr_Adhan.mp3",
-  Dhuhr: "https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_02_Dhuhr_Adhan.mp3",
-  Asr: "https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_03_Asr_Adhan.mp3",
-  Maghrib: "https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_04_Maghrib_Adhan.mp3",
-  Isha: "https://archive.org/download/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_05_Isha_Adhan.mp3"
-};
+  const audioFiles = {
+    mishary: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Mishary_Al_Afasy_-_HQ_(مشاري_العفاسي).mp3",
+    madinah: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Adhan_Al_Haram_Al_Madani_-_Al_Madinah_1_(أذان_الحرم_المدني_-_المدينة_المنورة).mp3",
+    makkah: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Ali_Ibn_Ahmad_Mala_1_-_Al_Haram_Al_Maki_(علي_بن_أحمد_ملا_-_الحرم_المكي).mp3",
+    istanbul: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Adhan_Turkey_1_(أذان_تركيا).mp3",
+    alaqsa: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Adhan_Al_Aqsa_-_Jerusalem_(أذان_المسجد_الأقصى_-_القدس).mp3",
+    indonesia: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Adhan_Indonesia_(أذان_إندونيسيا).mp3"
+  };
 
   const panel = document.getElementById("adhanSettings");
   if (!panel) return;
@@ -1632,13 +1634,40 @@ const files = {
   player.style.cssText = "width:100%;margin:12px 0";
 
   const title = document.createElement("p");
-  title.textContent = "نمونهٔ اذان آزاد (Beautiful Adhan)";
-
+  title.textContent = "نمونهٔ صدای انتخاب‌شده برای هر نماز";
   panel.append(title, player);
 
-  Object.entries(files).forEach(([prayer, url]) => {
+  const names = {
+    mishary: "مشاری العفاسی",
+    madinah: "اذان مدینه",
+    makkah: "اذان مکه",
+    istanbul: "اذان ترکیه / استانبول",
+    alaqsa: "اذان مسجدالاقصی",
+    indonesia: "اذان اندونیزیا"
+  };
+
+  ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"].forEach(prayer => {
     const select = document.getElementById("adhan-sound-" + prayer);
     if (!select) return;
+
+    let oldValue = select.value;
+    try {
+      const saved = JSON.parse(localStorage.getItem("tadabburAdhanSettings") || "{}");
+      oldValue = saved[prayer]?.sound || oldValue;
+    } catch {}
+
+    if (oldValue === "abdulrahman") oldValue = "indonesia";
+
+    select.innerHTML = "";
+    Object.entries(names).forEach(([value, label]) => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      select.appendChild(option);
+    });
+
+    select.value = audioFiles[oldValue] ? oldValue : "mishary";
+    select.dispatchEvent(new Event("change"));
 
     const btn = document.createElement("button");
     btn.type = "button";
@@ -1647,16 +1676,23 @@ const files = {
 
     btn.addEventListener("click", () => {
       player.pause();
-      player.src = url;
+      player.src = audioFiles[select.value];
       player.load();
+      title.textContent = "نمونهٔ " + names[select.value];
       player.play().catch(() => {
-        title.textContent = "برای شنیدن، دکمهٔ پخش را لمس کن.";
+        title.textContent = "برای پخش، دکمهٔ پخش را لمس کن.";
       });
       player.scrollIntoView({ behavior: "smooth", block: "nearest" });
     });
 
     select.insertAdjacentElement("afterend", btn);
   });
+
+  const credit = document.createElement("p");
+  credit.className = "muted";
+  credit.textContent = "نمونه‌های صوتی از مجموعهٔ Adhan MP3 در GitHub دریافت می‌شوند.";
+  panel.appendChild(credit);
 })();
+
 </script>
 </body>
