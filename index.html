@@ -111,13 +111,20 @@ nav {
 </style>
 
 
+
 <!-- OneSignal Web Push SDK v16 -->
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script
+  id="oneSignalSdk"
+  src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
+  defer
+></script>
+
 <script>
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 
 const appBase = new URL("./", window.location.href);
 const workerPath = new URL("sw.js", appBase).pathname;
+
 let oneSignalInstance = null;
 let oneSignalInitError = null;
 
@@ -127,15 +134,28 @@ function updateOneSignalButton() {
 
   if (!button || !status) return;
 
-  button.disabled = false;
-
   if (oneSignalInstance) {
+    button.disabled = false;
     status.textContent = "سامانه اعلان آماده است؛ دکمه را بزنید.";
   } else if (oneSignalInitError) {
-    status.textContent = "خطای اتصال: " + oneSignalInitError.message;
+    button.disabled = false;
+    status.textContent =
+      "خطای آماده‌سازی اعلان: " + oneSignalInitError.message;
   } else {
-    status.textContent = "سامانه اعلان در حال آماده‌سازی است.";
+    button.disabled = true;
+    status.textContent = "در حال اتصال به سامانه اعلان...";
   }
+}
+
+const sdkScript = document.getElementById("oneSignalSdk");
+
+if (sdkScript) {
+  sdkScript.addEventListener("error", () => {
+    oneSignalInitError = new Error(
+      "بارگذاری OneSignal ناموفق بود؛ اینترنت را بررسی کنید."
+    );
+    updateOneSignalButton();
+  });
 }
 
 window.OneSignalDeferred.push(async (OneSignal) => {
@@ -143,20 +163,26 @@ window.OneSignalDeferred.push(async (OneSignal) => {
     await OneSignal.init({
       appId: "f47577a6-ffad-430c-840e-05618c1b6312",
       serviceWorkerPath: workerPath,
-      serviceWorkerParam: { scope: appBase.pathname }
+      serviceWorkerParam: {
+        scope: appBase.pathname
+      }
     });
+
     oneSignalInstance = OneSignal;
-    updateOneSignalButton();
+    oneSignalInitError = null;
+
   } catch (error) {
     oneSignalInitError = error;
     console.error("OneSignal initialization:", error);
-    updateOneSignalButton();
   }
+
+  updateOneSignalButton();
 });
 
 document.addEventListener("DOMContentLoaded", () => {
   const button = document.getElementById("enableAdhanNotifications");
   const status = document.getElementById("onesignalStatus");
+
   if (!button || !status) return;
 
   updateOneSignalButton();
@@ -165,27 +191,35 @@ document.addEventListener("DOMContentLoaded", () => {
     const OneSignal = oneSignalInstance;
 
     if (!OneSignal) {
-      status.textContent = "سامانه اعلان هنوز آماده نیست؛ صفحه را تازه‌سازی کن.";
+      status.textContent = oneSignalInitError
+        ? "خطا: " + oneSignalInitError.message
+        : "سامانه اعلان هنوز آماده نشده است.";
       return;
     }
 
     if (!OneSignal.Notifications.isPushSupported()) {
-      status.textContent = "اعلان در این دستگاه پشتیبانی نمی‌شود.";
+      status.textContent =
+        "اعلان در این مرورگر یا حالت اجرا پشتیبانی نمی‌شود. اپ را از آیکون صفحه اصلی باز کنید.";
       return;
     }
 
     button.disabled = true;
-    status.textContent = "در حال درخواست اجازه اعلان...";
 
     try {
-      const permissionRequest = OneSignal.Notifications.requestPermission();
-      const granted = await permissionRequest;
+      status.textContent = "در حال درخواست اجازه اعلان...";
 
-      if (!granted || OneSignal.Notifications.permissionNative !== "granted") {
+      const granted =
+        await OneSignal.Notifications.requestPermission();
+
+      if (
+        !granted ||
+        OneSignal.Notifications.permissionNative !== "granted"
+      ) {
         throw new Error("اجازه اعلان داده نشد.");
       }
 
-      status.textContent = "اجازه داده شد؛ در حال ثبت اشتراک دستگاه...";
+      status.textContent = "اجازه داده شد؛ در حال ثبت دستگاه...";
+
       await OneSignal.User.PushSubscription.optIn();
 
       const sub = OneSignal.User.PushSubscription;
@@ -193,25 +227,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
       while (!(sub.optedIn === true && sub.id && sub.token)) {
         if (Date.now() - started > 20000) {
-          throw new Error("اشتراک دستگاه از OneSignal تأیید نشد.");
+          throw new Error(
+            "ثبت اشتراک دستگاه تأیید نشد؛ دوباره تلاش کنید."
+          );
         }
+
         await new Promise(resolve => setTimeout(resolve, 300));
       }
 
-      status.textContent = "اشتراک اعلان دستگاه تأیید شد.";
+      status.textContent =
+        "ثبت دستگاه موفق بود؛ اعلان اذان آماده است.";
+
     } catch (error) {
       console.error("OneSignal registration:", error);
-      status.textContent = "ثبت دستگاه انجام نشد: " + error.message;
+      status.textContent = "ثبت دستگاه ناموفق بود: " + error.message;
+
     } finally {
       button.disabled = false;
     }
   });
 });
-</script>
-</head>
 
-<body>
-<header>
+setTimeout(() => {
+  if (!oneSignalInstance && !oneSignalInitError) {
+    oneSignalInitError = new Error(
+      "پاسخی از سامانه OneSignal دریافت نشد."
+    );
+    updateOneSignalButton();
+  }
+}, 15000);
+</script>
+
   <div class="logo">
     <img src="./icon-512.png"
          alt="تدبر القرآن"
