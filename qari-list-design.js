@@ -113,4 +113,77 @@
       });
     });
   }
+  
+(function () {
+  const style = document.createElement("style");
+  style.textContent = `
+    @media (max-width: 600px) {
+      html, body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden !important;
+      }
+
+      main {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        padding: 12px !important;
+      }
+
+      header, nav, section {
+        max-width: 100%;
+        min-width: 0;
+      }
+
+      .home-tiles {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+
+      #tadabburNavigation {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px !important;
+      }
+
+      #tadabburNavigation button {
+        width: 100%;
+        min-width: 0;
+        white-space: normal;
+        font-size: 13px !important;
+      }
+
+      .ayah-content {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 8px !important;
+      }
+
+      .ayah-content .translation {
+        border-right: 0 !important;
+        border-top: 1px solid var(--line) !important;
+        padding: 10px 0 0 !important;
+      }
+
+      .tools {
+        flex-wrap: wrap;
+      }
+
+      .tools input {
+        flex: 1 1 100%;
+        min-width: 0;
+        width: 100%;
+      }
+
+      img, audio, video {
+        max-width: 100%;
+      }
+
+      p, h1, h2, h3, button {
+        overflow-wrap: anywhere;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+})();
+
 })();
