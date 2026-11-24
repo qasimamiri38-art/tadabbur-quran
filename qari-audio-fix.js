@@ -1,4 +1,3 @@
-
 /* Tadabbur Quran - Afghan Reciter Audio */
 (function () {
   "use strict";
@@ -21,6 +20,7 @@
     const edition = card.dataset.edition;
 
     if (edition === "barakatullah") {
+      event.preventEvent?.();
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();
@@ -78,11 +78,8 @@
 
         const playJuz = () => {
           const juz = select.value;
-
           audio.pause();
-          audio.src =
-            "https://bayyinat.org/Surah/Quran/Juz" + juz + ".mp3";
-
+          audio.src = "https://bayyinat.org/Surah/Quran/Juz" + juz + ".mp3";
           audio.load();
 
           status.textContent =
@@ -90,31 +87,22 @@
             " با تلاوت استاد برکت‌الله سلیم...";
 
           const request = audio.play();
-
           if (request) {
             request.catch(() => {
-              status.textContent =
-                "سپاره آماده است؛ دکمهٔ پخش را لمس کن.";
+              status.textContent = "سپاره آماده است؛ دکمهٔ پخش را لمس کن.";
             });
           }
         };
 
         select.addEventListener("change", playJuz);
-
         audio.addEventListener("error", () => {
-          status.textContent =
-            "فایل صوتی باز نشد؛ اتصال اینترنت را بررسی کن.";
+          status.textContent = "فایل صوتی باز نشد؛ اتصال اینترنت را بررسی کن.";
         });
-
         player._playJuz = playJuz;
       }
 
       player.hidden = false;
-      player.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
-
+      player.scrollIntoView({ behavior: "smooth", block: "center" });
       player._playJuz();
       return;
     }
@@ -130,75 +118,91 @@
       selectedReciter = selectedEdition;
       localStorage.setItem("selectedReciter", selectedEdition);
 
-      const surahNumber =
-        Number(document.getElementById("surah")?.value) || 1;
+      const surahNumber = Number(document.getElementById("surah")?.value) || 1;
 
-      document.querySelector(
-        '#tadabburNavigation button[data-page="reader"]'
-      )?.click();
+      document.querySelector('#tadabburNavigation button[data-page="reader"]')?.click();
 
-      if (
-        !Array.isArray(verses) ||
-        !verses.length ||
-        Number(verses[0].surah) !== surahNumber
-      ) {
+      if (!Array.isArray(verses) || !verses.length || Number(verses[0].surah) !== surahNumber) {
         await loadSurah();
       }
 
       await playAudio(verses[0].global);
-
     } catch (error) {
       const message = document.getElementById("status");
-      if (message) {
-        message.textContent =
-          "پخش قاری ممکن نشد: " + error.message;
-      }
+      if (message) message.textContent = "پخش قاری ممکن نشد: " + error.message;
     }
   }, true);
 })();
+
 /* فقط یک تلاوت در هر زمان */
 (function () {
   "use strict";
-
   if (window.__tadabburSingleAudioGuard) return;
   window.__tadabburSingleAudioGuard = true;
 
   document.addEventListener("play", function (event) {
     const playingAudio = event.target;
-
     if (!playingAudio || playingAudio.tagName !== "AUDIO") return;
 
     document.querySelectorAll("audio").forEach(function (audio) {
-      if (audio !== playingAudio && !audio.paused) {
-        audio.pause();
-      }
+      if (audio !== playingAudio && !audio.paused) audio.pause();
     });
   }, true);
 })();
 
-/* سربرگ صفحه را در همه اندازه‌ها دقیقاً وسط‌چین نگه می‌دارد. */
+/* وسط‌چینی قطعی عنوان در بخش سربرگ */
 (function () {
   "use strict";
+
+  function centerHeaderTitle() {
+    const header = document.querySelector("body > header") || document.querySelector("header");
+    if (!header) return;
+
+    header.style.setProperty("direction", "ltr", "important");
+    header.style.setProperty("text-align", "center", "important");
+
+    const title = header.querySelector("h1") || document.querySelector("h1");
+    if (!title) return;
+
+    title.style.setProperty("display", "block", "important");
+    title.style.setProperty("position", "relative", "important");
+    title.style.setProperty("width", "100%", "important");
+    title.style.setProperty("max-width", "100%", "important");
+    title.style.setProperty("margin", "5px auto", "important");
+    title.style.setProperty("padding", "0", "important");
+    title.style.setProperty("left", "0", "important");
+    title.style.setProperty("right", "0", "important");
+    title.style.setProperty("text-align", "center", "important");
+    title.style.setProperty("direction", "rtl", "important");
+  }
+
   const style = document.createElement("style");
-  style.id = "tadabbur-centered-page-header";
+  style.id = "tadabbur-header-title-center-force";
   style.textContent = `
-    body > header {
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 100% !important;
+    body > header, header {
+      direction: ltr !important;
       text-align: center !important;
     }
-    body > header > .logo {
+    body > header > h1, header h1 {
+      display: block !important;
+      position: relative !important;
+      width: 100% !important;
+      max-width: 100% !important;
       margin-left: auto !important;
       margin-right: auto !important;
-    }
-    body > header > h1,
-    body > header > p {
-      width: 100% !important;
+      left: 0 !important;
+      right: 0 !important;
       text-align: center !important;
+      direction: rtl !important;
     }
   `;
   document.head.appendChild(style);
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", centerHeaderTitle);
+  } else {
+    centerHeaderTitle();
+  }
+
+  window.addEventListener("load", centerHeaderTitle);
 })();
