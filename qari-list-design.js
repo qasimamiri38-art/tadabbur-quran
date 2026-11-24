@@ -288,3 +288,233 @@
   `;
   document.head.appendChild(style);
 })();
+
+/* تدبر القرآن — افزونهٔ ظاهر کتابخانه تلاوت
+   این کد را در انتهای فایل qari-list-design.js اضافه کن.
+   کدهای قبلی را پاک نکن؛ این بخش فقط ظاهر کتابخانه را تغییر می‌دهد. */
+(function () {
+  "use strict";
+
+  function buildTadabburGallery() {
+    const section = document.getElementById("reciters");
+    if (!section || section.dataset.galleryReady === "yes") return;
+    section.dataset.galleryReady = "yes";
+
+    const style = document.createElement("style");
+    style.id = "tadabbur-reciter-gallery";
+    style.textContent = `
+      #reciters { direction: rtl; }
+      #reciters .panel {
+        border: 1px solid #b99543 !important;
+        border-radius: 20px !important;
+        overflow: hidden;
+        background: linear-gradient(145deg,#102b20,#071a12) !important;
+        color: #f7f0df !important;
+        box-shadow: 0 8px 22px rgba(0,0,0,.25);
+        padding: 0 !important;
+        margin: 16px 0 !important;
+      }
+      #reciters .quran-gallery-banner {
+        display: grid;
+        grid-template-columns: minmax(180px,.9fr) 1.2fr;
+        align-items: center;
+        gap: 22px;
+        padding: 18px;
+        border: 2px solid #d4ad52;
+        border-radius: 22px;
+        background: linear-gradient(110deg,#0b2418,#153c2b 55%,#0b2418);
+        margin: 8px 0 22px;
+        overflow: hidden;
+      }
+      #reciters .quran-gallery-banner img {
+        width: 100%;
+        height: 190px;
+        object-fit: cover;
+        object-position: center;
+        border: 2px solid #d4ad52;
+        border-radius: 15px;
+      }
+      #reciters .quran-gallery-banner h2 {
+        color: #e4c36d !important;
+        font-size: 26px;
+        margin: 0 0 8px;
+      }
+      #reciters .quran-gallery-banner p {
+        color: #e8e0ce;
+        line-height: 1.9;
+        margin: 0;
+      }
+      #reciters .panel.quran-reciter-card {
+        display: grid;
+        grid-template-columns: minmax(180px,38%) minmax(0,1fr);
+        align-items: stretch;
+        min-height: 230px;
+      }
+      #reciters .quran-reciter-card .reciter-real-photo {
+        width: 100%;
+        height: 100%;
+        min-height: 230px;
+        display: block;
+        object-fit: cover;
+        object-position: center 25%;
+        border-left: 2px solid #b99543;
+      }
+      #reciters .quran-reciter-card .reciter-card-info {
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 9px;
+      }
+      #reciters .quran-reciter-card h3 {
+        color: #e4c36d !important;
+        font-size: 21px;
+        margin: 0 !important;
+      }
+      #reciters .quran-reciter-card p {
+        color: #d8d0bf;
+        line-height: 1.8;
+        margin: 0;
+      }
+      #reciters .quran-reciter-card .reciter-choice {
+        background: linear-gradient(90deg,#17613f,#0d432c) !important;
+        border: 1px solid #d4ad52 !important;
+        border-radius: 28px !important;
+        color: #fff !important;
+        padding: 11px 22px !important;
+        min-height: 46px;
+        margin-top: 7px;
+      }
+      #reciters .quran-reciter-card .reciter-photo-credit {
+        color: #b8c9bc;
+        font-size: 11px;
+        line-height: 1.6;
+      }
+      #reciters .quran-reciter-card .reciter-photo-credit a {
+        color: #e4c36d;
+      }
+      #reciters .panel:not(.quran-reciter-card) {
+        padding: 20px !important;
+      }
+      #reciters #selectedReciter { color: #e4c36d; }
+      @media (max-width:620px) {
+        #reciters .quran-gallery-banner { grid-template-columns: 1fr; }
+        #reciters .quran-gallery-banner img { height: 180px; }
+        #reciters .panel.quran-reciter-card { grid-template-columns: 1fr; }
+        #reciters .quran-reciter-card .reciter-real-photo {
+          height: 245px;
+          min-height: 245px;
+          border-left: 0;
+          border-bottom: 2px solid #b99543;
+        }
+        #reciters .quran-reciter-card .reciter-card-info { padding: 18px; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    const cards = Array.from(section.querySelectorAll(".panel")).filter(panel =>
+      panel.querySelector(".reciter-choice")
+    );
+
+    const portraits = [
+      {
+        match: "عبدالباسط",
+        src: "https://commons.wikimedia.org/wiki/Special:FilePath/Abdul_Basit_Abd_us-Samad.jpg",
+        alt: "تصویر استاد عبدالباسط عبدالصمد",
+        source: "Wikimedia Commons",
+        page: "https://commons.wikimedia.org/wiki/File:Abdul_Basit_Abd_us-Samad.jpg"
+      },
+      {
+        match: "مشاری",
+        src: "https://commons.wikimedia.org/wiki/Special:FilePath/%D0%9C%D0%B8%D1%88%D0%B0%D1%80%D0%B8_%D0%A0%D0%B0%D1%88%D0%B8%D0%B4.jpg",
+        alt: "تصویر استاد مشاری بن راشد العفاسی",
+        source: "Wikimedia Commons",
+        page: "https://commons.wikimedia.org/wiki/File:%D0%9C%D0%B8%D1%88%D0%B0%D1%80%D0%B8_%D0%A0%D0%B0%D1%88%D0%B8%D0%B4.jpg"
+      },
+      {
+        match: "الحصری",
+        src: "https://commons.wikimedia.org/wiki/Special:FilePath/%D8%A8%D8%B7%D8%A7%D9%82%D8%A9_%D8%B4%D8%AE%D8%B5%D9%8A%D8%A9_%D9%84%D9%85%D8%AD%D9%85%D9%88%D8%AF_%D8%AE%D9%84%D9%8A%D9%84_%D8%A7%D9%84%D8%AD%D8%B5%D8%B1%D9%8A_%28cropped%29.png",
+        alt: "تصویر استاد محمود خلیل الحصری",
+        source: "Wikimedia Commons",
+        page: "https://commons.wikimedia.org/"
+      },
+      {
+        match: "برکت",
+        src: "https://pajhwok.com/wp-content/uploads/2013/04/8653656419_849865ab04_z.jpg",
+        alt: "تصویر استاد برکت‌الله سلیم",
+        source: "Pajhwok",
+        page: "https://pajhwok.com/photo/qari-barakatullah-saleem/"
+      }
+    ];
+
+    cards.forEach(panel => {
+      const heading = panel.querySelector("h3");
+      const button = panel.querySelector(".reciter-choice");
+      if (!heading || !button) return;
+
+      const title = heading.textContent.trim();
+      const portrait = portraits.find(item => title.includes(item.match));
+      if (!portrait) return;
+
+      panel.classList.add("quran-reciter-card");
+      const info = document.createElement("div");
+      info.className = "reciter-card-info";
+
+      while (panel.firstChild) info.appendChild(panel.firstChild);
+
+      const img = document.createElement("img");
+      img.className = "reciter-real-photo";
+      img.loading = "lazy";
+      img.referrerPolicy = "no-referrer";
+      img.src = portrait.src;
+      img.alt = portrait.alt;
+      img.addEventListener("error", () => {
+        img.alt = "عکس از منبع بیرونی بارگذاری نشد";
+        img.style.background = "#183b2b";
+      }, { once: true });
+
+      const credit = document.createElement("small");
+      credit.className = "reciter-photo-credit";
+      credit.append("منبع عکس: ");
+      const link = document.createElement("a");
+      link.href = portrait.page;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = portrait.source;
+      credit.appendChild(link);
+      info.appendChild(credit);
+
+      panel.append(img, info);
+      button.textContent = "▶ انتخاب و شروع تلاوت";
+    });
+
+    const intro = section.querySelector(".panel:not(.quran-reciter-card)");
+    if (intro && !section.querySelector(".quran-gallery-banner")) {
+      const banner = document.createElement("div");
+      banner.className = "quran-gallery-banner";
+      banner.innerHTML = `
+        <img loading="lazy" referrerpolicy="no-referrer"
+          src="https://commons.wikimedia.org/wiki/Special:FilePath/Qur%27an_and_Rehal.jpg"
+          alt="قرآن کریم روی رحل">
+        <div>
+          <h2>کتابخانه تلاوت</h2>
+          <p>قرآن کریم در مرکز این مجموعه؛ برای شنیدن تلاوت، نام و تصویر مورد نظر را انتخاب کن.</p>
+        </div>
+      `;
+      intro.before(banner);
+
+      const heading = intro.querySelector("h2");
+      const paragraph = intro.querySelector("p");
+      if (heading) heading.textContent = "کتابخانه تلاوت";
+      if (paragraph) paragraph.textContent =
+        "برای آغاز تلاوت، یکی از نام‌ها و تصویرهای زیر را انتخاب کن.";
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", buildTadabburGallery, { once: true });
+  } else {
+    buildTadabburGallery();
+  }
+})();
