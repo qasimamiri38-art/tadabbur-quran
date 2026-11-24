@@ -312,4 +312,21 @@
   } else {
     installGallery();
   }
+  
+  // تغییر نام کتابخانه در منوی اصلی
+  document.querySelectorAll(
+    '#tadabburNavigation button[data-page="reciters"]'
+  ).forEach(button => {
+    button.textContent = "🎙️ کتابخانه تلاوت";
+  });
+
+  // تغییر نام میان‌بر صفحه خانه
+  const homeLink = document.querySelector(
+    "#home .home-reciter-link h3"
+  );
+
+  if (homeLink) {
+    homeLink.textContent = "🎙️ کتابخانه تلاوت";
+  }
+
 })();
