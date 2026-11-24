@@ -187,3 +187,58 @@
 })();
 
 })();
+
+(function () {
+  const style = document.createElement("style");
+
+  style.textContent = `
+    @media (max-width: 600px) {
+      header {
+        width: 100% !important;
+        max-width: 100vw !important;
+        padding: 20px 14px 18px !important;
+        text-align: center !important;
+        overflow: hidden !important;
+      }
+
+      header .logo {
+        margin: 0 auto 12px !important;
+      }
+
+      header h1 {
+        width: 100% !important;
+        font-size: 27px !important;
+        text-align: center !important;
+        white-space: normal !important;
+      }
+
+      header p {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 8px auto !important;
+        padding: 0 4px !important;
+        font-size: 14px !important;
+        line-height: 2 !important;
+        text-align: center !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
+      }
+
+      #home .home-welcome {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 14px !important;
+        overflow: hidden !important;
+      }
+
+      #home .home-welcome img {
+        width: 100% !important;
+        height: auto !important;
+        max-height: 220px !important;
+        object-fit: contain !important;
+      }
+    }
+  `;
+
+  document.head.appendChild(style);
+})();
