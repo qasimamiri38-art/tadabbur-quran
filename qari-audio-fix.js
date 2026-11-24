@@ -27,8 +27,8 @@
 
       const section = document.getElementById("reciters");
       const status = document.getElementById("reciterStatus");
-const reader = document.getElementById("reader");
-document.querySelector('#tadabburNavigation button[data-page="reader"]')?.click();
+      const reader = document.getElementById("reader");
+      document.querySelector('#tadabburNavigation button[data-page="reader"]')?.click();
       section.querySelectorAll(".reciter-card").forEach(item => {
         item.classList.toggle("selected", item === card);
       });
@@ -174,4 +174,31 @@ document.querySelector('#tadabburNavigation button[data-page="reader"]')?.click(
       }
     });
   }, true);
+})();
+
+/* سربرگ صفحه را در همه اندازه‌ها دقیقاً وسط‌چین نگه می‌دارد. */
+(function () {
+  "use strict";
+  const style = document.createElement("style");
+  style.id = "tadabbur-centered-page-header";
+  style.textContent = `
+    body > header {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      text-align: center !important;
+    }
+    body > header > .logo {
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+    body > header > h1,
+    body > header > p {
+      width: 100% !important;
+      text-align: center !important;
+    }
+  `;
+  document.head.appendChild(style);
 })();
