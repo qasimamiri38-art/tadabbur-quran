@@ -242,3 +242,49 @@
 
   document.head.appendChild(style);
 })();
+/* اصلاح نهایی سربرگ موبایل */
+((function () {
+  const style = document.createElement("style");
+  style.textContent = `
+    @media (max-width: 600px) {
+      body > header {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: calc(18px + env(safe-area-inset-top)) 16px 22px !important;
+        text-align: center !important;
+        overflow: hidden !important;
+      }
+      body > header > .logo {
+        width: 88px !important;
+        height: 88px !important;
+        margin: 0 auto 12px !important;
+        flex: 0 0 88px !important;
+      }
+      body > header > h1 {
+        width: 100% !important;
+        margin: 6px auto 10px !important;
+        font-size: 27px !important;
+        line-height: 1.6 !important;
+        text-align: center !important;
+        white-space: normal !important;
+      }
+      body > header > p {
+        width: 100% !important;
+        margin: 4px auto !important;
+        padding: 0 !important;
+        font-size: 14px !important;
+        line-height: 2 !important;
+        text-align: center !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+})();
