@@ -1514,25 +1514,27 @@ document.getElementById("barakatJuzSelect")?.remove();
       const audioUrl = `https://cdn.islamic.network/quran/audio-surah/128/${edition}/${surahNumber}.mp3`;
 
       audio.pause();
-      audio.src = audioUrl;
-      audio.load();
-      message.textContent = "قاری انتخاب‌شده: " + name + " · در حال پخش " + surahName;
+      const audioUrl = `https://cdn.islamic.network/quran/audio-surah/128/${edition}/${surahNumber}.mp3`;
 
-      // play() is called synchronously from the user's photo tap (important for iPad/Safari).
-      const playRequest = audio.play();
-      if (playRequest && typeof playRequest.catch === "function") {
-        playRequest.catch(() => {
-          message.textContent = "پخش خودکار آغاز نشد. دکمهٔ ▶ داخل پخش‌کننده را لمس کن.";
-        });
-      }
-      audio.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    });
+audio.pause();
+audio.src = audioUrl;
+audio.load();
+message.textContent = "قاری انتخاب‌شده: " + name + " · در حال پخش " + surahName;
+
+// play() is called synchronously from the user's photo tap (important for iPad/Safari).
+const playRequest = audio.play();
+if (playRequest && typeof playRequest.catch === "function") {
+  playRequest.catch(() => {
+    message.textContent = "پخش خودکار آغاز نشد. دکمهٔ ▶ داخل پخش‌کننده را لمس کن.";
   });
-
+}
+audio.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
   audio.addEventListener("ended", () => {
-    message.textContent = "تلاوت این سوره پایان یافت.";
-  });
-  audio.addEventListener("error", () => {
+  if (audio.dataset.everyayahPlaylist === "yes") return;
+  message.textContent = "تلاوت سوره پایان یافت.";
+});
+  if (audio.dataset.everyayahPlaylist === "yes") return;
     message.textContent = "فایل صوتی در دسترس نشد. اتصال اینترنت یا قاری دیگری را بررسی کن.";
   });
 
