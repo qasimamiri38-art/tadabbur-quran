@@ -1582,59 +1582,7 @@ audio.scrollIntoView({ behavior: "smooth", block: "nearest" });
 </script>
 
 
-(function () {
-  const prayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
-  const storageKey = "tadabburAdhanSettings";
 
-  function loadSettings() {
-    try {
-      return JSON.parse(localStorage.getItem(storageKey)) || {};
-    } catch {
-      return {};
-    }
-  }
-
-  const settings = loadSettings();
-
-  prayers.forEach(prayer => {
-    const enabled = document.getElementById("adhan-enabled-" + prayer);
-    const type = document.getElementById("adhan-type-" + prayer);
-    const sound = document.getElementById("adhan-sound-" + prayer);
-
-    if (!enabled || !type || !sound) return;
-
-    const saved = settings[prayer] || {};
-
-    if (typeof saved.enabled === "boolean") {
-      enabled.checked = saved.enabled;
-    }
-
-    if (saved.type) type.value = saved.type;
-    if (saved.sound) sound.value = saved.sound;
-
-    function saveSettings() {
-      settings[prayer] = {
-        enabled: enabled.checked,
-        type: type.value,
-        sound: sound.value
-      };
-
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(settings));
-        const status = document.getElementById("adhanSaveStatus");
-        if (status) status.textContent = "تنظیمات اذان ذخیره شد.";
-      } catch {
-        const status = document.getElementById("adhanSaveStatus");
-        if (status) status.textContent = "ذخیره‌سازی انجام نشد.";
-      }
-    }
-
-    enabled.addEventListener("change", saveSettings);
-    type.addEventListener("change", saveSettings);
-    sound.addEventListener("change", saveSettings);
-  });
-})();
-</script>
 
 <script>
 (function () {
