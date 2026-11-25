@@ -1510,8 +1510,7 @@ document.getElementById("barakatJuzSelect")?.remove();
       cards.forEach((other) => other.classList.toggle("selected", other === card));
       localStorage.setItem("selectedReciter", edition);
       const surahNumber = Number(byId("surah")?.value) || 1;
-      const surahName = byId("surah")?.selectedOptions?.[0]?.textContent || ("سورهٔ " + surahNumber);
-      const audioUrl = `https://cdn.islamic.network/quran/audio-surah/128/${edition}/${surahNumber}.mp3`;
+      const surahName = byId("surah")?.selectedOptions?.[0]?.textContent || ("سورهٔ " + const audioUrl = `https://cdn.islamic.network/quran/audio-surah/128/${edition}/${surahNumber}.mp3`;
 
       audio.pause();
       const audioUrl = `https://cdn.islamic.network/quran/audio-surah/128/${edition}/${surahNumber}.mp3`;
