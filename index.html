@@ -1,4 +1,4 @@
-  <!doctype html>
+<!doctype html>
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -1512,6 +1512,10 @@ document.getElementById("barakatJuzSelect")?.remove();
       const surahNumber = Number(byId("surah")?.value) || 1;
       const surahName = byId("surah")?.selectedOptions?.[0]?.textContent || ("سورهٔ " + surahNumber);
       const audioUrl = `https://cdn.islamic.network/quran/audio-surah/128/${edition}/${surahNumber}.mp3`;
+
+      audio.pause();
+      const audioUrl = `https://cdn.islamic.network/quran/audio-surah/128/${edition}/${surahNumber}.mp3`;
+
 audio.pause();
 audio.src = audioUrl;
 audio.load();
@@ -1549,7 +1553,15 @@ audio.scrollIntoView({ behavior: "smooth", block: "nearest" });
   showPage("reader");
 })();
 </script>
+<!-- <script src="./qari-audio-fix.js"></script> -->
 <script src="./qari-audio-fix.js"></script>
+<script src="./qari-list-design.js"></script>
+<script src="./qibla-compass-fix.js"></script>
+<script src="./reading-mode.js"></script>
+<script src="./memorization-engine.js"></script>
+<script src="./qari-lesson.js"></script>
+<script src="./prayer-auto-setup.js"></script>
+<script>
 <script src="./qari-list-design.js"></script>
 <script src="./qibla-compass-fix.js"></script>
 <script src="./reading-mode.js"></script>
