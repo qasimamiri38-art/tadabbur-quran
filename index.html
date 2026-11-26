@@ -1484,22 +1484,30 @@ audio.pause();
 audio.src = audioUrl;
 audio.load();
 message.textContent = "قاری انتخاب‌شده: " + name + " · در حال پخش " + surahName;
-audio.addEventListener("ended", () => {
-  if (audio.dataset.everyayahPlaylist === "yes") return;
-  message.textContent = "تلاوت سوره پایان یافت.";
-});
+      const playRequest = audio.play();
 
-audio.addEventListener("error", () => {
-  if (audio.dataset.everyayahPlaylist === "yes") return;
-  message.textContent = "فایل صوتی در دسترس نیست؛ اتصال اینترنت یا قاری دیگری را بررسی کن.";
-});
-}
-audio.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      if (playRequest && typeof playRequest.catch === "function") {
+        playRequest.catch(() => {
+          message.textContent =
+            "پخش خودکار آغاز نشد؛ دکمهٔ پخش‌کننده را لمس کن.";
+        });
+      }
+
+      audio.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest"
+      });
+    });
   });
+
   audio.addEventListener("ended", () => {
-  if (audio.dataset.everyayahPlaylist === "yes") return;
-  message.textContent = "تلاوت سوره پایان یافت.";
-});
+    message.textContent = "تلاوت سوره پایان یافت.";
+  });
+
+  audio.addEventListener("error", () => {
+    message.textContent =
+      "فایل صوتی در دسترس نیست؛ اتصال اینترنت یا قاری دیگری را بررسی کن.";
+  });
   
 
   // Open the Quran reader with the selected surah; changing surah then tapping a card plays it.
