@@ -149,13 +149,22 @@
       }
     }, true);
 
-      }
+        }
 
   function install() {
     installHeaderFix();
     installSingleAudioGuard();
     installReciterPlayback();
   }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install, { once: true });
+  } else {
+    install();
+  }
+})();
+
+  
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", install, { once: true });
