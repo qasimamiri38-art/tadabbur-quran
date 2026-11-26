@@ -142,15 +142,18 @@
       }
     }, true);
 
-    document.addEventListener("error", function (event) {
+      document.addEventListener("error", function (event) {
       if (event.target && event.target.id === "tadabburReciterAudio") {
         const status = document.getElementById("tadabburReciterStatus");
-        if (status) status.textContent = "فایل صوتی در دسترس نیست؛ اتصال اینترنت یا قاری دیگری را بررسی کنید.";
+        if (status) status.textContent = "فایل صوتی در دسترس نیست؛ اتصال اینترنت را بررسی کنید.";
       }
+    }, true);
+
     function install() {
-  installHeaderFix();
-  installSingleAudioGuard();
-}
+      installHeaderFix();
+      installSingleAudioGuard();
+      installReciterPlayback();
+    }
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", install, { once: true });
