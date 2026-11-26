@@ -147,14 +147,10 @@
         const status = document.getElementById("tadabburReciterStatus");
         if (status) status.textContent = "فایل صوتی در دسترس نیست؛ اتصال اینترنت یا قاری دیگری را بررسی کنید.";
       }
-    }, true);
-  }
-
-  function install() {
-    installHeaderFix();
-    installSingleAudioGuard();
-    installReciterPlayback();
-  }
+    function install() {
+  installHeaderFix();
+  installSingleAudioGuard();
+}
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", install, { once: true });
