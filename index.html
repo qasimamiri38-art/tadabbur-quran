@@ -1484,13 +1484,15 @@ audio.pause();
 audio.src = audioUrl;
 audio.load();
 message.textContent = "قاری انتخاب‌شده: " + name + " · در حال پخش " + surahName;
+audio.addEventListener("ended", () => {
+  if (audio.dataset.everyayahPlaylist === "yes") return;
+  message.textContent = "تلاوت سوره پایان یافت.";
+});
 
-// play() is called synchronously from the user's photo tap (important for iPad/Safari).
-const playRequest = audio.play();
-if (playRequest && typeof playRequest.catch === "function") {
-  playRequest.catch(() => {
-    message.textContent = "پخش خودکار آغاز نشد. دکمهٔ ▶ داخل پخش‌کننده را لمس کن.";
-  });
+audio.addEventListener("error", () => {
+  if (audio.dataset.everyayahPlaylist === "yes") return;
+  message.textContent = "فایل صوتی در دسترس نیست؛ اتصال اینترنت یا قاری دیگری را بررسی کن.";
+});
 }
 audio.scrollIntoView({ behavior: "smooth", block: "nearest" });
   });
@@ -1498,9 +1500,7 @@ audio.scrollIntoView({ behavior: "smooth", block: "nearest" });
   if (audio.dataset.everyayahPlaylist === "yes") return;
   message.textContent = "تلاوت سوره پایان یافت.";
 });
-  if (audio.dataset.everyayahPlaylist === "yes") return;
-    message.textContent = "فایل صوتی در دسترس نشد. اتصال اینترنت یا قاری دیگری را بررسی کن.";
-  });
+  
 
   // Open the Quran reader with the selected surah; changing surah then tapping a card plays it.
   const surahSelect = byId("surah");
