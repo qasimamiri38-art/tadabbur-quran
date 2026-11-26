@@ -149,7 +149,20 @@
       }
     }, true);
 
-    function install() {
+      }
+
+  function install() {
+    installHeaderFix();
+    installSingleAudioGuard();
+    installReciterPlayback();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install, { once: true });
+  } else {
+    install();
+  }
+})();
       installHeaderFix();
       installSingleAudioGuard();
       installReciterPlayback();
