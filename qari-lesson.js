@@ -1,4 +1,4 @@
-/* Tadabbur Quran — Qari Lesson: ayah-by-ayah listening and follow-along */
+ /* Tadabbur Quran — Qari Lesson: ayah-by-ayah listening and follow-along */
 (function () {
   "use strict";
   const API = "https://api.alquran.cloud/v1";
