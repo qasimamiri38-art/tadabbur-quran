@@ -1629,15 +1629,24 @@ audio.scrollIntoView({ behavior: "smooth", block: "nearest" });
     if (oldValue === "abdulrahman") oldValue = "indonesia";
 
     select.innerHTML = "";
-    Object.entries(names).forEach(([value, label]) => {
-      const option = document.createElement("option");
-      option.value = value;
-      option.textContent = label;
-      select.appendChild(option);
-    });
 
-    select.value = audioFiles[oldValue] ? oldValue : "mishary";
-    select.dispatchEvent(new Event("change"));
+const availableNames = prayer === "Fajr"
+  ? {
+      mishary: names.mishary,
+      madinah: names.madinah,
+      makkah: names.makkah
+    }
+  : names;
+
+Object.entries(availableNames).forEach(([value, label]) => {
+  const option = document.createElement("option");
+  option.value = value;
+  option.textContent = label;
+  select.appendChild(option);
+});
+
+select.value = availableNames[oldValue] ? oldValue : "mishary";
+select.dispatchEvent(new Event("change"));
 
     const btn = document.createElement("button");
     btn.type = "button";
