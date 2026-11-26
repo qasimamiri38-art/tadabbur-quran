@@ -1,4 +1,5 @@
- /* Tadabbur Quran — header alignment, single-audio guard, and reciter playback repair */
+ 
+/* Tadabbur Quran — header alignment, single-audio guard, and reciter playback repair */
 (function () {
   "use strict";
 
