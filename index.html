@@ -1454,17 +1454,22 @@ if (edition === "barakatullah") {
     other.classList.toggle("selected", other === card)
   );
 
-  // Keep the Quran verse-by-verse reciter unchanged.
+  // Clear any previous failed reciter stream so its old "Error" state
+  // is not mistaken for Barakatullah's separate Juz recordings.
+  audio.pause();
+  audio.removeAttribute("src");
+  audio.load();
+
   let juzSelect = document.getElementById("barakatJuzSelect");
 
   if (!juzSelect) {
     juzSelect = document.createElement("select");
     juzSelect.id = "barakatJuzSelect";
     juzSelect.style.cssText =
-      "display:block;width:100%;padding:12px;margin:12px 0;border-radius:12px;background:#183126;color:white;border:1px solid #8c7540;font-size:16px;";
+      "display:block;width:100%;padding:14px;margin:12px 0;border-radius:12px;background:#183126;color:white;border:1px solid #d8b66b;font-size:17px;";
 
     juzSelect.innerHTML =
-      '<option value="">انتخاب سپاره</option>';
+      '<option value="">📖 سپارهٔ مورد نظر را انتخاب کن</option>';
 
     for (let i = 1; i <= 30; i++) {
       const option = document.createElement("option");
@@ -1483,21 +1488,25 @@ if (edition === "barakatullah") {
       audio.src =
         "https://bayyinat.org/Surah/Quran/Juz" +
         String(juz).padStart(2, "0") + ".mp3";
-
       audio.load();
 
       message.textContent =
-        "تلاوت استاد برکت‌الله سلیم · سپاره " + juz;
+        "تلاوت استاد برکت‌الله سلیم · سپاره " + juz + " · در حال آماده‌سازی";
 
-      audio.play().catch(() => {
-        message.textContent =
-          "برای آغاز تلاوت، دکمهٔ پخش را لمس کن.";
-      });
+      const playRequest = audio.play();
+      if (playRequest && typeof playRequest.catch === "function") {
+        playRequest.catch(() => {
+          message.textContent =
+            "پخش خودکار آغاز نشد؛ دکمهٔ پخش را لمس کن.";
+        });
+      }
     });
   }
 
   juzSelect.value = "";
-  message.textContent = "استاد برکت‌الله سلیم انتخاب شد؛ سپارهٔ مورد نظر را انتخاب کن.";
+  juzSelect.scrollIntoView({ behavior: "smooth", block: "center" });
+  message.textContent =
+    "استاد برکت‌الله سلیم انتخاب شد؛ از فهرست بالا یکی از ۳۰ سپاره را انتخاب کن.";
   return;
 }
 
