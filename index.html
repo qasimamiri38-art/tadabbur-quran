@@ -28,6 +28,16 @@ select{flex:1;min-width:0}input{flex:2;min-width:170px}
 .arabic{font:30px/2.15 "Amiri Quran",serif;text-align:justify;margin:12px 0;color:var(--arabic-color)}
 .arabic.indopak{font-family:"Noto Nastaliq Urdu","Amiri Quran",serif;line-height:2.6;text-align:right}
 .arabic.mushaf{font-family:"UthmanicHafs","Amiri Quran",serif;line-height:2.35;text-align:justify}
+.arabic.tajweed{line-height:2.35;text-align:justify}
+.tajweed-mark{font-weight:700}
+.tajweed-noon-tanween{color:#f28b82}
+.tajweed-meem-sakinah{color:#ffb86b}
+.tajweed-letter-relations{color:#80cbc4}
+.tajweed-madd{color:#82b1ff}
+.tajweed-qalqalah{color:#ce93d8}
+.tajweed-tafkheem-tarqeeq{color:#e6c36a}
+.tajweed-mushaddadatan{color:#a5d6a7}
+.tajweed-other{color:#f48fb1}
 /* فونت‌های قرآنی: بارگذاری از CDN رسمی مستندات Quran Foundation */
 @font-face{
   font-family:'UthmanicHafs';
@@ -329,7 +339,7 @@ setTimeout(() => {
   <option value="dari_badkhashani">ترجمه دری بدخشیانی</option>
 </select>
 
-  <select id="quranFont" aria-label="رسم‌الخط قرآن"><option value="uthmanic" selected>عثمانی (حفص)</option><option value="indopak">هندی ـ پاکستانی (حفص نستعلیق)</option><option value="tajweed" disabled>مصحف تجویدی (در حال آماده‌سازی)</option><option value="mushaf">مصحف مدینه (حفص)</option></select>
+  <select id="quranFont" aria-label="رسم‌الخط قرآن"><option value="uthmanic" selected>عثمانی (حفص)</option><option value="indopak">هندی ـ پاکستانی (حفص نستعلیق)</option><option value="tajweed">مصحف تجویدی (حفص)</option><option value="mushaf">مصحف مدینه (حفص)</option></select>
   <select id="tafsir">
     <option value="">بدون تفسیر</option>
   </select>
@@ -570,6 +580,54 @@ function status(message){
   if(el) el.textContent=message;
 }
 let surahs=[], verses=[], translationId="", tafsirId="", fontSize=30, verseObserver=null;
+let tajweedBundlePromise=null, tajweedBundle=null;
+const TAJWEED_BASE="https://raw.githubusercontent.com/quran-ws/quran-tajweed/v0.4.3/";
+async function loadTajweedBundle(){
+ if(tajweedBundle) return tajweedBundle;
+ if(!tajweedBundlePromise){
+  tajweedBundlePromise=(async()=>{
+   const [annRes,editionRes,rulesRes]=await Promise.all([
+    fetch(TAJWEED_BASE+"packages/annotations/uthmani-hafs.json"),
+    fetch(TAJWEED_BASE+"editions/uthmani-hafs.json"),
+    fetch(TAJWEED_BASE+"packages/rules/rules.json")
+   ]);
+   if(!annRes.ok||!editionRes.ok||!rulesRes.ok) throw new Error("داده‌های تجوید از منبع اصلی دریافت نشد.");
+   const [annotations,edition,rules]=await Promise.all([annRes.json(),editionRes.json(),rulesRes.json()]);
+   if(annotations.riwayah!=="hafs-an-asim"||rules.riwayah!=="hafs-an-asim"||annotations.corpusVersion!==rules.version) throw new Error("نسخهٔ قواعد و علامت‌های تجوید با هم سازگار نیستند.");
+   if(!edition.ayahs||!annotations.spans||!Array.isArray(annotations.ruleIds)) throw new Error("ساختار دادهٔ تجوید معتبر نیست.");
+   const refs=Object.keys(edition.ayahs).sort((a,b)=>{const [sa,aa]=a.split(":").map(Number),[sb,ab]=b.split(":").map(Number);return sa-sb||aa-ab;});
+   if(refs.length!==6236) throw new Error("تعداد آیات نسخهٔ تجوید درست نیست.");
+   const field=String.fromCharCode(0),record=String.fromCharCode(1);
+   const canonical=refs.map(ref=>ref+field+edition.ayahs[ref]).join(record);
+   const digestBytes=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(canonical));
+   const digest=Array.from(new Uint8Array(digestBytes),b=>b.toString(16).padStart(2,"0")).join("");
+   if(digest!==annotations.edition.sha256) throw new Error("متن قرآن با علامت‌های تجوید تطبیق ندارد؛ برای جلوگیری از رنگ‌آمیزی اشتباه، تجوید نمایش داده نشد.");
+   const categories=new Map((rules.categories||[]).map(x=>[x.id,x.topic]));
+   const hukums=new Map((rules.hukums||[]).map(x=>[x.id,x.category]));
+   const ruleMap=new Map((rules.rules||[]).map(x=>[x.id,{topic:categories.get(hukums.get(x.hukum))||"other",label:x.label?.ar||x.hukum}]));
+   tajweedBundle={annotations,edition,ruleMap};
+   return tajweedBundle;
+  })().catch(error=>{tajweedBundlePromise=null;throw error;});
+ }
+ return tajweedBundlePromise;
+}
+function renderTajweed(ar,text,spans,bundle){
+ const chars=Array.from(text);let cursor=0;
+ for(const item of (spans||[])){
+  const start=Number(item[0]),end=Number(item[1]),ruleIndex=Number(item[2]);
+  const focusStart=Number(item.length>3?item[3]:start),focusEnd=Number(item.length>4?item[4]:end);
+  if(!Number.isInteger(focusStart)||!Number.isInteger(focusEnd)||focusStart<cursor||focusEnd<=focusStart||focusEnd>chars.length) continue;
+  if(focusStart>cursor) ar.append(document.createTextNode(chars.slice(cursor,focusStart).join("")));
+  const ruleId=bundle.annotations.ruleIds[ruleIndex];
+  const meta=bundle.ruleMap.get(ruleId)||{topic:"other",label:ruleId||"قاعده تجوید"};
+  const mark=document.createElement("span");
+  mark.className="tajweed-mark tajweed-"+meta.topic;
+  mark.title=meta.label;
+  mark.textContent=chars.slice(focusStart,focusEnd).join("");
+  ar.append(mark);cursor=focusEnd;
+ }
+ if(cursor<chars.length) ar.append(document.createTextNode(chars.slice(cursor).join("")));
+}
 
 const VALID_AUDIO_RECITERS = [
   "ar.abdulbasit",
@@ -767,11 +825,12 @@ async function loadSurah() {
 
     const selectedScript = $("quranFont")?.value || "uthmanic";
     const scriptId = selectedScript === "indopak" ? "hafs-nastaliq" : selectedScript === "mushaf" ? "qpc-hafs" : null;
+    const tajweedMode = selectedScript === "tajweed";
     const scriptUrl = scriptId
       ? "https://quran-json.risanb.com/text/" + scriptId + "/chapters/" + n + ".json"
       : null;
 
-    const [data, dariByAya, scriptResponse] = await Promise.all([
+    const [data, dariByAya, scriptResponse, tajweedData] = await Promise.all([
       api(
         "/surah/" + n + "/editions/" +
         ids.map(encodeURIComponent).join(",")
@@ -780,7 +839,8 @@ async function loadSurah() {
       scriptUrl ? fetch(scriptUrl).then(response => {
         if (!response.ok) throw new Error("متن هندی‌ـ‌پاکستانی دریافت نشد");
         return response.json();
-      }) : Promise.resolve(null)
+      }) : Promise.resolve(null),
+      tajweedMode ? loadTajweedBundle() : Promise.resolve(null)
     ]);
 
     const editions = Array.isArray(data) ? data : [data];
@@ -790,6 +850,7 @@ async function loadSurah() {
     ) || editions[0];
 
     const scriptVerses = scriptResponse?.verses;
+    if(tajweedMode && (!tajweedData?.edition?.ayahs || !tajweedData.annotations?.spans)) throw new Error("داده‌های تجوید کامل دریافت نشد.");
     if (scriptId &&
         (!Array.isArray(scriptVerses) || scriptVerses.length !== ar?.ayahs?.length)) {
       throw new Error("تعداد آیات رسم‌الخط انتخاب‌شده با متن حفص برابر نیست؛ نمایش تغییر داده نشد.");
@@ -807,7 +868,8 @@ async function loadSurah() {
       global: a.number,
       n: a.numberInSurah,
       surah: n,
-      arabic: scriptId ? scriptVerses[i].text : a.text,
+      arabic: tajweedMode ? tajweedData.edition.ayahs[n+":"+a.numberInSurah] : scriptId ? scriptVerses[i].text : a.text,
+      tajweedSpans: tajweedMode ? (tajweedData.annotations.spans[n+":"+a.numberInSurah] || []) : null,
       translation:
         dariByAya.get(Number(a.numberInSurah)) || "",
       tafsir:
@@ -855,9 +917,14 @@ content.className="ayah-content";
 
 const ar=document.createElement("p");
 const activeScript=$("quranFont")?.value;
- ar.className="arabic"+(activeScript==="indopak"?" indopak":activeScript==="mushaf"?" mushaf":"");
+ ar.className="arabic"+(activeScript==="indopak"?" indopak":activeScript==="mushaf"?" mushaf":activeScript==="tajweed"?" tajweed":"");
 ar.style.fontSize=fontSize+"px";
-ar.textContent=(v.n===1 && Number(v.surah)!==1 && Number(v.surah)!==9 ? v.arabic.replace(/^بِسْمِ.*?الرَّحِيمِ\s*/,"") : v.arabic)+" ۞";
+if(activeScript==="tajweed" && tajweedBundle){
+ renderTajweed(ar,v.arabic,v.tajweedSpans,tajweedBundle);
+ ar.append(document.createTextNode(" ۞"));
+}else{
+ ar.textContent=(v.n===1 && Number(v.surah)!==1 && Number(v.surah)!==9 ? v.arabic.replace(/^بِسْمِ.*?الرَّحِيمِ\s*/,"") : v.arabic)+" ۞";
+}
 content.append(ar);
 
 if(v.translation){
