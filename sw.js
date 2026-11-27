@@ -1,5 +1,5 @@
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
-const CACHE = "tadabbur-quran-v11";
+const CACHE = "tadabbur-quran-v12";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -7,9 +7,6 @@ const APP_SHELL = [
   "./icon-512.png",
   "./qari-audio-fix.js",
   "./qari-list-design.js",
-  "./abdulbasit.jpg",
-  "./alafasy.jpg",
-  "./husary.jpg",
   "./barakatullah.jpg"
 ];
 
