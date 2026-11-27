@@ -920,7 +920,7 @@ async function playAudio(number){
       // Alafasy's verified EveryAyah files use Surah/Ayah numbering.
       // Keep the existing CDN route for the other selected reciters.
       const ayahAudioUrl = selectedReciter === "ar.alafasy"
-        ? "https://everyayah.com/data/Alafasy_128kbps/" +
+        ? "https://verse.mp3quran.net/data/Alafasy_128kbps/" +
           String(v.surah).padStart(3, "0") +
           String(v.n).padStart(3, "0") + ".mp3"
         : "https://cdn.islamic.network/quran/audio/" +
@@ -972,7 +972,7 @@ if (
 ) {
   const basmalaBitrate = selectedReciter === "ar.abdulbasit" ? 192 : 128;
   const basmalaAudioUrl = selectedReciter === "ar.alafasy"
-    ? "https://everyayah.com/data/Alafasy_128kbps/001001.mp3"
+    ? "https://verse.mp3quran.net/data/Alafasy_128kbps/001001.mp3"
     : "https://cdn.islamic.network/quran/audio/" +
       basmalaBitrate + "/" + selectedReciter + "/1.mp3";
 
