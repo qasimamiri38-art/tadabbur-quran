@@ -1,0 +1,27 @@
+@font-face{font-family:UthmanicHafs;src:url("https://verses.quran.foundation/fonts/quran/hafs/uthmanic_hafs/UthmanicHafs1Ver18.woff2") format("woff2")}
+@import url('https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Vazirmatn:wght@400;500;600;700&display=swap');
+:root{--bg:#09150f;--panel:#14251b;--green:#18563c;--gold:#d8b66b;--ink:#f5eddd;--muted:#c2c6bb;--line:#675633}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:radial-gradient(ellipse at top,#173b29,var(--bg) 65%);color:var(--ink);font-family:Vazirmatn,Arial,sans-serif}
+body{display:flex;flex-direction:column;padding:2.5vh 3vw}
+.top{height:12vh;min-height:82px;display:flex;align-items:center;gap:18px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.logo{width:72px;height:72px}.top h1{font-size:34px;color:var(--gold);margin:0}.top p{margin:0;color:var(--muted);font-size:16px}.top-status{margin-right:auto;color:var(--muted);font-size:15px}
+main{flex:1;min-height:0;position:relative;padding:18px 0}.screen{display:none;height:100%;overflow:hidden}.screen.active{display:block}
+h2{color:var(--gold);font-size:30px;margin:8px 0 14px}.lead{font-size:22px;color:#e7dcc4}
+.home-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;max-width:980px;margin:34px auto}
+button{font:inherit;color:var(--ink);background:linear-gradient(145deg,#1b3023,#14241b);border:2px solid #675633;border-radius:16px;padding:16px 22px;font-size:21px;min-height:66px;cursor:pointer}
+button:focus,button.focused{outline:4px solid var(--gold);outline-offset:3px;border-color:#f1d48b;background:linear-gradient(145deg,#28583d,#1b3b2a);color:#fff4d8}
+button.primary{background:linear-gradient(145deg,#216344,#16452f);border-color:#b99a55}
+.tile{min-height:120px;font-size:26px}.hint{color:var(--muted);font-size:16px;text-align:center;margin-top:28px}
+.screen-head{display:flex;justify-content:space-between;align-items:center}.screen-head h2{margin:0 0 14px}.small{min-height:48px;font-size:17px;padding:8px 18px}
+.browse-layout{height:calc(100% - 58px);display:grid;grid-template-columns:1.3fr .7fr;gap:22px}
+.surah-list{overflow-y:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:9px;padding:8px}
+.surah-item{min-height:62px;text-align:right;font-size:19px}.surah-item.selected{border-color:var(--gold);background:#254b34}
+.side-info{background:rgba(20,37,27,.86);border:1px solid var(--line);border-radius:18px;padding:24px}.side-info h3{font:30px UthmanicHafs,serif;color:var(--gold)}.side-info p{font-size:18px;line-height:2;color:var(--muted)}
+.reciter-list{display:flex;flex-direction:column;gap:16px;max-width:850px;margin:24px auto}.reciter-list button{text-align:right}
+.reader-controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}.reader-controls button{min-width:150px}.status{text-align:center;color:var(--gold);font-size:17px;padding:8px}
+.ayah-list{height:calc(100% - 145px);overflow-y:auto;background:rgba(7,18,12,.52);border:1px solid var(--line);border-radius:18px;padding:14px 26px}
+.ayah{border-bottom:1px solid rgba(216,182,107,.2);padding:12px 10px;text-align:center}.ayah.active{background:rgba(255,224,138,.18);border-radius:12px}
+.arabic{font:34px/2.15 UthmanicHafs,"Amiri Quran",serif;color:#fff1d5;margin:0}.translation{font-size:18px;line-height:1.9;color:#d9cfba;margin:4px 0 0}
+.ayah-number{font:14px Vazirmatn;color:var(--gold);margin:0 8px}
+footer{text-align:center;color:#8e9b8f;font-size:12px;padding-top:8px}
+@media (min-width:1500px){.arabic{font-size:42px}.translation{font-size:20px}.surah-item{font-size:22px}}
