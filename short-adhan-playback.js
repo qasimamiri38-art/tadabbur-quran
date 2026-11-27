@@ -54,59 +54,85 @@
 
   function addUnlockButton() {
     const panel = document.getElementById("adhanSettings");
-    if (!panel || document.getElementById("shortAdhanUnlock")) return;
+    if (!panel) return;
 
-    const button = document.createElement("button");
-    button.type = "button";
-    button.id = "shortAdhanUnlock";
-    button.className = "secondary";
-    button.textContent = "🔊 فعال‌سازی پخش اذان هنگام بازبودن اپ";
-
-    statusNode = document.createElement("p");
-    statusNode.className = "muted";
-    statusNode.id = "shortAdhanStatus";
-    statusNode.setAttribute("aria-live", "polite");
-    statusNode.textContent = "برای پخش خودکار صدا در وقت نماز، یک‌بار این دکمه را لمس کن.";
-
-    button.addEventListener("click", async () => {
-      try {
-        audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
-        await audioContext.resume();
-        const oscillator = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        gain.gain.value = 0.0001;
-        oscillator.connect(gain);
-        gain.connect(audioContext.destination);
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.02);
-        unlocked = true;
-        button.textContent = "✓ پخش اذان فعال شد";
-        status("صدای اعلان‌ها فعال شد؛ اکنون دکمهٔ آزمایش هر نماز را بزن.");
-      } catch (error) {
-        unlocked = false;
-        status("آیفون اجازهٔ پخش خودکار نداد؛ دوباره دکمه را لمس کن.");
-      }
-    });
-
+    // Restore the collapse/expand control independently from audio setup.
     const heading = panel.querySelector("h2");
-    settingsToggle = document.createElement("button");
-    settingsToggle.type = "button";
-    settingsToggle.id = "adhanSettingsToggle";
-    settingsToggle.className = "secondary";
-    settingsToggle.textContent = "− بستن تنظیمات";
-    settingsToggle.style.cssText = "display:block;width:100%;margin:10px 0;";
-    settingsToggle.setAttribute("aria-expanded", "true");
-    settingsToggle.addEventListener("click", () => {
-      const collapsed = settingsToggle.getAttribute("aria-expanded") === "true";
-      Array.from(panel.children).forEach(child => {
-        if (child !== heading && child !== settingsToggle) child.hidden = collapsed;
+    let toggle = document.getElementById("adhanSettingsToggle");
+    if (!toggle) {
+      toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.id = "adhanSettingsToggle";
+      toggle.className = "secondary";
+      toggle.style.cssText = "display:block;width:100%;margin:10px 0;";
+      toggle.setAttribute("aria-expanded", "true");
+      if (heading && heading.nextSibling) panel.insertBefore(toggle, heading.nextSibling);
+      else panel.insertBefore(toggle, panel.firstChild);
+    }
+
+    const collapseStyleId = "adhanSettingsCollapseStyle";
+    if (!document.getElementById(collapseStyleId)) {
+      const style = document.createElement("style");
+      style.id = collapseStyleId;
+      style.textContent = "#adhanSettings.adhan-collapsed > :not(h2):not(#adhanSettingsToggle){display:none!important}";
+      document.head.appendChild(style);
+    }
+
+    const syncToggleLabel = () => {
+      const collapsed = panel.classList.contains("adhan-collapsed");
+      toggle.textContent = collapsed ? "+ بازکردن تنظیمات" : "− بستن تنظیمات";
+      toggle.setAttribute("aria-expanded", String(!collapsed));
+    };
+    if (panel.dataset.adhanToggleBound !== "true") {
+      toggle.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        panel.classList.toggle("adhan-collapsed");
+        syncToggleLabel();
       });
-      settingsToggle.setAttribute("aria-expanded", String(!collapsed));
-      settingsToggle.textContent = collapsed ? "+ بازکردن تنظیمات" : "− بستن تنظیمات";
-    });
-    if (heading && heading.nextSibling) panel.insertBefore(settingsToggle, heading.nextSibling);
-    else panel.appendChild(settingsToggle);
-    panel.append(button, statusNode);
+      panel.dataset.adhanToggleBound = "true";
+    }
+    syncToggleLabel();
+
+    if (!document.getElementById("shortAdhanUnlock")) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.id = "shortAdhanUnlock";
+      button.className = "secondary";
+      button.textContent = "🔊 فعال‌سازی پخش اذان هنگام بازبودن اپ";
+      button.addEventListener("click", async () => {
+        try {
+          audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
+          await audioContext.resume();
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          gain.gain.value = 0.0001;
+          oscillator.connect(gain);
+          gain.connect(audioContext.destination);
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + 0.02);
+          unlocked = true;
+          button.textContent = "✓ پخش اذان فعال شد";
+          status("صدای اعلان‌ها فعال شد؛ اکنون دکمهٔ آزمایش هر نماز را بزن.");
+        } catch (error) {
+          unlocked = false;
+          status("آیفون اجازهٔ پخش خودکار نداد؛ دوباره دکمه را لمس کن.");
+        }
+      });
+      panel.appendChild(button);
+    }
+
+    if (!statusNode) {
+      statusNode = document.getElementById("shortAdhanStatus");
+      if (!statusNode) {
+        statusNode = document.createElement("p");
+        statusNode.className = "muted";
+        statusNode.id = "shortAdhanStatus";
+        statusNode.setAttribute("aria-live", "polite");
+        statusNode.textContent = "برای پخش خودکار صدا در وقت نماز، یک‌بار دکمهٔ فعال‌سازی را لمس کن.";
+        panel.appendChild(statusNode);
+      }
+    }
 
     PRAYERS.forEach(prayer => {
       const type = document.getElementById("adhan-type-" + prayer);
