@@ -120,9 +120,12 @@
           if(status==="SUBSCRIBED"){
             if(codeBox){
               codeBox.style.display="block";
-              codeBox.innerHTML="**کد اتصال تلویزیون**<br><strong style='font-size:28px;letter-spacing:4px;direction:ltr;display:inline-block'>"+independentRoomCode+"</strong><br>در تلویزیون صفحهٔ «تلویزیون تدبر القرآن» را باز کن و این کد را وارد کن.<br><span style='font-size:11px'>پس از اتصال، صدا و تلاوت روی خود تلویزیون اجرا می‌شود؛ بستن اپ آیپد پخش را قطع نمی‌کند.</span>";
+              const receiverUrl=new URL("./tv-receiver.html",location.href).href;
+              codeBox.innerHTML="کد اتصال تلویزیون<br><strong style='font-size:28px;letter-spacing:4px;direction:ltr;display:inline-block'>"+independentRoomCode+"</strong><br>در مرورگر تلویزیون این صفحه را باز کن:<br><a href='"+receiverUrl+"' target='_blank' style='color:#f0d58e;text-decoration:underline;direction:ltr;display:block;overflow-wrap:anywhere'>"+receiverUrl+"</a><br>کد را در تلویزیون وارد کن و روی خود تلویزیون «شروع تلاوت» را بزن.<br><span style='font-size:11px'>پس از شروع، صدا روی خود تلویزیون اجرا می‌شود؛ بستن اپ آیپد پخش را قطع نمی‌کند.</span>";
             }
             if(button){button.textContent="✓ تلویزیون آمادهٔ اتصال است";button.disabled=false;}
+            const pause=$("tadabburTvPause"),stop=$("tadabburTvStop");
+            if(pause)pause.disabled=false;if(stop)stop.disabled=false;
             setStatus("کد اتصال ساخته شد. صفحهٔ تلویزیون را باز و کد را وارد کن.");
           }
         });
