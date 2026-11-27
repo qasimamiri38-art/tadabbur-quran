@@ -1879,7 +1879,7 @@ document.getElementById("barakatJuzSelect")?.remove();
     mishary: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Mishary_Al_Afasy_-_HQ_(مشاري_العفاسي).mp3",
     madinah: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Adhan_Al_Haram_Al_Madani_-_Al_Madinah_1_(أذان_الحرم_المدني_-_المدينة_المنورة).mp3",
     makkah: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Ali_Ibn_Ahmad_Mala_1_-_Al_Haram_Al_Maki_(علي_بن_أحمد_ملا_-_الحرم_المكي).mp3",
-    istanbul: "./adhan-turkey.mp3",
+    istanbul: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Adhan_Turkey_1_(أذان_تركيا).mp3",
     alaqsa: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Adhan_Al_Aqsa_-_Jerusalem_(أذان_المسجد_الأقصى_-_القدس).mp3",
     indonesia: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Adhan_Indonesia_(أذان_إندونيسيا).mp3"
   };
@@ -1957,11 +1957,14 @@ player.src = prayer === "Fajr" && fajrAudioFiles[select.value]
   ? fajrAudioFiles[select.value]
   : audioFiles[select.value];
       player.load();
-      title.textContent = "نمونهٔ اذان " + prayer + " · " + names[select.value];
+      title.textContent = "در حال بارگذاری اذان " + prayer + " · " + names[select.value];
+      player.onerror = () => {
+        title.textContent = "فایل صوتی بارگذاری نشد؛ اتصال اینترنت یا دسترسی به منبع صدا را بررسی کن.";
+      };
       player.play().then(() => {
         title.textContent = "در حال پخش اذان " + prayer + " · " + names[select.value];
       }).catch(() => {
-        title.textContent = "برای شنیدن اذان، دکمهٔ ▶ پخش را در پخش‌کننده لمس کن.";
+        title.textContent = "پخش خودکار انجام نشد؛ دکمهٔ ▶ پخش را در پخش‌کننده لمس کن.";
       });
       player.scrollIntoView({ behavior: "smooth", block: "nearest" });
     });
