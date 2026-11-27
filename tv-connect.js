@@ -8,9 +8,9 @@
   // After registering tv-receiver.html in Google Cast Console, place its app ID in tv-cast-config.js.
   const CUSTOM_CAST_RECEIVER = window.TADABBUR_CAST_RECEIVER_ID || "";
   const RECITERS = {
-    "ar.alafasy": { name: "استاد مشاری بن راشد العفاسی", bitrate: 128 },
-    "ar.abdulbasit": { name: "استاد عبدالباسط عبدالصمد", bitrate: 192 },
-    "ar.husary": { name: "استاد محمود خلیل الحصری", bitrate: 128 }
+    "ar.alafasy": { name: "استاد مشاری بن راشد العفاسی", bitrate: 128, timingId: 7 },
+    "ar.abdulbasit": { name: "استاد عبدالباسط عبدالصمد", bitrate: 192, timingId: 2 },
+    "ar.husary": { name: "استاد محمود خلیل الحصری", bitrate: 128, timingId: 6 }
   };
   const $ = id => document.getElementById(id);
   let castContext = null;
@@ -117,6 +117,21 @@
     return "https://cdn.islamic.network/quran/audio-surah/" + reciter.bitrate + "/" + reciter.edition + "/" + surah.number + ".mp3";
   }
 
+  async function fetchTimedChapterAudio(surahNumber, reciter) {
+    const url = "https://api.quran.com/api/v4/chapter_recitations/" +
+      reciter.timingId + "/" + surahNumber + "?segments=true";
+    const response = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!response.ok) throw new Error("دادهٔ زمان‌بندی کلمات برای این قاری دریافت نشد (" + response.status + ").");
+    const payload = await response.json();
+    const file = payload && payload.audio_file;
+    const timestamps = file && Array.isArray(file.timestamps) ? file.timestamps : [];
+    const hasWords = timestamps.some(v => Array.isArray(v.segments) && v.segments.length);
+    if (!file || !file.audio_url || !hasWords) {
+      throw new Error("برای این سوره و قاری، زمان‌بندی معتبر کلمه‌به‌کلمه موجود نیست.");
+    }
+    return { audioUrl: file.audio_url, timingReciterId: reciter.timingId };
+  }
+
   function initializeCast() {
     if (!window.cast || !window.cast.framework || !window.chrome || !window.chrome.cast) return;
     try {
@@ -166,7 +181,9 @@
       if (!session) throw new Error("گیرندهٔ تلویزیون انتخاب نشد.");
       const surah = selectedSurah();
       const reciter = currentReciter();
-      const url = audioUrl();
+      setStatus("در حال دریافت صوت و زمان‌بندی دقیق کلمات برای " + reciter.name + "…");
+      const timedAudio = await fetchTimedChapterAudio(surah.number, reciter);
+      const url = timedAudio.audioUrl;
       const mediaInfo = new chrome.cast.media.MediaInfo(url, "audio/mpeg");
       mediaInfo.streamType = chrome.cast.media.StreamType.BUFFERED;
       mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
@@ -180,6 +197,7 @@
         surahName: surah.label,
         reciter: reciter.edition,
         reciterName: reciter.name,
+        timingReciterId: timedAudio.timingReciterId,
         receiverScreen: "quran"
       };
       const request = new chrome.cast.media.LoadRequest(mediaInfo);
