@@ -106,12 +106,24 @@
     const translation = $("translation");
     if (!selectors || !language || !translation || $("translationLibraryDownload")) return;
 
+    // Force both native selectors to remain visibly rendered in Safari/iPad grid layouts.
+    language.style.setProperty("display", "block", "important");
+    language.style.setProperty("visibility", "visible", "important");
+    language.style.setProperty("min-height", "48px");
+    language.style.setProperty("width", "100%");
+    language.setAttribute("aria-label", "فهرست زبان‌ها");
+    translation.style.setProperty("display", "block", "important");
+    translation.style.setProperty("visibility", "visible", "important");
+    translation.style.setProperty("min-height", "48px");
+    translation.style.setProperty("width", "100%");
+    translation.setAttribute("aria-label", "فهرست مترجمان");
+
     const search = document.createElement("input");
     search.type = "search";
     search.id = "translationLanguageSearch";
     search.placeholder = "جست‌وجوی زبان‌ها…";
     search.setAttribute("aria-label", "جست‌وجوی زبان ترجمه");
-    search.style.cssText = "grid-column:1/-1;width:100%;box-sizing:border-box;padding:12px;border-radius:12px;background:#202b25;color:inherit;border:1px solid #b99b52;";
+    search.style.cssText = "display:block;grid-column:1/-1;width:100%;min-height:48px;box-sizing:border-box;padding:12px;border-radius:12px;background:#202b25;color:inherit;border:1px solid #b99b52;";
 
     const download = document.createElement("button");
     download.type = "button";
