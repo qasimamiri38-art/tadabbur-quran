@@ -1107,7 +1107,7 @@ const saved=read("tadabbur-saved",[]);
   const top=document.createElement("div");top.className="ayah-top";const label=document.createElement("span");label.textContent="سوره "+v.surah+" · آیه "+v.n;
   const actions=document.createElement("div");actions.className="actions";
   const mark=document.createElement("button");mark.textContent=saved.some(x=>x.surah===v.surah&&x.ayah===v.n)?"★ نشان‌شده":"☆ نشان";mark.onclick=()=>toggle(v);
-  const play=document.createElement("button");play.textContent="▶ پخش";play.onclick=()=>playAudio(v.global);
+  const play=document.createElement("button");play.className="ayah-play-button";play.dataset.global=String(v.global);play.textContent="▶ پخش";play.onclick=()=>playAudio(v.global);
   actions.append(mark,play);top.append(label,actions);
   const content=document.createElement("div");
 content.className="ayah-content";
@@ -1159,138 +1159,177 @@ function renderSaved(){
 
 
 
-async function playAudio(number){
-  try{
-    let a=$("audio");
+let playbackRunId = 0;
+let activePlaybackGlobal = null;
 
-    if(!a){
-      a=document.createElement("audio");
-      a.id="audio";
-      a.controls=true;
-      a.style.width="100%";
+function updatePlaybackButtons() {
+  document.querySelectorAll(".ayah-play-button").forEach(button => {
+    const active = activePlaybackGlobal !== null &&
+      Number(button.dataset.global) === Number(activePlaybackGlobal);
+    button.textContent = active ? "⏹ توقف" : "▶ پخش";
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+  const mainButton = $("playSurah");
+  if (mainButton) {
+    if (!mainButton.dataset.defaultLabel) mainButton.dataset.defaultLabel = mainButton.textContent;
+    mainButton.textContent = activePlaybackGlobal !== null ? "⏹ توقف تلاوت" : mainButton.dataset.defaultLabel;
+  }
+}
+
+function stopQuranPlayback(message) {
+  playbackRunId++;
+  const player = $("audio");
+  if (player) {
+    player.onended = null;
+    player.onerror = null;
+    player.pause();
+    try { player.currentTime = 0; } catch (_) {}
+  }
+  activePlaybackGlobal = null;
+  updatePlaybackButtons();
+  if (message) status(message);
+}
+
+async function playAudio(number) {
+  try {
+    let a = $("audio");
+    if (!a) {
+      a = document.createElement("audio");
+      a.id = "audio";
+      a.controls = true;
+      a.style.width = "100%";
       $("status").after(a);
     }
 
-    let index=verses.findIndex(
-      v=>Number(v.global)===Number(number)
-    );
+    const requestedNumber = Number(number);
+    if (activePlaybackGlobal === requestedNumber && !a.paused) {
+      stopQuranPlayback("تلاوت متوقف شد.");
+      return;
+    }
 
-    if(index<0) throw Error("آیه پیدا نشد");
+    const runId = ++playbackRunId;
+    let index = verses.findIndex(v => Number(v.global) === requestedNumber);
+    if (index < 0) throw Error("آیه پیدا نشد");
 
-    async function playNext(){
-      if(index>=verses.length){
-        a.onended=null;
-        status("تلاوت سوره پایان یافت");
+    a.pause();
+    a.onended = null;
+    a.onerror = null;
+
+    function setActive(v) {
+      activePlaybackGlobal = Number(v.global);
+      updatePlaybackButtons();
+    }
+
+    function handlePlaybackError(error) {
+      if (runId !== playbackRunId) return;
+      stopQuranPlayback("خطا در پخش: " + (error?.message || "فایل صوتی در دسترس نیست."));
+    }
+
+    function playCurrentBasmalaOrAyah() {
+      if (runId !== playbackRunId) return;
+      const firstVerse = verses[index];
+      if (!firstVerse) return;
+
+      if (Number(firstVerse.n) === 1 &&
+          Number(firstVerse.surah) !== 1 &&
+          Number(firstVerse.surah) !== 9) {
+        setActive(firstVerse);
+        const basmalaFolder = selectedReciter === "ar.abdulbasit"
+          ? "Abdul_Basit_Murattal_192kbps"
+          : "Alafasy_128kbps";
+        const basmalaAudioUrl =
+          (selectedReciter === "ar.abdulbasit" || selectedReciter === "ar.alafasy")
+            ? "https://verse.mp3quran.net/data/" + basmalaFolder + "/001000.mp3"
+            : "https://cdn.islamic.network/quran/audio/128/" + selectedReciter + "/1.mp3";
+
+        status("در حال پخش بسم‌الله الرحمن الرحیم");
+        a.onended = () => {
+          if (runId !== playbackRunId) return;
+          a.onended = null;
+          playNext().catch(handlePlaybackError);
+        };
+        a.onerror = () => handlePlaybackError(new Error("پخش بسم‌الله ناموفق بود"));
+        a.src = basmalaAudioUrl;
+        a.load();
+        a.play().catch(handlePlaybackError);
+      } else {
+        playNext().catch(handlePlaybackError);
+      }
+    }
+
+    async function playNext() {
+      if (runId !== playbackRunId) return;
+
+      if (index >= verses.length) {
+        const finishedSurah = Number($("surah").value);
+        if (finishedSurah >= 114) {
+          stopQuranPlayback("تلاوت قرآن کریم به پایان رسید.");
+          return;
+        }
+
+        const nextSurah = finishedSurah + 1;
+        status("سوره پایان یافت؛ در حال آماده‌سازی سورهٔ بعدی...");
+        $("surah").value = String(nextSurah);
+        await loadSurah();
+        if (runId !== playbackRunId) return;
+        if (!verses.length || Number(verses[0].surah) !== nextSurah) {
+          stopQuranPlayback("بارگذاری سورهٔ بعدی ناموفق بود؛ اتصال اینترنت را بررسی کنید.");
+          return;
+        }
+        index = 0;
+        playCurrentBasmalaOrAyah();
         return;
       }
 
-      const v=verses[index];document.getElementById("ayah-"+v.surah+"-"+v.n)?.scrollIntoView({behavior:"smooth",block:"center"});
-      // Use verified EveryAyah per-ayah files for Abdul Basit and Alafasy.
-      // This avoids the unsupported/missing global-index stream that Safari reported.
+      const v = verses[index];
+      setActive(v);
+      document.getElementById("ayah-" + v.surah + "-" + v.n)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+
       const ayahFolder = selectedReciter === "ar.abdulbasit"
         ? "Abdul_Basit_Murattal_192kbps"
         : "Alafasy_128kbps";
-      const ayahAudioUrl = (selectedReciter === "ar.abdulbasit" || selectedReciter === "ar.alafasy")
-        ? "https://verse.mp3quran.net/data/" + ayahFolder + "/" +
-          String(v.surah).padStart(3, "0") +
-          String(v.n).padStart(3, "0") + ".mp3"
-        : "https://cdn.islamic.network/quran/audio/128/" + selectedReciter + "/" + v.global + ".mp3";
+      const ayahAudioUrl =
+        (selectedReciter === "ar.abdulbasit" || selectedReciter === "ar.alafasy")
+          ? "https://verse.mp3quran.net/data/" + ayahFolder + "/" +
+            String(v.surah).padStart(3, "0") +
+            String(v.n).padStart(3, "0") + ".mp3"
+          : "https://cdn.islamic.network/quran/audio/128/" + selectedReciter + "/" + v.global + ".mp3";
 
-      a.onended=()=>{
+      a.onended = () => {
+        if (runId !== playbackRunId) return;
         index++;
-        playNext().catch(e=>{
-          a.onended=null;
-          status("خطا در ادامه تلاوت: "+e.message);
-        });
+        playNext().catch(handlePlaybackError);
       };
-
-      a.src=ayahAudioUrl;
+      a.onerror = () => handlePlaybackError(new Error("فایل صوتی آیه " + v.n + " بارگذاری نشد"));
+      a.src = ayahAudioUrl;
       a.load();
-// Media Session is optional: some Safari/iPadOS versions reject
-// unsupported actions. Never let that prevent Quran audio playback.
-try {
-  const mediaSession = navigator.mediaSession;
-  if (mediaSession && typeof mediaSession.setActionHandler === "function") {
-    if (typeof MediaMetadata !== "undefined") {
-      mediaSession.metadata = new MediaMetadata({
-        title: "تلاوت قرآن کریم",
-        artist: "تدبّر القرآن",
-        album: "قرآن کریم"
-      });
-    }
-    try { mediaSession.setActionHandler("play", () => { a.play().catch(() => {}); }); } catch (_) {}
-    try { mediaSession.setActionHandler("pause", () => a.pause()); } catch (_) {}
-    try { mediaSession.playbackState = "playing"; } catch (_) {}
-  }
-} catch (_) {
-  // Playback continues even when media controls are unavailable.
-}
+
+      try {
+        const mediaSession = navigator.mediaSession;
+        if (mediaSession && typeof mediaSession.setActionHandler === "function") {
+          if (typeof MediaMetadata !== "undefined") {
+            mediaSession.metadata = new MediaMetadata({
+              title: "آیه " + v.n + " · سوره " + v.surah,
+              artist: "تدبّر القرآن",
+              album: "قرآن کریم"
+            });
+          }
+          try { mediaSession.setActionHandler("play", () => { a.play().catch(() => {}); }); } catch (_) {}
+          try { mediaSession.setActionHandler("pause", () => a.pause()); } catch (_) {}
+        }
+      } catch (_) {}
 
       await a.play();
-      status("در حال پخش آیه "+v.n);
+      if (runId === playbackRunId) status("در حال پخش آیه " + v.n);
     }
 
-a.onended = null;
-
-// پخش بسم‌الله پیش از شروع سوره
-const firstVerse = verses[index];
-
-if (
-  Number(firstVerse.n) === 1 &&
-  Number(firstVerse.surah) !== 1 &&
-  Number(firstVerse.surah) !== 9
-) {
-  const basmalaFolder = selectedReciter === "ar.abdulbasit"
-    ? "Abdul_Basit_Murattal_192kbps"
-    : "Alafasy_128kbps";
-  const basmalaAudioUrl = (selectedReciter === "ar.abdulbasit" || selectedReciter === "ar.alafasy")
-    ? "https://verse.mp3quran.net/data/" + basmalaFolder + "/001000.mp3"
-    : "https://cdn.islamic.network/quran/audio/128/" + selectedReciter + "/1.mp3";
-
-  status("در حال پخش بسم‌الله الرحمن الرحیم");
-
-  await new Promise((resolve, reject) => {
-    a.onended = resolve;
-    a.onerror = () => reject(Error("پخش بسم‌الله ناموفق بود"));
-    a.src = basmalaAudioUrl;
-    a.load();
-
-    const request = a.play();
-    if (request && request.catch) {
-      request.catch(reject);
-    }
-  });
-
-  a.onended = null;
-  a.onerror = null;
+    playCurrentBasmalaOrAyah();
+  } catch (e) {
+    stopQuranPlayback("خطای پخش: " + (e?.message || "خطای نامشخص"));
+    console.error("Tadabbur Quran playback error", e);
+  }
 }
-
-await playNext();
-
-  }catch(e){
- const player = $("audio");
- const mediaError = player && player.error ? player.error.code : "ندارد";
- const networkState = player ? player.networkState : "ندارد";
- const source = player ? (player.currentSrc || player.src || "بدون نشانی") : "پخش‌کننده ساخته نشد";
- console.error("Tadabbur Quran audio diagnostic", {
-   name: e && e.name,
-   message: e && e.message,
-   mediaError,
-   networkState,
-   source
- });
- status(
-   "خطای پخش: " + (e && e.name ? e.name : "نامشخص") +
-   " · " + (e && e.message ? e.message : "بدون توضیح") +
-   " · کد رسانه: " + mediaError +
-   " · وضعیت شبکه: " + networkState +
-   " · نشانی: " + source
- );
-}
-}
-
-
-document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("active",x===b));["reader","reciters","memorize","saved","about"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab));if(b.dataset.tab==="saved")renderSaved()});
 
 // انتخاب‌گر رسم‌الخط؛ فقط گزینه‌ای فعال است که متن و فونت آن با هم تأیید شده‌اند.
 const quranFontControl=$("quranFont");
