@@ -1421,8 +1421,7 @@ if (edition === "barakatullah") {
     other.classList.toggle("selected", other === card)
   );
 
-  localStorage.setItem("selectedReciter", edition);
-
+  // Keep the Quran verse-by-verse reciter unchanged.
   let juzSelect = document.getElementById("barakatJuzSelect");
 
   if (!juzSelect) {
