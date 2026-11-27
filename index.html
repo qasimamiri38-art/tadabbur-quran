@@ -327,7 +327,7 @@ setTimeout(() => {
   <option value="dari_badkhashani">ترجمه دری بدخشیانی</option>
 </select>
 
-  <select id="quranFont" aria-label="رسم‌الخط قرآن"><option value="uthmanic" selected>عثمانی (فعال)</option><option value="indopak" disabled>هندی ـ پاکستانی (پس از اتصال متن معتبر)</option><option value="tajweed" disabled>مصحف تجویدی (پس از اتصال متن رنگی)</option><option value="mushaf" disabled>مصحف (پس از آماده‌سازی فونت)</option></select>
+  <select id="quranFont" aria-label="رسم‌الخط قرآن"><option value="uthmanic" selected>عثمانی (حفص)</option><option value="indopak">هندی ـ پاکستانی (حفص نستعلیق)</option><option value="tajweed" disabled>مصحف تجویدی (به‌زودی)</option><option value="mushaf" disabled>مصحف (به‌زودی)</option></select>
   <select id="tafsir">
     <option value="">بدون تفسیر</option>
   </select>
@@ -409,6 +409,7 @@ setTimeout(() => {
 <p><strong>قسیم امیری</strong></p>
 <p>برای صلح و صلاح مردم افغانستان.</p>
 <h3 style="color:var(--gold)">متن قرآن و ترجمه‌ها</h3>
+<p>متن عثمانی از AlQuran Cloud و متن هندی‌ـ‌پاکستانی حفص نستعلیق از پروژه Quran JSON دریافت می‌شود. منبع و نسخهٔ داده در <a href="https://quran-json.risanb.com/meta/sources.json" target="_blank" rel="noopener" style="color:var(--gold)">فهرست منابع و نسخه‌ها</a> قابل بررسی است. متن هندی‌ـ‌پاکستانی از Qur'anpedia.net با ذکر منبع و نسخه منتشر شده است. <a href="https://github.com/risan/quran-json" target="_blank" rel="noopener" style="color:var(--gold)">مشخصات و مجوز داده‌ها</a>.</p>
 <p>متن عربی قرآن از سرویس AlQuran Cloud دریافت می‌شود. ترجمه و تفسیر، آثار انسانی و علمی‌اند و مشخصات مترجم و مفسر باید برای هر نسخه معرفی شود.</p><p>منبع متن عربی قرآن: <a href="https://tanzil.net/" target="_blank" rel="noopener" style="color:var(--gold)">Tanzil</a> · <a href="https://tanzil.net/docs/" target="_blank" rel="noopener" style="color:var(--gold)">اسناد Tanzil</a></p>
 <p><a style="color:var(--gold)" href="https://alquran.cloud/api" target="_blank" rel="noopener">مستندات منبع داده قرآن</a></p>
 
@@ -762,12 +763,21 @@ async function loadSurah() {
         : [])
     ];
 
-    const [data, dariByAya] = await Promise.all([
+    const selectedScript = $("quranFont")?.value || "uthmanic";
+    const scriptUrl = selectedScript === "indopak"
+      ? "https://quran-json.risanb.com/text/hafs-nastaliq/chapters/" + n + ".json"
+      : null;
+
+    const [data, dariByAya, scriptResponse] = await Promise.all([
       api(
         "/surah/" + n + "/editions/" +
         ids.map(encodeURIComponent).join(",")
       ),
-      fetchDariSurah(n)
+      fetchDariSurah(n),
+      scriptUrl ? fetch(scriptUrl).then(response => {
+        if (!response.ok) throw new Error("متن هندی‌ـ‌پاکستانی دریافت نشد");
+        return response.json();
+      }) : Promise.resolve(null)
     ]);
 
     const editions = Array.isArray(data) ? data : [data];
@@ -775,6 +785,12 @@ async function loadSurah() {
     const ar = editions.find(x =>
       x.edition?.identifier === "quran-uthmani"
     ) || editions[0];
+
+    const scriptVerses = scriptResponse?.verses;
+    if (selectedScript === "indopak" &&
+        (!Array.isArray(scriptVerses) || scriptVerses.length !== ar?.ayahs?.length)) {
+      throw new Error("تعداد آیات متن هندی‌ـ‌پاکستانی با متن حفص برابر نیست؛ رسم‌الخط تغییر داده نشد.");
+    }
 
     const tf = editions.find(x =>
       x.edition?.identifier === tafsirId
@@ -788,7 +804,7 @@ async function loadSurah() {
       global: a.number,
       n: a.numberInSurah,
       surah: n,
-      arabic: a.text,
+      arabic: selectedScript === "indopak" ? scriptVerses[i].text : a.text,
       translation:
         dariByAya.get(Number(a.numberInSurah)) || "",
       tafsir:
@@ -974,7 +990,13 @@ document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.query
 
 // انتخاب‌گر رسم‌الخط؛ فقط گزینه‌ای فعال است که متن و فونت آن با هم تأیید شده‌اند.
 const quranFontControl=$("quranFont");
-if(quranFontControl){quranFontControl.value="uthmanic";}
+if(quranFontControl){
+  quranFontControl.value="uthmanic";
+  quranFontControl.onchange=()=>{
+    $("search").value="";
+    loadSurah();
+  };
+}
 $("surah").onchange=()=>{$("search").value="";loadSurah()};
 const translationControl=$("translation");
 if(translationControl){
