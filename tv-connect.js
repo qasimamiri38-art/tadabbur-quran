@@ -149,6 +149,24 @@
       const ayahs = payload && payload.data && Array.isArray(payload.data.ayahs) ? payload.data.ayahs : [];
       const urls = ayahs.map(item => item && item.audio).filter(Boolean);
       if (!urls.length || urls.length !== ayahs.length) throw new Error("فایل‌های صوتی کامل این سوره برای قاری انتخاب‌شده پیدا نشد.");
+
+      // Surah Al-Baqarah and the other surahs (except Al-Faatiha and At-Tawbah)
+      // begin with a separate Bismillah recitation. AlQuran Cloud's ayah-1
+      // audio starts at the actual first ayah (e.g. Alif-Laam-Meem), so prepend
+      // the same reciter's Bismillah audio, taken from Al-Faatiha ayah 1.
+      const surahNumber = selectedSurah().number;
+      if (surahNumber !== 1 && surahNumber !== 9) {
+        const basmalaResponse = await fetch("https://api.alquran.cloud/v1/surah/1/" + audioEdition(), {
+          headers: { Accept: "application/json" }
+        });
+        if (!basmalaResponse.ok) throw new Error("صدای بسم‌الله برای قاری انتخاب‌شده دریافت نشد.");
+        const basmalaPayload = await basmalaResponse.json();
+        const basmalaUrl = basmalaPayload && basmalaPayload.data &&
+          Array.isArray(basmalaPayload.data.ayahs) && basmalaPayload.data.ayahs[0]
+          ? basmalaPayload.data.ayahs[0].audio : null;
+        if (!basmalaUrl) throw new Error("صدای بسم‌الله برای قاری انتخاب‌شده موجود نیست.");
+        urls.unshift(basmalaUrl);
+      }
       airPlayQueue = urls;
       airPlayQueueKey = key;
       airPlayIndex = 0;
