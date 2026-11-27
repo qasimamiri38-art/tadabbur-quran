@@ -1644,12 +1644,22 @@ document.getElementById("barakatJuzSelect")?.remove();
 
     const saved = settings[prayer] || {};
 
-    if (typeof saved.enabled === "boolean") {
-      enabled.checked = saved.enabled;
-    }
-
+    // User requested all five prayer reminders enabled.
+    // Preserve each prayer's selected alert type and sound.
+    enabled.checked = true;
     if (saved.type) type.value = saved.type;
     if (saved.sound) sound.value = saved.sound;
+
+    settings[prayer] = {
+      enabled: true,
+      type: type.value,
+      sound: sound.value || "mishary"
+    };
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(settings));
+    } catch (error) {
+      console.warn("Could not save enabled prayer reminders", error);
+    }
 
     function saveSettings() {
       settings[prayer] = {
