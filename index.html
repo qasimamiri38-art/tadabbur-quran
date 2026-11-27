@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#09251c"><meta name="description" content="قرآن کریم با ترجمه و تفسیر برای تدبر">
 <link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icon-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Noto+Nastaliq+Urdu&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
 <title>تدبّر القرآن</title>
 <style>
 :root{color-scheme:dark;--bg:#0b100f;--page-bg:#0b100f;--panel:#17211b;--gold:#d8b66b;--ink:#f5eddd;--muted:#a9b3aa;--line:#51452d;--green:#164b36;--arabic-color:#fff4dd;--translation-color:#e6dcc8;--tafsir-color:#d6dccc}
@@ -26,6 +26,7 @@ select{flex:1;min-width:0}input{flex:2;min-width:170px}
 .actions button{font-size:12px;padding:6px 9px;background:#222b25}
 
 .arabic{font:30px/2.15 "Amiri Quran",serif;text-align:justify;margin:12px 0;color:var(--arabic-color)}
+.arabic.indopak{font-family:"Noto Nastaliq Urdu","Amiri Quran",serif;line-height:2.6;text-align:right}
 /* فونت‌های قرآنی: بارگذاری از CDN رسمی مستندات Quran Foundation */
 @font-face{
   font-family:'UthmanicHafs';
@@ -851,7 +852,7 @@ const saved=read("tadabbur-saved",[]);
 content.className="ayah-content";
 
 const ar=document.createElement("p");
-ar.className="arabic";
+ar.className="arabic"+(($("quranFont")?.value==="indopak")?" indopak":"");
 ar.style.fontSize=fontSize+"px";
 ar.textContent=(v.n===1 && Number(v.surah)!==1 && Number(v.surah)!==9 ? v.arabic.replace(/^بِسْمِ.*?الرَّحِيمِ\s*/,"") : v.arabic)+" ۞";
 content.append(ar);
