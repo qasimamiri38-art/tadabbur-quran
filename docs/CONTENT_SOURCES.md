@@ -158,3 +158,14 @@ The main `index.html` already displays the four local image paths and includes s
 ### ZIP archive status
 
 The repository also contains `reciter_photos_four.zip` (191,000 bytes). Its archive contents were not extracted in this pass, so no claim is made about whether it contains better or duplicate versions. Compare its members visually before using any of them.
+
+
+## Quranic and Prophetic dua references added (2026-11-27)
+
+The dua library now distinguishes Quranic supplications (with surah/ayah references) from Prophetic adhkar (with hadith collection and number). Added initial Sunnah entries:
+
+- Morning/evening remembrance: Sunan Abi Dawud 5068, narrated from Abu Hurairah; Sunnah.com lists it as Sahih according to al-Albani: https://sunnah.com/abudawud/43/296
+- Before sleep and on waking: Sahih al-Bukhari 6324: https://sunnah.com/bukhari:6324
+- Travel remembrance when mounting: the wording is Qur'an 43:13–14 and its use in the Prophetic travel supplication is reported in Sahih Muslim 1342: https://sunnah.com/muslim:1342
+
+The first implementation intentionally adds only these source-checked examples. It does not yet claim to be a complete morning/evening adhkar collection or a complete travel supplication sequence. Translations shown in the app are concise Dari renderings for comprehension, not a published named translation. Verify wording and translation editorially before release; retain the source links beside each hadith-based entry.
