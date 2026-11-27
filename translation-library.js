@@ -140,8 +140,7 @@
       localStorage.setItem("tadabbur-translation-key", activeKey);
       const selected = allTranslations.find(item => item.key === activeKey);
       setStatus("ترجمهٔ انتخاب‌شده: " + (selected?.title || "فارسی دری — بدخشیانی"));
-      if (typeof window.loadSurah === "function") await window.loadSurah();
-      else $("surah")?.dispatchEvent(new Event("change"));
+      // The original reader change handler reloads the current surah once.
     });
 
     download.addEventListener("click", async () => {
