@@ -75,7 +75,7 @@ cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-ev
     "ar.abdulbasit":"استاد عبدالباسط عبدالصمد",
     "ar.husary":"استاد محمود خلیل الحصری"
   };
-  let requestId=0, wordSpans=[], wordWeights=[], totalWordWeight=0, lastActiveWord=-1, progressTimer=null;
+  let requestId=0, verseWordSpans={}, timedWords=[], activeTimedWord=null, progressTimer=null, currentSurah=1;
   function tajweedFragment(source){
     const fragment=document.createDocumentFragment();
     const pattern=/\[([a-z])(?::\d+)?\[([^\]]*)\]/g;
@@ -92,38 +92,55 @@ cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-ev
     if(last<(source||"").length) fragment.appendChild(document.createTextNode(source.slice(last)));
     return fragment;
   }
-  function wrapWords(root){
-    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
-    const nodes=[];
-    while(walker.nextNode()) nodes.push(walker.currentNode);
-    nodes.forEach(node=>{
-      const parts=node.nodeValue.split(/(\s+)/);
-      if(parts.length===1) return;
-      const fragment=document.createDocumentFragment();
-      parts.forEach(part=>{
-        if(!part) return;
-        if(/^\s+$/.test(part)){fragment.appendChild(document.createTextNode(part));return;}
-        const word=document.createElement("span");
-        word.className="tv-word";
-        word.textContent=part;
-        const clean=part.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g,"");
-        word.dataset.weight=String(Math.max(1,Array.from(clean).length));
-        wordSpans.push(word);
-        wordWeights.push(Number(word.dataset.weight));
-        totalWordWeight+=Number(word.dataset.weight);
-        fragment.appendChild(word);
-      });
-      node.parentNode.replaceChild(fragment,node);
-    });
-  }
-  function renderAyahs(ayahs){
+  function renderTimedAyahs(ayahs, timestamps, surahNumber){
     ayahBox.replaceChildren();
-    wordSpans=[];wordWeights=[];totalWordWeight=0;lastActiveWord=-1;
+    verseWordSpans={};timedWords=[];activeTimedWord=null;
     ayahs.forEach(ayah=>{
       const line=document.createElement("div");
       line.className="tv-ayah";
-      line.appendChild(tajweedFragment(ayah.text || ""));
-      wrapWords(line);
+      const tajweed=tajweedFragment(ayah.text || "");
+      const holder=document.createElement("span");
+      holder.appendChild(tajweed);
+      const walker=document.createTreeWalker(holder,NodeFilter.SHOW_TEXT);
+      const textNodes=[];
+      let fullText="";
+      while(walker.nextNode()){
+        const node=walker.currentNode;
+        const value=node.nodeValue||"";
+        if(!value) continue;
+        const classes=[];
+        let parent=node.parentElement;
+        while(parent&&parent!==holder){
+          if(parent.classList) parent.classList.forEach(c=>{if(!classes.includes(c))classes.push(c);});
+          parent=parent.parentElement;
+        }
+        textNodes.push({node,start:fullText.length,end:fullText.length+value.length,classes});
+        fullText+=value;
+      }
+      const key=surahNumber+":"+Number(ayah.numberInSurah);
+      const words=[];
+      const fragment=document.createDocumentFragment();
+      const regex=/\S+/g;
+      let match,last=0;
+      while((match=regex.exec(fullText))){
+        if(match.index>last) fragment.appendChild(document.createTextNode(fullText.slice(last,match.index)));
+        const word=document.createElement("span");
+        word.className="tv-word";
+        word.textContent=match[0];
+        const scores={};
+        textNodes.forEach(part=>{
+          const overlap=Math.max(0,Math.min(match.index+match[0].length,part.end)-Math.max(match.index,part.start));
+          if(overlap) part.classes.forEach(c=>{scores[c]=(scores[c]||0)+overlap;});
+        });
+        const tajweedClass=Object.keys(scores).sort((a,b)=>scores[b]-scores[a])[0];
+        if(tajweedClass) word.classList.add(tajweedClass);
+        words.push(word);
+        fragment.appendChild(word);
+        last=regex.lastIndex;
+      }
+      if(last<fullText.length) fragment.appendChild(document.createTextNode(fullText.slice(last)));
+      verseWordSpans[key]=words;
+      line.appendChild(fragment);
       const number=document.createElement("span");
       number.className="ayah-number";
       number.textContent=String(ayah.numberInSurah || "");
@@ -131,31 +148,39 @@ cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-ev
       line.appendChild(number);
       ayahBox.appendChild(line);
     });
+    timestamps.forEach(verse=>{
+      const words=verseWordSpans[verse.verse_key]||[];
+      (verse.segments||[]).forEach(segment=>{
+        const wordIndex=Number(segment[0]),startMs=Number(segment[1]),endMs=Number(segment[2]);
+        const element=words[wordIndex-1];
+        if(element&&Number.isFinite(startMs)&&Number.isFinite(endMs)&&endMs>=startMs){
+          timedWords.push({element,start:startMs/1000,end:endMs/1000});
+        }
+      });
+    });
+    timedWords.sort((a,b)=>a.start-b.start);
   }
   function updateWordCursor(){
-    if(!wordSpans.length||!totalWordWeight) return;
-    let current=0,duration=0;
-    try{
-      current=Number(player.getCurrentTimeSec())||0;
-      duration=Number(player.getDurationSec())||0;
-    }catch(_){return;}
-    if(!(duration>0)) return;
-    const target=current/duration*totalWordWeight;
-    let sum=0,index=wordWeights.length-1;
-    for(let i=0;i<wordWeights.length;i++){
-      sum+=wordWeights[i];
-      if(target<sum){index=i;break;}
+    if(!timedWords.length) return;
+    let current=0;
+    try{current=Number(player.getCurrentTimeSec())||0;}catch(_){return;}
+    let low=0,high=timedWords.length-1,candidate=-1;
+    while(low<=high){
+      const mid=(low+high)>>1;
+      if(timedWords[mid].start<=current){candidate=mid;low=mid+1;}
+      else high=mid-1;
     }
-    if(index===lastActiveWord) return;
-    if(lastActiveWord>=0) wordSpans[lastActiveWord].classList.remove("tv-word-active");
-    lastActiveWord=index;
-    const active=wordSpans[index];
-    if(!active) return;
-    active.classList.add("tv-word-active");
-    const rect=active.getBoundingClientRect();
+    if(candidate<0) return;
+    const item=timedWords[candidate];
+    if(current>item.end+0.12) return;
+    if(activeTimedWord===item.element) return;
+    if(activeTimedWord) activeTimedWord.classList.remove("tv-word-active");
+    activeTimedWord=item.element;
+    activeTimedWord.classList.add("tv-word-active");
+    const rect=activeTimedWord.getBoundingClientRect();
     const box=ayahBox.getBoundingClientRect();
     if(rect.top<box.top+24||rect.bottom>box.bottom-24){
-      active.scrollIntoView({behavior:"smooth",block:"center",inline:"nearest"});
+      activeTimedWord.scrollIntoView({behavior:"smooth",block:"center",inline:"nearest"});
     }
   }
   function startWordCursor(){
@@ -165,38 +190,53 @@ cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-ev
   function stopWordCursor(){
     if(progressTimer){clearInterval(progressTimer);progressTimer=null;}
   }
-  async function loadUthmaniText(surahNumber){
+  async function loadUthmaniText(surahNumber, timingReciterId, expectedAudioUrl){
     const thisRequest=++requestId;
-    ayahBox.innerHTML='<div class="tv-ayah">در حال آماده‌سازی متن عثمانی و رنگ‌های تجوید…</div>';
+    currentSurah=surahNumber;
+    ayahBox.innerHTML='<div class="tv-ayah">در حال آماده‌سازی متن عثمانی و زمان‌بندی کلمات…</div>';
     try{
-      const response=await fetch("https://api.alquran.cloud/v1/surah/"+surahNumber+"/quran-tajweed");
-      if(!response.ok) throw new Error("Tajweed text service unavailable");
-      const result=await response.json();
-      const ayahs=result && result.data && Array.isArray(result.data.ayahs)?result.data.ayahs:[];
-      if(!ayahs.length) throw new Error("No tajweed ayahs returned");
+      const timingUrl="https://api.quran.com/api/v4/chapter_recitations/"+timingReciterId+"/"+surahNumber+"?segments=true";
+      const responses=await Promise.all([
+        fetch("https://api.alquran.cloud/v1/surah/"+surahNumber+"/quran-tajweed"),
+        fetch(timingUrl,{headers:{Accept:"application/json"}})
+      ]);
+      if(!responses[0].ok) throw new Error("متن عثمانی دریافت نشد");
+      if(!responses[1].ok) throw new Error("زمان‌بندی دقیق کلمات دریافت نشد");
+      const [textResult,timingResult]=await Promise.all(responses.map(r=>r.json()));
+      const ayahs=textResult&&textResult.data&&Array.isArray(textResult.data.ayahs)?textResult.data.ayahs:[];
+      const file=timingResult&&timingResult.audio_file;
+      const timestamps=file&&Array.isArray(file.timestamps)?file.timestamps:[];
+      const hasWords=timestamps.some(v=>Array.isArray(v.segments)&&v.segments.length);
+      if(!ayahs.length||!file||!hasWords) throw new Error("زمان‌بندی کلمه‌به‌کلمه برای این تلاوت موجود نیست");
+      const normalize=u=>{try{const x=new URL(u);return x.host+x.pathname;}catch(_){return String(u||"");}};
+      if(expectedAudioUrl&&normalize(file.audio_url)!==normalize(expectedAudioUrl)){
+        throw new Error("فایل صوتی و زمان‌بندی از یک منبع نیستند؛ برای جلوگیری از نشانگر نادرست، همگام‌سازی متوقف شد");
+      }
       if(thisRequest!==requestId) return;
-      renderAyahs(ayahs);
+      renderTimedAyahs(ayahs,timestamps,surahNumber);
       ayahBox.scrollTop=0;
       startWordCursor();
-      hint.textContent="رسم‌الخط عثمانی با رنگ‌بندی قواعد تجوید · صدا از تلویزیون پخش می‌شود";
+      hint.textContent="نشانگر کلمه با زمان‌بندی اختصاصی همین قاری هماهنگ است";
     }catch(error){
       if(thisRequest!==requestId) return;
-      ayahBox.innerHTML='<div class="tv-ayah">متن رنگی تجوید دریافت نشد؛ اتصال اینترنت تلویزیون را بررسی کن.</div>';
+      stopWordCursor();
+      ayahBox.innerHTML='<div class="tv-ayah">متن قرآن نمایش داده شد، اما زمان‌بندی دقیق کلمات دریافت نشد. نشانگر تقریبی اجرا نمی‌شود.</div>';
+      hint.textContent=error.message||"همگام‌سازی دقیق در دسترس نیست";
     }
   }
   player.setMessageInterceptor(cast.framework.messages.MessageType.LOAD,request=>{
     const metadata=request.media && request.media.metadata ? request.media.metadata : {};
     const custom=request.media && request.media.customData ? request.media.customData : {};
     const number=Number(custom.surahNumber)||1;
+    const timingReciterId=Number(custom.timingReciterId)||7;
     surah.textContent=custom.surahName || metadata.title || "تلاوت قرآن کریم";
     reciter.textContent=custom.reciterName || metadata.artist || names[custom.reciter] || "قاری تدبر القرآن";
     basmala.style.display=(number===1 || number===9)?"none":"block";
-    loadUthmaniText(number);
+    loadUthmaniText(number,timingReciterId,request.media && request.media.contentId);
     hint.textContent="در حال اتصال تلاوت به تلویزیون…";
     return request;
   });
   player.addEventListener(cast.framework.events.EventType.PLAYER_LOAD_COMPLETE,()=>{
-    hint.textContent="نشانگر کلمه همراه پیشرفت تلاوت حرکت می‌کند · متن عثمانی و رنگ‌های تجوید";
     updateWordCursor();
   });
   player.addEventListener(cast.framework.events.EventType.PLAY,()=>{startWordCursor();});
