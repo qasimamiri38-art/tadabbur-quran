@@ -57,19 +57,19 @@
     return rows;
   }
 
-  // The original Dari fetcher remains the default; other selected translations use QuranEnc.
-  const originalDariFetcher = window.fetchDariSurah;
-  window.fetchDariSurah = async function (surah) {
-    if (activeKey === DEFAULT_KEY) {
+  // Explicit bridge used by the reader's original lexical fetchDariSurah function.
+  window.fetchTranslationForReader = async function (surah) {
+    const key = window.activeQuranTranslationKey || DEFAULT_KEY;
+    if (key === DEFAULT_KEY) {
       const cached = await readCached(DEFAULT_KEY, surah);
       if (cached?.length) return new Map(cached.map(row => [Number(row.aya), row.translation || ""]));
-      return originalDariFetcher(surah);
+      return null; // let the original Badakhshani fetcher run
     }
-    const cached = await readCached(activeKey, surah);
-    let rows = cached;
-    if (!rows) rows = await fetchRows(activeKey, surah);
+    let rows = await readCached(key, surah);
+    if (!rows) rows = await fetchRows(key, surah);
     return new Map(rows.map(row => [Number(row.aya), row.translation || ""]));
   };
+  window.activeQuranTranslationKey = activeKey;
 
   function setStatus(message) {
     const el = $("translationLibraryStatus");
@@ -101,6 +101,9 @@
     }
     select.value = activeKey;
     select.disabled = !select.options.length;
+    activeKey = select.value || DEFAULT_KEY;
+    window.activeQuranTranslationKey = activeKey;
+    localStorage.setItem("tadabbur-translation-key", activeKey);
   }
 
   function buildLibrary() {
@@ -149,9 +152,14 @@
       });
     });
 
-    language.addEventListener("change", () => fillTranslations(language.value));
+    language.addEventListener("change", () => {
+      fillTranslations(language.value);
+      // Notify the reader's existing handler so translationId and the visible verses update together.
+      translation.dispatchEvent(new Event("change", { bubbles: true }));
+    });
     translation.addEventListener("change", async () => {
       activeKey = translation.value || DEFAULT_KEY;
+      window.activeQuranTranslationKey = activeKey;
       localStorage.setItem("tadabbur-translation-key", activeKey);
       const selected = allTranslations.find(item => item.key === activeKey);
       setStatus("Selected: " + (selected?.title || "Dari — Badakhshani"));
