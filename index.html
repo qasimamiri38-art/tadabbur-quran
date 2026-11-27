@@ -719,6 +719,11 @@ async function api(path) {
 const DARI_TRANSLATION_ID = "dari_badkhashani";
 
 async function fetchDariSurah(suraNumber) {
+  const selectedRows = window.fetchTranslationForReader
+    ? await window.fetchTranslationForReader(suraNumber)
+    : null;
+  if (selectedRows) return selectedRows;
+
   const url =
     "https://quranenc.com/api/v1/translation/sura/" +
     DARI_TRANSLATION_ID + "/" + suraNumber;
@@ -728,11 +733,6 @@ async function fetchDariSurah(suraNumber) {
   if (!response.ok) {
     throw new Error("ترجمه دری دریافت نشد: " + response.status);
   }
-
-  const selectedRows = window.fetchTranslationForReader
-    ? await window.fetchTranslationForReader(suraNumber)
-    : null;
-  if (selectedRows) return selectedRows;
 
   const data = await response.json();
 
@@ -1973,6 +1973,6 @@ player.src = prayer === "Fajr" && fajrAudioFiles[select.value]
 })();
 
 </script>
-<script src="./translation-library.js?v=6"></script>
+<script src="./translation-library.js?v=7"></script>
 </body>
  
