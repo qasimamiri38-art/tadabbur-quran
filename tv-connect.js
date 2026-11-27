@@ -24,6 +24,9 @@
   let airPlayQueuePromise = null;
   let airPlayIndex = 0;
   let airPlayPreparing = false;
+  let independentClient = null;
+  let independentChannel = null;
+  let independentRoomCode = "";
 
   const style = document.createElement("style");
   style.textContent = [
@@ -57,6 +60,8 @@
       '<div id="tvCastSlot"><google-cast-launcher id="tadabburCastLauncher" aria-label="اتصال به Google Cast"></google-cast-launcher></div>',
       '<button type="button" id="tadabburAirPlayButton"> پخش با AirPlay</button>',
       '<div class="tv-remote-actions"><button type="button" id="tadabburTvPlay">▶ پخش سوره روی تلویزیون</button><button type="button" id="tadabburTvPause" disabled>⏸ توقف / ادامه</button><button type="button" id="tadabburTvStop" disabled>⏹ قطع اتصال</button></div>',
+      '<button type="button" id="tadabburIndependentStart" style="grid-column:1/-1">📺 راه‌اندازی پخش مستقل تلویزیون</button>',
+      '<div id="tadabburIndependentCode" style="grid-column:1/-1;display:none;text-align:center;padding:12px;border:1px dashed #d9b66c;border-radius:12px;line-height:1.9"></div>',
       '<div class="tv-volume"><span>صدای تلویزیون</span><input id="tadabburTvVolume" type="range" min="0" max="1" step="0.05" value="0.8" disabled></div>',
       '<div id="tvConnectStatus" role="status" aria-live="polite">برای Google Cast از Chrome سازگار استفاده کن؛ در آیفون و آیپد گزینهٔ AirPlay را آزمایش کن.</div>',
       '<div class="tv-compat">پشتیبانی فعلی این نسخه: Google Cast در مرورگرهای پشتیبانی‌شده و AirPlay در Safari روی دستگاه‌های اپل. پخش مستقل با صفحهٔ اختصاصی تدبر القرآن برای تلویزیون‌های Samsung و LG در مرحلهٔ گیرنده‌های اختصاصی قرار دارد.</div>',
@@ -73,7 +78,77 @@
       remoteController.setVolumeLevel();
     });
     $("tadabburAirPlayButton").addEventListener("click", openAirPlayPicker);
+    $("tadabburIndependentStart").addEventListener("click", startIndependentTvSession);
     updateAirPlayAvailability();
+  }
+
+  function loadSupabaseSdk() {
+    if (window.supabase && window.supabase.createClient) return Promise.resolve(window.supabase);
+    if (window.__tadabburSupabaseLoading) return window.__tadabburSupabaseLoading;
+    window.__tadabburSupabaseLoading = new Promise((resolve,reject)=>{
+      const script=document.createElement("script");
+      script.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+      script.async=true;
+      script.onload=()=>window.supabase&&window.supabase.createClient?resolve(window.supabase):reject(new Error("کتابخانهٔ اتصال تلویزیون بارگذاری نشد"));
+      script.onerror=()=>reject(new Error("اتصال به سرویس تلویزیون برقرار نشد"));
+      document.head.appendChild(script);
+    });
+    return window.__tadabburSupabaseLoading;
+  }
+  async function startIndependentTvSession() {
+    const button=$("tadabburIndependentStart");
+    const codeBox=$("tadabburIndependentCode");
+    if(button) button.disabled=true;
+    try {
+      const sdk=await loadSupabaseSdk();
+      const client=sdk.createClient("https://qwneuagotrskouuwikak.supabase.co","sb_publishable_rMhKtE-Gq9ESxG-lC2qotA_FmmPUeo8");
+      const bytes=new Uint8Array(8);
+      crypto.getRandomValues(bytes);
+      independentRoomCode=Array.from(bytes).map(v=>v.toString(16).padStart(2,"0")).join("").toUpperCase();
+      independentClient=client;
+      independentChannel=client.channel("tadabbur-tv-"+independentRoomCode,{config:{broadcast:{ack:true}}});
+      independentChannel
+        .on("broadcast",{event:"ready"},()=>{
+          sendIndependentSession();
+        })
+        .on("broadcast",{event:"control"},({payload})=>{
+          if(payload&&payload.action==="disconnected"){
+            setStatus("اتصال مستقل تلویزیون پایان یافت.");
+          }
+        })
+        .subscribe(status=>{
+          if(status==="SUBSCRIBED"){
+            if(codeBox){
+              codeBox.style.display="block";
+              codeBox.innerHTML="**کد اتصال تلویزیون**<br><strong style='font-size:28px;letter-spacing:4px;direction:ltr;display:inline-block'>"+independentRoomCode+"</strong><br>در تلویزیون صفحهٔ «تلویزیون تدبر القرآن» را باز کن و این کد را وارد کن.<br><span style='font-size:11px'>پس از اتصال، صدا و تلاوت روی خود تلویزیون اجرا می‌شود؛ بستن اپ آیپد پخش را قطع نمی‌کند.</span>";
+            }
+            if(button){button.textContent="✓ تلویزیون آمادهٔ اتصال است";button.disabled=false;}
+            setStatus("کد اتصال ساخته شد. صفحهٔ تلویزیون را باز و کد را وارد کن.");
+          }
+        });
+    } catch(error) {
+      if(button) button.disabled=false;
+      setStatus("راه‌اندازی پخش مستقل ناموفق بود: "+(error.message||error));
+    }
+  }
+  async function sendIndependentSession() {
+    if(!independentChannel) return;
+    const surah=selectedSurah(), reciter=currentReciter();
+    const result=await independentChannel.send({type:"broadcast",event:"session",payload:{
+      surahNumber:surah.number,surahName:surah.label,reciter:reciter.edition,
+      reciterName:reciter.name,issuedAt:Date.now()
+    }});
+    setStatus(result==="ok"?"تلویزیون مستقل متصل شد؛ اکنون از دکمهٔ پخش روی تلویزیون استفاده کن.":"فرستادن اطلاعات تلاوت به تلویزیون ناموفق بود.");
+  }
+  async function sendIndependentControl(action,value) {
+    if(!independentChannel) return false;
+    try {
+      await independentChannel.send({type:"broadcast",event:"control",payload:{action,value}});
+      return true;
+    } catch(error) {
+      setStatus("فرمان به تلویزیون نرسید: "+(error.message||error));
+      return false;
+    }
   }
 
   function setStatus(message) {
@@ -339,6 +414,7 @@
     return !!(airPlayActive || (audio && audio.webkitCurrentPlaybackTargetIsWireless === true));
   }
   function toggleCastPlayback() {
+    if(independentChannel){sendIndependentControl("toggle");return;}
     const connected = !!(castContext && castContext.getCurrentSession());
     if (connected && remoteController) {
       try { remoteController.playOrPause(); } catch (error) { setStatus("کنترل پخش ناموفق بود: " + error.message); }
@@ -352,6 +428,7 @@
     }
   }
   async function stopCastPlayback() {
+    if(independentChannel){sendIndependentControl("stop");return;}
     try {
       const session = castContext && castContext.getCurrentSession();
       if (session) {
@@ -381,12 +458,12 @@
     const volume = $("tadabburTvVolume");
     const audio = $("audio");
     if (pause) {
-      pause.disabled = !connected;
+      pause.disabled = !connected && !independentChannel;
       const paused = castConnected ? !!(remotePlayer && remotePlayer.isPaused) : !!(audio && audio.paused);
       pause.textContent = paused ? "▶ ادامهٔ پخش" : "⏸ توقف / ادامه";
     }
     if (stop) {
-      stop.disabled = !connected;
+      stop.disabled = !connected && !independentChannel;
       stop.textContent = airConnected && !castConnected ? "⏹ توقف پخش" : "⏹ قطع اتصال";
     }
     if (volume) {
