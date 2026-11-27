@@ -360,6 +360,26 @@ nav {
   #adhanSettings #enableAdhanNotifications{max-width:none}
 }
 
+
+/* Home screen refinement — compact navigation and balanced hero */
+#tadabburNavigation{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:12px;margin:0 0 18px;border:1px solid rgba(216,182,107,.42);border-radius:18px;background:rgba(11,24,17,.82);box-shadow:0 8px 24px rgba(0,0,0,.18)}
+#tadabburNavigation button{min-width:0;min-height:54px;padding:10px 8px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.55;font-size:clamp(13px,1.7vw,16px);white-space:normal;overflow-wrap:anywhere;border-radius:14px;background:linear-gradient(145deg,#1c3025,#17251d);border:1px solid rgba(216,182,107,.3)}
+#tadabburNavigation button.active{background:linear-gradient(145deg,#244b36,#183b2b);border-color:#d8b66b;color:#f1d48f;box-shadow:inset 0 0 0 1px rgba(216,182,107,.14)}
+.home-welcome{margin:10px 0 20px}.home-cover-art{min-height:440px}.home-cover-art>img{object-position:center 54%}.home-cover-content{padding:32px 20px 28px}.home-cover-content h2{margin-bottom:4px}.home-cover-content p{max-width:560px}
+@media(max-width:700px){
+header{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:14px;padding:10px 16px 12px;text-align:right}
+.logo{width:62px;height:62px;flex:0 0 62px;margin:0;border-radius:18px}h1{font-size:25px;margin:0;line-height:1.5}header p{display:none}
+main{padding:10px 12px}
+#tadabburNavigation{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:9px;margin-bottom:14px;border-radius:16px}
+#tadabburNavigation button{min-height:48px;padding:8px 6px;font-size:13px}
+#home{padding:4px 0 18px}.home-welcome{margin:8px 0 16px;border-radius:19px}
+.home-cover-art{min-height:390px}.home-cover-art>img{object-position:46% center}
+.home-cover-content{padding:24px 14px 22px}.home-cover-content h2{font-size:36px;line-height:1.35}
+.home-cover-content p{font-size:13px;line-height:1.8;margin-bottom:16px}
+.home-enter-button{min-width:0;width:min(100%,270px);padding:12px 18px!important;font-size:16px!important}
+}
+@media(max-width:380px){#tadabburNavigation{gap:6px;padding:7px}#tadabburNavigation button{font-size:12px;min-height:45px}.home-cover-art{min-height:360px}.home-cover-content h2{font-size:32px}}
+
 </style>
 
 
