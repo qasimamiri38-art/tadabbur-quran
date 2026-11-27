@@ -884,9 +884,11 @@ async function playAudio(number){
       }
 
       const v=verses[index];document.getElementById("ayah-"+v.surah+"-"+v.n)?.scrollIntoView({behavior:"smooth",block:"center"});
-      const d=await api("/ayah/"+v.global+"/"+selectedReciter);
-
-      if(!d.audio) throw Error("فایل صوتی موجود نیست");
+      // Direct ayah stream from the documented AlQuran Cloud CDN.
+      const ayahBitrate = selectedReciter === "ar.abdulbasit" ? 192 : 128;
+      const ayahAudioUrl =
+        "https://cdn.islamic.network/quran/audio/" +
+        ayahBitrate + "/" + selectedReciter + "/" + v.global + ".mp3";
 
       a.onended=()=>{
         index++;
@@ -896,7 +898,8 @@ async function playAudio(number){
         });
       };
 
-      a.src=d.audio;
+      a.src=ayahAudioUrl;
+      a.load();
 if("mediaSession" in navigator){
  navigator.mediaSession.metadata=new MediaMetadata({
   title:"تلاوت قرآن کریم",
@@ -922,18 +925,17 @@ if (
   Number(firstVerse.surah) !== 1 &&
   Number(firstVerse.surah) !== 9
 ) {
-  const basmala = await api("/ayah/1/" + selectedReciter);
-
-  if (!basmala.audio) {
-    throw Error("صدای بسم‌الله پیدا نشد");
-  }
+  const basmalaBitrate = selectedReciter === "ar.abdulbasit" ? 192 : 128;
+  const basmalaAudioUrl =
+    "https://cdn.islamic.network/quran/audio/" +
+    basmalaBitrate + "/" + selectedReciter + "/1.mp3";
 
   status("در حال پخش بسم‌الله الرحمن الرحیم");
 
   await new Promise((resolve, reject) => {
     a.onended = resolve;
     a.onerror = () => reject(Error("پخش بسم‌الله ناموفق بود"));
-    a.src = basmala.audio;
+    a.src = basmalaAudioUrl;
     a.load();
 
     const request = a.play();
