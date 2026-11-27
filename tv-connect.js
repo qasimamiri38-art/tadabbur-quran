@@ -18,7 +18,6 @@
   let remoteController = null;
   let castReady = false;
   let activeSession = false;
-  let updateTimer = null;
 
   const style = document.createElement("style");
   style.textContent = [
@@ -253,11 +252,6 @@
       audio.addEventListener("loadedmetadata", updateAirPlayAvailability);
       audio.addEventListener("play", updateAirPlayAvailability);
     }
-    if (updateTimer) clearInterval(updateTimer);
-    updateTimer = setInterval(() => {
-      const currentAudio = $("audio");
-      if (currentAudio && currentAudio.src) updateAirPlayAvailability();
-    }, 2500);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
