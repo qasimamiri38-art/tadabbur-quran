@@ -729,6 +729,11 @@ async function fetchDariSurah(suraNumber) {
     throw new Error("ترجمه دری دریافت نشد: " + response.status);
   }
 
+  const selectedRows = window.fetchTranslationForReader
+    ? await window.fetchTranslationForReader(suraNumber)
+    : null;
+  if (selectedRows) return selectedRows;
+
   const data = await response.json();
 
   const rows = Array.isArray(data)
@@ -1968,6 +1973,6 @@ player.src = prayer === "Fajr" && fajrAudioFiles[select.value]
 })();
 
 </script>
-<script src="./translation-library.js?v=5"></script>
+<script src="./translation-library.js?v=6"></script>
 </body>
  
