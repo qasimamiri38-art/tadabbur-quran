@@ -18,6 +18,7 @@
   let remoteController = null;
   let castReady = false;
   let activeSession = false;
+  let airPlayActive = false;
 
   const style = document.createElement("style");
   style.textContent = [
@@ -25,7 +26,9 @@
     "#tadabburTvConnect .tv-connect-heading{grid-column:1/-1;color:#e4c77d;font-weight:700;font-size:16px}",
     "#tadabburTvConnect .tv-connect-sub{grid-column:1/-1;color:#c9c4b5;font-size:12px;line-height:1.8}",
     "#tadabburTvConnect button,#tadabburTvConnect google-cast-launcher{min-height:46px;border:1px solid #b99a5a;border-radius:12px;background:#1b563e;color:#fff4df;padding:9px 12px;font:inherit;font-weight:600;cursor:pointer;text-align:center}",
-    "#tadabburTvConnect google-cast-launcher{display:block;width:100%;box-sizing:border-box;--connected-color:#f0d58e;--disconnected-color:#fff4df}",
+    "#tadabburTvConnect #tvCastSlot{display:none;min-width:0}",
+    "#tadabburTvConnect #tvCastSlot.is-ready{display:block}",
+    "#tadabburTvConnect google-cast-launcher{display:block;width:100%;min-height:46px;box-sizing:border-box;--connected-color:#f0d58e;--disconnected-color:#fff4df}",
     "#tadabburTvConnect button:disabled{opacity:.45;cursor:not-allowed}",
     "#tadabburTvConnect .tv-remote-actions{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}",
     "#tadabburTvConnect .tv-remote-actions button{background:#26382c}",
@@ -87,12 +90,16 @@
       return;
     }
     try {
-      if (!audio.src) {
-        audio.src = audioUrl();
+      const source = audioUrl();
+      if (!audio.src || audio.dataset.tvSource !== source) {
+        audio.pause();
+        audio.src = source;
+        audio.dataset.tvSource = source;
+        audio.preload = "auto";
         audio.load();
       }
       audio.webkitShowPlaybackTargetPicker();
-      setStatus("فهرست دستگاه‌های AirPlay باز شد. تلویزیون سازگار را انتخاب کن.");
+      setStatus("فهرست AirPlay باز شد. تلویزیون را انتخاب کن؛ پس از اتصال، دکمهٔ «پخش سوره روی تلویزیون» فعال می‌شود.");
     } catch (error) {
       setStatus("AirPlay باز نشد: " + (error.message || "دوباره تلاش کن."));
     }
@@ -156,10 +163,13 @@
         activeSession = event.sessionState === cast.framework.SessionState.SESSION_STARTED ||
           event.sessionState === cast.framework.SessionState.SESSION_RESUMED;
         syncRemoteControls();
-        if (activeSession) setStatus("به تلویزیون متصل شدی. اکنون پخش را از همین دستگاه کنترل کن.");
-        else if (event.sessionState === cast.framework.SessionState.SESSION_ENDED) setStatus("اتصال تلویزیون پایان یافت.");
+        if (activeSession) setStatus("به تلویزیون با Google Cast وصل شدی. کنترل پخش فعال است.");
+        else if (event.sessionState === cast.framework.SessionState.SESSION_ENDED) setStatus("اتصال Google Cast پایان یافت.");
+        syncRemoteControls();
       });
       castReady = true;
+      const castSlot = $("tvCastSlot");
+      if (castSlot) castSlot.classList.add("is-ready");
       setStatus("Google Cast آماده است. تلویزیون یا گیرندهٔ سازگار را از دکمهٔ Cast انتخاب کن.");
       syncRemoteControls();
     } catch (error) {
@@ -168,8 +178,30 @@
   }
 
   async function playOnCast() {
+    const audio = $("audio");
+    if (isAirPlayActive()) {
+      try {
+        const source = audioUrl();
+        if (!audio.src || audio.dataset.tvSource !== source) {
+          audio.pause();
+          audio.src = source;
+          audio.dataset.tvSource = source;
+          audio.load();
+        }
+        await audio.play();
+        syncRemoteControls();
+        setStatus("تلاوت از طریق AirPlay روی تلویزیون پخش می‌شود؛ کنترل توقف و ادامه فعال است.");
+      } catch (error) {
+        setStatus("پخش AirPlay آغاز نشد: " + (error.message || "دوباره تلاش کن."));
+      }
+      return;
+    }
     if (!castReady || !castContext) {
-      setStatus("Google Cast در این مرورگر آماده نیست. برای iPhone/iPad از AirPlay و برای Android از Chrome سازگار استفاده کن.");
+      if (audio && typeof audio.webkitShowPlaybackTargetPicker === "function") {
+        setStatus("ابتدا دکمهٔ AirPlay را بزن و تلویزیون را انتخاب کن؛ سپس پخش را آغاز کن.");
+      } else {
+        setStatus("این مرورگر AirPlay یا Google Cast را پشتیبانی نمی‌کند. از Safari در دستگاه اپل یا Chrome و گیرندهٔ Cast استفاده کن.");
+      }
       return;
     }
     try {
@@ -220,34 +252,65 @@
     }
   }
 
+  function isAirPlayActive() {
+    const audio = $("audio");
+    return !!(airPlayActive || (audio && audio.webkitCurrentPlaybackTargetIsWireless === true));
+  }
   function toggleCastPlayback() {
-    if (!remoteController || !activeSession) return;
-    try { remoteController.playOrPause(); } catch (error) { setStatus("کنترل پخش ناموفق بود: " + error.message); }
+    const connected = !!(castContext && castContext.getCurrentSession());
+    if (connected && remoteController) {
+      try { remoteController.playOrPause(); } catch (error) { setStatus("کنترل پخش ناموفق بود: " + error.message); }
+      return;
+    }
+    const audio = $("audio");
+    if (isAirPlayActive() && audio) {
+      if (audio.paused) audio.play().then(syncRemoteControls).catch(error => setStatus("ادامهٔ پخش ناموفق بود: " + error.message));
+      else audio.pause();
+      syncRemoteControls();
+    }
   }
   async function stopCastPlayback() {
     try {
       const session = castContext && castContext.getCurrentSession();
-      if (session) await session.endSession(true);
-      activeSession = false;
-      syncRemoteControls();
-      setStatus("پخش تلویزیون متوقف و اتصال پایان یافت.");
+      if (session) {
+        await session.endSession(true);
+        activeSession = false;
+        syncRemoteControls();
+        setStatus("پخش Google Cast متوقف و اتصال پایان یافت.");
+        return;
+      }
+      const audio = $("audio");
+      if (isAirPlayActive() && audio) {
+        audio.pause();
+        try { audio.currentTime = 0; } catch (_) {}
+        syncRemoteControls();
+        setStatus("پخش AirPlay متوقف شد. برای قطع مسیر AirPlay، دوباره انتخابگر AirPlay را باز کن و دستگاه را تغییر بده.");
+      }
     } catch (error) {
-      setStatus("قطع اتصال ناموفق بود: " + (error.message || error));
+      setStatus("توقف یا قطع اتصال ناموفق بود: " + (error.message || error));
     }
   }
   function syncRemoteControls() {
-    const connected = !!(castContext && castContext.getCurrentSession());
+    const castConnected = !!(castContext && castContext.getCurrentSession());
+    const airConnected = isAirPlayActive();
+    const connected = castConnected || airConnected;
     const pause = $("tadabburTvPause");
     const stop = $("tadabburTvStop");
     const volume = $("tadabburTvVolume");
+    const audio = $("audio");
     if (pause) {
       pause.disabled = !connected;
-      pause.textContent = remotePlayer && remotePlayer.isPaused ? "▶ ادامهٔ پخش" : "⏸ توقف / ادامه";
+      const paused = castConnected ? !!(remotePlayer && remotePlayer.isPaused) : !!(audio && audio.paused);
+      pause.textContent = paused ? "▶ ادامهٔ پخش" : "⏸ توقف / ادامه";
     }
-    if (stop) stop.disabled = !connected;
+    if (stop) {
+      stop.disabled = !connected;
+      stop.textContent = airConnected && !castConnected ? "⏹ توقف پخش" : "⏹ قطع اتصال";
+    }
     if (volume) {
-      volume.disabled = !connected;
-      if (remotePlayer && typeof remotePlayer.volumeLevel === "number") volume.value = String(remotePlayer.volumeLevel);
+      volume.disabled = !castConnected;
+      if (castConnected && remotePlayer && typeof remotePlayer.volumeLevel === "number") volume.value = String(remotePlayer.volumeLevel);
+      volume.title = airConnected && !castConnected ? "صدای AirPlay را با ریموت تلویزیون تنظیم کن." : "";
     }
   }
 
@@ -274,8 +337,27 @@
     if (audio) {
       audio.disableRemotePlayback = false;
       audio.setAttribute("x-webkit-airplay", "allow");
+      audio.setAttribute("preload", "auto");
       audio.addEventListener("loadedmetadata", updateAirPlayAvailability);
-      audio.addEventListener("play", updateAirPlayAvailability);
+      audio.addEventListener("play", () => { updateAirPlayAvailability(); syncRemoteControls(); });
+      audio.addEventListener("pause", syncRemoteControls);
+      audio.addEventListener("ended", syncRemoteControls);
+      audio.addEventListener("webkitcurrentplaybacktargetiswirelesschanged", () => {
+        airPlayActive = audio.webkitCurrentPlaybackTargetIsWireless === true;
+        syncRemoteControls();
+        setStatus(airPlayActive
+          ? "به تلویزیون از طریق AirPlay وصل شدی؛ کنترل توقف و ادامه فعال است."
+          : "اتصال AirPlay پایان یافت.");
+      });
+      if (window.WebKitPlaybackTargetAvailabilityEvent) {
+        audio.addEventListener("webkitplaybacktargetavailabilitychanged", event => {
+          const button = $("tadabburAirPlayButton");
+          if (button) button.disabled = event.availability !== "available";
+          if (event.availability === "available") setStatus("تلویزیون AirPlay پیدا شد؛ برای اتصال دکمهٔ AirPlay را بزن.");
+        });
+      }
+      airPlayActive = audio.webkitCurrentPlaybackTargetIsWireless === true;
+      syncRemoteControls();
     }
   }
 
