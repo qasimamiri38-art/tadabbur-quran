@@ -73,7 +73,7 @@
 
   function setStatus(message) {
     const el = $("translationLibraryStatus");
-    if (el) el.textContent = message;
+    if (el) { el.textContent = message; el.hidden = false; }
   }
 
   function fillTranslations(languageCode) {
@@ -93,7 +93,7 @@
     list.forEach(item => {
       const option = document.createElement("option");
       option.value = item.key;
-      option.textContent = item.title + (item.description ? " — " + item.description : "");
+      option.textContent = item.title;
       select.append(option);
     });
     if (![...select.options].some(option => option.value === activeKey)) {
@@ -131,14 +131,14 @@
     const download = document.createElement("button");
     download.type = "button";
     download.id = "translationLibraryDownload";
-    download.textContent = "⬇ دانلود کامل این ترجمه برای مطالعهٔ آفلاین";
+    download.textContent = "⬇ Download for offline use";
     download.style.cssText = "grid-column:1/-1;width:100%;padding:13px;border-radius:12px;background:#155b40;color:white;border:1px solid #c5a65a;font-weight:600;";
 
     const status = document.createElement("p");
     status.id = "translationLibraryStatus";
     status.setAttribute("role", "status");
-    status.style.cssText = "grid-column:1/-1;margin:4px 0;color:#d7bd78;text-align:center;";
-    status.textContent = "ترجمهٔ دری بدخشیانی انتخاب شده است.";
+    status.style.cssText = "grid-column:1/-1;margin:2px 0;color:#d7bd78;text-align:center;font-size:13px;";
+    status.hidden = true;
     selectors.insertBefore(search, language);
     selectors.append(download, status);
 
@@ -154,7 +154,7 @@
       activeKey = translation.value || DEFAULT_KEY;
       localStorage.setItem("tadabbur-translation-key", activeKey);
       const selected = allTranslations.find(item => item.key === activeKey);
-      setStatus("ترجمهٔ انتخاب‌شده: " + (selected?.title || "فارسی دری — بدخشیانی"));
+      setStatus("Selected: " + (selected?.title || "Dari — Badakhshani"));
       // The original reader change handler reloads the current surah once.
     });
 
@@ -216,9 +216,10 @@
       language.value = activeKey === DEFAULT_KEY ? "dari" : (initial?.language_iso_code || "dari");
       fillTranslations(language.value);
       if (translation) translation.value = activeKey;
-      setStatus("Library ready: " + languageNames.size + " languages and " + allTranslations.length + " translations. Language names and translator titles are sorted alphabetically.");
+      setStatus("");
+      const statusEl = $("translationLibraryStatus"); if (statusEl) statusEl.hidden = true;
     } catch (error) {
-      setStatus("کتابخانهٔ زبان‌ها فعلاً بارگذاری نشد: " + error.message + "؛ ترجمهٔ دری اصلی حفظ شده است.");
+      setStatus("Language list unavailable. Your Dari translation is unchanged.");
       language.replaceChildren(new Option("Dari", "dari"));
       language.value = "dari";
       fillTranslations("dari");
