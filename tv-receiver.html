@@ -128,7 +128,7 @@ cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-ev
     const number=Number(custom.surahNumber)||1;
     surah.textContent=custom.surahName || metadata.title || "تلاوت قرآن کریم";
     reciter.textContent=custom.reciterName || metadata.artist || names[custom.reciter] || "قاری تدبر القرآن";
-    basmala.style.display=number===9?"none":"block";
+    basmala.style.display=(number===1 || number===9)?"none":"block";
     loadUthmaniText(number);
     hint.textContent="در حال اتصال تلاوت به تلویزیون…";
     return request;
