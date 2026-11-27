@@ -1672,11 +1672,9 @@ document.getElementById("barakatJuzSelect")?.remove();
         bitrate + "/" + edition + "/" + surahNumber + ".mp3";
 
       message.textContent = "قاری انتخاب‌شده: " + name + " · در حال آماده‌سازی " + surahName;
-      audio.src = audioUrl;
-      audio.load();
 
-      // Fallback: if the full-surah MP3 is unavailable, use official
-      // ayah audio URLs returned by AlQuran Cloud for the same reciter.
+      // If the full-surah source fails in Safari (including NotSupportedError),
+      // switch to the API's per-ayah audio stream instead of leaving Error visible.
       audio.onerror = async () => {
         audio.onerror = null;
         message.textContent = "منبع کامل سوره در دسترس نبود؛ منبع جایگزین در حال آماده‌سازی است…";
@@ -1714,10 +1712,16 @@ document.getElementById("barakatJuzSelect")?.remove();
         }
       };
 
+      audio.src = audioUrl;
+      audio.load();
       const playRequest = audio.play();
       if (playRequest && typeof playRequest.catch === "function") {
         playRequest.catch(() => {
-          message.textContent = "برای آغاز تلاوت، دکمهٔ پخش‌کننده را لمس کن.";
+          if (typeof audio.onerror === "function") {
+            audio.onerror();
+          } else {
+            message.textContent = "برای آغاز تلاوت، دکمهٔ پخش‌کننده را لمس کن.";
+          }
         });
       }
 
