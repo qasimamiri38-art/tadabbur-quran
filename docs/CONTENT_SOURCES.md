@@ -88,3 +88,23 @@ Before any resource is marked production-ready, record:
 ## 5. Release gate
 
 No resource should be described as “licensed,” “official,” “original,” or “offline-ready” until the exact file/edition has supporting source and permission evidence. Public API access alone is not proof of redistribution rights.
+
+
+## 6. Repository Quran-text integrity audit (2026-11-27)
+
+The existing repository files were inspected directly through their Git blobs. These are structural checks, **not** a comparison against Tanzil or a printed Hafs mushaf:
+
+- `quran-uthmani.txt` contains 6,236 lines.
+- `quran-uthmani-structured.json` and `quran-uthmani-structured-v2-min.json` each contain 6,236 verse records and 114 surah records.
+- Both structured files agree on all 6,236 `surah:ayah` text values.
+- All 6,236 verse keys are unique.
+- Every structured record's `source_line` points to a line in `quran-uthmani.txt` that exactly equals its preserved `source_text`.
+- The per-surah verse counts match the standard 114-surah count sequence (sum 6,236).
+- The structured files deliberately separate the opening basmala for 112 surahs; Al-Fatiha keeps its basmala as ayah 1, and At-Tawbah has no opening basmala. This explains why comparing `text_uthmani` directly with the complete source line reports apparent differences at basmala-bearing surahs: the source line contains the opening basmala while the verse field stores it separately.
+- The JSON metadata itself explicitly says the source text does not identify a recitation chain and that Hafs 'an Asim is the project's target, not a verified source attribution.
+
+**Audit result:** repository files are internally consistent in their line mapping, record counts, and two structured variants. They are **not yet approved as canonical production Quran text**, because their original publisher/version/license provenance has not been established and no independent word-for-word comparison against the official Tanzil release or an authoritative Hafs mushaf has been completed.
+
+### Next validation step
+
+Obtain the exact official Tanzil Uthmani Version 1.1 source and its unmodified copyright block. Compare the existing repository's canonical verse strings against the official file using a documented mapping that treats opening basmalas separately. Report every mismatch without automatically correcting the Quran text. Only after a zero-unexplained-difference review should the selected file be marked as the production canonical text.
