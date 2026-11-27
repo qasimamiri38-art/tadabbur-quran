@@ -181,9 +181,16 @@
       if (!session) throw new Error("گیرندهٔ تلویزیون انتخاب نشد.");
       const surah = selectedSurah();
       const reciter = currentReciter();
-      setStatus("در حال دریافت صوت و زمان‌بندی دقیق کلمات برای " + reciter.name + "…");
-      const timedAudio = await fetchTimedChapterAudio(surah.number, reciter);
-      const url = timedAudio.audioUrl;
+      setStatus("در حال آماده‌سازی تلاوت " + reciter.name + "…");
+      let url = audioUrl();
+      let timingReciterId = null;
+      try {
+        const timedAudio = await fetchTimedChapterAudio(surah.number, reciter);
+        url = timedAudio.audioUrl;
+        timingReciterId = timedAudio.timingReciterId;
+      } catch (timingError) {
+        setStatus("تلاوت با منبع قبلی پخش می‌شود؛ زمان‌بندی دقیق کلمات فعلاً برای این اتصال در دسترس نیست.");
+      }
       const mediaInfo = new chrome.cast.media.MediaInfo(url, "audio/mpeg");
       mediaInfo.streamType = chrome.cast.media.StreamType.BUFFERED;
       mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
@@ -197,7 +204,7 @@
         surahName: surah.label,
         reciter: reciter.edition,
         reciterName: reciter.name,
-        timingReciterId: timedAudio.timingReciterId,
+        timingReciterId: timingReciterId,
         receiverScreen: "quran"
       };
       const request = new chrome.cast.media.LoadRequest(mediaInfo);
