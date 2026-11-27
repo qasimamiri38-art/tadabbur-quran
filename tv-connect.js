@@ -5,6 +5,8 @@
   window.__tadabburTvConnectInstalled = true;
 
   const DEFAULT_CAST_RECEIVER = "CC1AD845";
+  // After registering tv-receiver.html in Google Cast Console, place its app ID in tv-cast-config.js.
+  const CUSTOM_CAST_RECEIVER = window.TADABBUR_CAST_RECEIVER_ID || "";
   const RECITERS = {
     "ar.alafasy": { name: "استاد مشاری بن راشد العفاسی", bitrate: 128 },
     "ar.abdulbasit": { name: "استاد عبدالباسط عبدالصمد", bitrate: 192 },
@@ -121,7 +123,7 @@
     try {
       castContext = cast.framework.CastContext.getInstance();
       castContext.setOptions({
-        receiverApplicationId: DEFAULT_CAST_RECEIVER,
+        receiverApplicationId: CUSTOM_CAST_RECEIVER || DEFAULT_CAST_RECEIVER,
         autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
       });
       remotePlayer = new cast.framework.RemotePlayer();
