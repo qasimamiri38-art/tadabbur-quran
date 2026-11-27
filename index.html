@@ -545,12 +545,25 @@ function status(message){
 }
 let surahs=[], verses=[], translationId="", tafsirId="", fontSize=30, verseObserver=null;
 
-let selectedReciter = localStorage.getItem("selectedReciter") || "ar.alafasy";
+const VALID_AUDIO_RECITERS = [
+  "ar.abdulbasit",
+  "ar.alafasy",
+  "ar.husary"
+];
+
+const savedAudioReciter = localStorage.getItem("selectedReciter");
+let selectedReciter = VALID_AUDIO_RECITERS.includes(savedAudioReciter)
+  ? savedAudioReciter
+  : "ar.alafasy";
+
+if (selectedReciter !== savedAudioReciter) {
+  localStorage.setItem("selectedReciter", selectedReciter);
+}
 
 const reciterNames = {
-"عبدالباسط عبدالصمد": "ar.abdulbasitmurattal",
-"مشاری العفاسی": "ar.alafasy",
-"محمود خلیل الحصری": "ar.husary"
+  "عبدالباسط عبدالصمد": "ar.abdulbasit",
+  "مشاری العفاسی": "ar.alafasy",
+  "محمود خلیل الحصری": "ar.husary"
 };
 
 document.querySelectorAll(".reciter-choice").forEach(button => {
