@@ -1,0 +1,55 @@
+name: Samsung Tizen TV checks
+
+on:
+  push:
+    paths:
+      - "tv/tizen/**"
+      - ".github/workflows/tizen-tv-check.yml"
+  pull_request:
+    paths:
+      - "tv/tizen/**"
+      - ".github/workflows/tizen-tv-check.yml"
+  workflow_dispatch:
+
+jobs:
+  validate-tizen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate JavaScript syntax
+        run: |
+          node --check tv/tizen/app.js
+
+      - name: Validate Tizen XML and local assets
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          import xml.etree.ElementTree as ET
+
+          root = Path("tv/tizen")
+          manifest = ET.parse(root / "config.xml").getroot()
+          ns = {"tizen": "http://tizen.org/ns/widgets"}
+          content = manifest.find("{http://www.w3.org/ns/widgets}content")
+          icon = manifest.find("{http://www.w3.org/ns/widgets}icon")
+          assert content is not None and (root / content.attrib["src"]).is_file()
+          assert icon is not None and (root / icon.attrib["src"]).is_file()
+
+          html = (root / "index.html").read_text(encoding="utf-8")
+          for asset in re.findall(r'<(?:script|link)[^>]+(?:src|href)="([^"]+)"', html):
+              if asset.startswith(("http://", "https://", "//", "data:")):
+                  continue
+              assert (root / asset).is_file(), f"Missing local asset: {asset}"
+
+          app_id = manifest.find("tizen:application", ns)
+          assert app_id is not None, "Missing Tizen application declaration"
+          assert app_id.attrib.get("id") and app_id.attrib.get("package"), "Tizen app ID/package missing"
+          print("Tizen manifest and local assets are valid.")
+          PY
