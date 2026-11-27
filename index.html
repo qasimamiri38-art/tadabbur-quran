@@ -1490,7 +1490,10 @@ document.getElementById("barakatJuzSelect")?.remove();
       const surahName = byId("surah")?.selectedOptions?.[0]?.textContent || ("سورهٔ " + surahNumber);
 
       audio.pause();
-      const audioUrl = `https://cdn.islamic.network/quran/audio-surah/128/${edition}/${surahNumber}.mp3`;
+      // AlQuran Cloud serves Abdul Basit surah recordings at 192 kbps;
+      // Alafasy and Husary are available at 128 kbps.
+      const bitrate = edition === "ar.abdulbasit" ? 192 : 128;
+      const audioUrl = `https://cdn.islamic.network/quran/audio-surah/${bitrate}/${edition}/${surahNumber}.mp3`;
 
 audio.pause();
 audio.src = audioUrl;
