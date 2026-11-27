@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#09251c">
+<title>تدبر القرآن · تلویزیون</title>
+<script src="https://www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;overflow:hidden}
+body{display:grid;place-items:center;background:#07130d url("./hero-quran.png") center/cover no-repeat;color:#fff1d4;font-family:Tahoma,Arial,sans-serif}
+body:before{content:"";position:fixed;inset:0;background:linear-gradient(180deg,rgba(3,13,8,.52),rgba(3,13,8,.82));pointer-events:none}
+.frame{position:relative;z-index:1;width:min(92vw,1500px);height:min(90vh,850px);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:clamp(22px,4vh,52px);border:1px solid rgba(220,190,120,.58);border-radius:30px;background:rgba(5,22,13,.62);box-shadow:0 18px 70px #0008}
+.brand{display:flex;align-items:center;gap:20px;text-align:center}
+.brand img{width:clamp(58px,7vw,96px);height:clamp(58px,7vw,96px);object-fit:contain;border:1px solid #d8b66b;border-radius:22px;background:#08150e}
+h1{margin:0;color:#f2d58d;font-size:clamp(28px,4vw,58px)}
+.sub{margin:8px 0 0;color:#e7ddc7;font-size:clamp(14px,1.5vw,22px)}
+.quran-mark{font-family:"Amiri Quran",serif;font-size:clamp(44px,8vw,112px);color:#fff2d7;text-align:center;text-shadow:0 4px 26px #000;line-height:1.6}
+.now{font-size:clamp(19px,2.5vw,34px);color:#f0d58e;text-align:center}
+.reciter{font-size:clamp(15px,1.7vw,23px);color:#e5dfcf;text-align:center}
+.hint{font-size:clamp(12px,1.2vw,17px);color:#c3c8ba;text-align:center}
+cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-events:none;left:-10px;bottom:-10px}
+@media(max-width:650px){.frame{height:94vh;padding:18px;border-radius:18px}.brand{flex-direction:column;gap:10px}}
+</style>
+</head>
+<body>
+<main class="frame">
+  <header class="brand">
+    <img src="./icon-512.png" alt="نشان تدبر القرآن">
+    <div><h1>تَدَبُّرُ القُرآن</h1><p class="sub">قرآن کریم · تلاوت زنده</p></div>
+  </header>
+  <section aria-live="polite">
+    <div class="quran-mark">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+    <div id="tvSurah" class="now">در انتظار اتصال دستگاه فرستنده…</div>
+    <div id="tvReciter" class="reciter">سه قاری برگزیدهٔ تدبر القرآن</div>
+  </section>
+  <footer class="hint" id="tvHint">برای انتخاب سوره و قاری، برنامهٔ تدبر القرآن را در موبایل باز کن.</footer>
+</main>
+<cast-media-player></cast-media-player>
+<script>
+(function(){
+  "use strict";
+  if(!window.cast || !cast.framework) return;
+  const context=cast.framework.CastReceiverContext.getInstance();
+  const player=context.getPlayerManager();
+  const surah=document.getElementById("tvSurah");
+  const reciter=document.getElementById("tvReciter");
+  const hint=document.getElementById("tvHint");
+  const names={
+    "ar.alafasy":"استاد مشاری بن راشد العفاسی",
+    "ar.abdulbasit":"استاد عبدالباسط عبدالصمد",
+    "ar.husary":"استاد محمود خلیل الحصری"
+  };
+  player.setMessageInterceptor(cast.framework.messages.MessageType.LOAD,request=>{
+    const metadata=request.media && request.media.metadata ? request.media.metadata : {};
+    const custom=request.media && request.media.customData ? request.media.customData : {};
+    surah.textContent=custom.surahName || metadata.title || "تلاوت قرآن کریم";
+    reciter.textContent=custom.reciterName || metadata.artist || names[custom.reciter] || "قاری تدبر القرآن";
+    hint.textContent="صدا از تلویزیون پخش می‌شود · کنترل با ریموت یا دستگاه متصل";
+    return request;
+  });
+  player.addEventListener(cast.framework.events.EventType.PLAYER_LOAD_COMPLETE,()=>{
+    hint.textContent="تلاوت آغاز شد · برای توقف یا ادامه از ریموت تلویزیون یا موبایل استفاده کن";
+  });
+  player.addEventListener(cast.framework.events.EventType.ENDED,()=>{
+    hint.textContent="این تلاوت پایان یافت";
+  });
+  context.start();
+})();
+</script>
+</body>
+</html>
