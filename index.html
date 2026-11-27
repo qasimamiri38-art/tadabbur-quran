@@ -917,9 +917,14 @@ async function playAudio(number){
       const v=verses[index];document.getElementById("ayah-"+v.surah+"-"+v.n)?.scrollIntoView({behavior:"smooth",block:"center"});
       // Direct ayah stream from the documented AlQuran Cloud CDN.
       const ayahBitrate = selectedReciter === "ar.abdulbasit" ? 192 : 128;
-      const ayahAudioUrl =
-        "https://cdn.islamic.network/quran/audio/" +
-        ayahBitrate + "/" + selectedReciter + "/" + v.global + ".mp3";
+      // Alafasy's verified EveryAyah files use Surah/Ayah numbering.
+      // Keep the existing CDN route for the other selected reciters.
+      const ayahAudioUrl = selectedReciter === "ar.alafasy"
+        ? "https://everyayah.com/data/Alafasy_128kbps/" +
+          String(v.surah).padStart(3, "0") +
+          String(v.n).padStart(3, "0") + ".mp3"
+        : "https://cdn.islamic.network/quran/audio/" +
+          ayahBitrate + "/" + selectedReciter + "/" + v.global + ".mp3";
 
       a.onended=()=>{
         index++;
@@ -966,9 +971,10 @@ if (
   Number(firstVerse.surah) !== 9
 ) {
   const basmalaBitrate = selectedReciter === "ar.abdulbasit" ? 192 : 128;
-  const basmalaAudioUrl =
-    "https://cdn.islamic.network/quran/audio/" +
-    basmalaBitrate + "/" + selectedReciter + "/1.mp3";
+  const basmalaAudioUrl = selectedReciter === "ar.alafasy"
+    ? "https://everyayah.com/data/Alafasy_128kbps/001001.mp3"
+    : "https://cdn.islamic.network/quran/audio/" +
+      basmalaBitrate + "/" + selectedReciter + "/1.mp3";
 
   status("در حال پخش بسم‌الله الرحمن الرحیم");
 
