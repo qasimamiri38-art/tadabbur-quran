@@ -946,7 +946,7 @@ card.append(top,content);
   },{threshold:[0.55]});
   document.querySelectorAll("#verses .ayah").forEach(el=>verseObserver.observe(el));
  }
- status(list.length+" آیه نمایش داده شد");
+ status(list.length+" آیه نمایش داده شد"+($("quranFont")?.value==="tajweed"?" · رنگ‌بندی تجوید حفص فعال است":""));
 }
 function toggle(v){let a=read("tadabbur-saved",[]),i=a.findIndex(x=>x.surah===v.surah&&x.ayah===v.n);if(i>=0)a.splice(i,1);else a.push({surah:v.surah,ayah:v.n,arabic:v.arabic,translation:v.translation});write("tadabbur-saved",a);render();renderSaved()}
 function renderSaved(){
