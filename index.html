@@ -1262,34 +1262,33 @@ async function playAudio(number) {
       stopQuranPlayback("خطا در پخش: " + (error?.message || "فایل صوتی در دسترس نیست."));
     }
 
+    let audioAyahs = [];
+    const audioEdition = selectedReciter === "ar.abdulbasit"
+      ? "ar.abdulbasitmurattal"
+      : selectedReciter;
+
+    async function loadAudioAyahsForSurah(surahNumber) {
+      status("در حال دریافت تلاوت " + (RECITER_DISPLAY_NAMES[selectedReciter] || "قاری انتخاب‌شده") + "...");
+      const response = await fetch(
+        "https://api.alquran.cloud/v1/surah/" + surahNumber + "/" + audioEdition
+      );
+      if (!response.ok) throw new Error("منبع صوتی قاری پاسخ نداد: " + response.status);
+      const result = await response.json();
+      const ayahs = result && result.data && Array.isArray(result.data.ayahs)
+        ? result.data.ayahs
+        : [];
+      if (!ayahs.length || ayahs.some(ayah => !ayah.audio)) {
+        throw new Error("فایل صوتی کامل برای این سوره و قاری پیدا نشد.");
+      }
+      audioAyahs = ayahs;
+    }
+
     function playCurrentBasmalaOrAyah() {
       if (runId !== playbackRunId) return;
-      const firstVerse = verses[index];
-      if (!firstVerse) return;
-
-      if (Number(firstVerse.n) === 1 &&
-          Number(firstVerse.surah) !== 1 &&
-          Number(firstVerse.surah) !== 9) {
-        setActive(firstVerse);
-        const basmalaFolder = RECITER_AUDIO_FOLDERS[selectedReciter] || RECITER_AUDIO_FOLDERS["ar.alafasy"];
-        // EveryAyah stores the separate surah opening as SSS000.mp3.
-        // Use this surah's own opening file, not Al-Fatiha's 001000.mp3.
-        const basmalaAudioUrl = "https://everyayah.com/data/" +
-          basmalaFolder + "/" + String(firstVerse.surah).padStart(3, "0") + "000.mp3";
-
-        status("در حال پخش بسم‌الله الرحمن الرحیم");
-        a.onended = () => {
-          if (runId !== playbackRunId) return;
-          a.onended = null;
-          playNext().catch(handlePlaybackError);
-        };
-        a.onerror = () => handlePlaybackError(new Error("پخش بسم‌الله ناموفق بود"));
-        a.src = basmalaAudioUrl;
-        a.load();
-        a.play().catch(handlePlaybackError);
-      } else {
-        playNext().catch(handlePlaybackError);
-      }
+      // The first-ayah recording from the selected reciter contains the
+      // correct surah opening where applicable; do not request a guessed
+      // standalone Bismillah URL from a different audio directory.
+      playNext().catch(handlePlaybackError);
     }
 
     async function playNext() {
@@ -1312,6 +1311,13 @@ async function playAudio(number) {
           return;
         }
         index = 0;
+        try {
+          await loadAudioAyahsForSurah(nextSurah);
+        } catch (error) {
+          handlePlaybackError(error);
+          return;
+        }
+        if (runId !== playbackRunId) return;
         playCurrentBasmalaOrAyah();
         return;
       }
@@ -1321,10 +1327,12 @@ async function playAudio(number) {
       document.getElementById("ayah-" + v.surah + "-" + v.n)
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
 
-      const ayahFolder = RECITER_AUDIO_FOLDERS[selectedReciter] || RECITER_AUDIO_FOLDERS["ar.alafasy"];
-      const ayahAudioUrl = "https://everyayah.com/data/" + ayahFolder + "/" +
-        String(v.surah).padStart(3, "0") +
-        String(v.n).padStart(3, "0") + ".mp3";
+      const audioEntry = audioAyahs[index];
+      const ayahAudioUrl = audioEntry && audioEntry.audio;
+      if (!ayahAudioUrl) {
+        handlePlaybackError(new Error("فایل صوتی آیه " + v.n + " برای قاری انتخاب‌شده موجود نیست."));
+        return;
+      }
 
       a.onended = () => {
         if (runId !== playbackRunId) return;
@@ -1354,6 +1362,13 @@ async function playAudio(number) {
       if (runId === playbackRunId) status("در حال پخش آیه " + v.n);
     }
 
+    try {
+      await loadAudioAyahsForSurah(Number(verses[index].surah));
+    } catch (error) {
+      handlePlaybackError(error);
+      return;
+    }
+    if (runId !== playbackRunId) return;
     playCurrentBasmalaOrAyah();
   } catch (e) {
     stopQuranPlayback("خطای پخش: " + (e?.message || "خطای نامشخص"));
