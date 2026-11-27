@@ -570,7 +570,7 @@ if (selectedReciter !== savedAudioReciter) {
 }
 
 const reciterNames = {
-  "عبدالباسط عبدالصمد": "ar.abdulbasit",
+  "عبدالباسط عبدالصمد": "ar.abdulbasitmurattal",
   "مشاری العفاسی": "ar.alafasy",
   "محمود خلیل الحصری": "ar.husary"
 };
@@ -1364,7 +1364,7 @@ if (home && !home.querySelector("#homeAirPlay")) {
       <div class="reciter-grid">
         <button type="button" class="reciter-card" data-edition="ar.abdulbasit" data-name="استاد عبدالباسط عبدالصمد">
           <span class="reciter-photo">
-                        <img loading="lazy" referrerpolicy="no-referrer" src="https://commons.wikimedia.org/wiki/Special:FilePath/Abdel_Basit_Abdel_Samad_1955.png" alt="تصویر استاد عبدالباسط عبدالصمد">
+                        <img loading="lazy" referrerpolicy="no-referrer" src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Abdel_Basit_Abdel_Samad_1955.png" alt="تصویر استاد عبدالباسط عبدالصمد">
             <span class="reciter-fallback" hidden>🎙️</span><span class="reciter-index">۱</span>
           </span>
           <span class="reciter-card-body">
@@ -1377,7 +1377,7 @@ if (home && !home.querySelector("#homeAirPlay")) {
 
         <button type="button" class="reciter-card" data-edition="ar.alafasy" data-name="استاد مشاری بن راشد العفاسی">
           <span class="reciter-photo">
-            <img loading="lazy" referrerpolicy="no-referrer" src="https://commons.wikimedia.org/wiki/Special:FilePath/Мишари_Рашид.jpg" alt="تصویر استاد مشاری بن راشد العفاسی">
+            <img loading="lazy" referrerpolicy="no-referrer" src="https://upload.wikimedia.org/wikipedia/commons/2/24/%D0%9C%D0%B8%D1%88%D0%B0%D1%80%D0%B8_%D0%A0%D0%B0%D1%88%D0%B8%D0%B4.jpg" alt="تصویر استاد مشاری بن راشد العفاسی">
             <span class="reciter-fallback" hidden>🎙️</span><span class="reciter-index">۲</span>
           </span>
           <span class="reciter-card-body">
@@ -1390,7 +1390,7 @@ if (home && !home.querySelector("#homeAirPlay")) {
 
         <button type="button" class="reciter-card" data-edition="ar.husary" data-name="استاد محمود خلیل الحصری">
           <span class="reciter-photo">
-            <img loading="lazy" referrerpolicy="no-referrer" src="https://commons.wikimedia.org/wiki/Special:FilePath/Hussary.jpg" alt="تصویر استاد محمود خلیل الحصری">
+            <img loading="lazy" referrerpolicy="no-referrer" src="https://upload.wikimedia.org/wikipedia/commons/7/70/Hussary.jpg" alt="تصویر استاد محمود خلیل الحصری">
             <span class="reciter-fallback" hidden>🎙️</span><span class="reciter-index">۳</span>
           </span>
           <span class="reciter-card-body">
@@ -1514,7 +1514,7 @@ document.getElementById("barakatJuzSelect")?.remove();
 
 
       cards.forEach((other) => other.classList.toggle("selected", other === card));
-      localStorage.setItem("selectedReciter", edition);
+      localStorage.setItem("selectedReciter", edition === "ar.abdulbasit" ? "ar.abdulbasitmurattal" : edition);
       const surahNumber = Number(byId("surah")?.value) || 1;
       const surahName = byId("surah")?.selectedOptions?.[0]?.textContent || ("سورهٔ " + surahNumber);
 
@@ -1539,7 +1539,7 @@ document.getElementById("barakatJuzSelect")?.remove();
         message.textContent = "منبع کامل سوره در دسترس نبود؛ منبع جایگزین در حال آماده‌سازی است…";
         try {
           const response = await fetch(
-            "https://api.alquran.cloud/v1/surah/" + surahNumber + "/" + edition
+            "https://api.alquran.cloud/v1/surah/" + surahNumber + "/" + (edition === "ar.abdulbasit" ? "ar.abdulbasitmurattal" : edition)
           );
           if (!response.ok) throw new Error("HTTP " + response.status);
           const json = await response.json();
