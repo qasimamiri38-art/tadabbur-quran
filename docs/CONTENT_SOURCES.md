@@ -140,3 +140,21 @@ The reciter gallery should use real, clean portraits with no embedded names, cap
 ### Immediate next action
 
 Inspect the four existing repository image files (alafasy.jpg, abdulbasit.jpg, husary.jpg, barakatullah.jpg) and the archive reciter_photos_four.zip. Compare them with the candidate source pages above, then keep, replace, or hold each image based on visual quality and documented rights. The repository file audit must be completed before changing the app's image paths.
+
+
+### Visual inspection of existing repository portraits (completed 2026-11-27)
+
+The four current JPEGs were fetched from the repository and visually inspected at full image size:
+
+| File | Visual result | Decision |
+|---|---|---|
+| `alafasy.jpg` | Correct-looking single-person portrait; clean background; no embedded name or watermark; close crop around the face. | Keep for now. It is usable in a portrait card; consider a slightly wider licensed portrait later if the gallery needs consistent framing. |
+| `abdulbasit.jpg` | Single-person archival/colorized portrait; clean background; no embedded name or visible watermark; face and clothing are clear. | Keep for now. Confirm the exact source/license record before final public release. |
+| `husary.jpg` | Correct-looking single-person archival portrait; no embedded name; visibly lower resolution and has a scan/photo border and a circular mark at lower left. | Keep as a temporary source asset, but mark for replacement with a cleaner, higher-resolution licensed portrait when available. Do not remove before replacement is approved. |
+| `barakatullah.jpg` | Single-person portrait; no embedded name, but the top edge includes phone status-bar/interface icons and the framing is a little tight. | Hold. Do not publish as the final gallery portrait until replaced by a clean original or cropped from a permission-cleared master. Existing project code credits Pajhwok / Haseeb Muslih; verify that credit and reuse permission against the original image page. |
+
+The main `index.html` already displays the four local image paths and includes source-credit links in the reciter cards: Wikimedia Commons for the first three and Pajhwok / Haseeb Muslih for Barakatullah Salim. The source links are useful attribution, but a credit link by itself is not proof that all reuse conditions have been met. The separate installer script `qari-library-install.js` contains remote Wikimedia/Pajhwok image URLs; do not assume those remote files and the current local JPEGs are byte-identical. The existing local photos have not been replaced in this audit.
+
+### ZIP archive status
+
+The repository also contains `reciter_photos_four.zip` (191,000 bytes). Its archive contents were not extracted in this pass, so no claim is made about whether it contains better or duplicate versions. Compare its members visually before using any of them.
