@@ -7,7 +7,6 @@ const APP_SHELL = [
   "./icon-512.png",
   "./qari-audio-fix.js",
   "./qari-list-design.js",
-  "./barakatullah.jpg"
 ];
 
 self.addEventListener("install", event => {
