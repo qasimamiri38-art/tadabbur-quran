@@ -26,6 +26,17 @@ select{flex:1;min-width:0}input{flex:2;min-width:170px}
 .actions button{font-size:12px;padding:6px 9px;background:#222b25}
 
 .arabic{font:30px/2.15 "Amiri Quran",serif;text-align:justify;margin:12px 0;color:var(--arabic-color)}
+/* فونت‌های قرآنی: بارگذاری از CDN رسمی مستندات Quran Foundation */
+@font-face{
+  font-family:'UthmanicHafs';
+  src:url('https://verses.quran.foundation/fonts/quran/hafs/uthmanic_hafs/UthmanicHafs1Ver18.woff2') format('woff2');
+  font-display:swap;
+}
+@font-face{
+  font-family:'IndopakNastaleeq';
+  src:url('https://verses.quran.foundation/fonts/quran/hafs/nastaleeq/indopak/indopak-nastaleeq-waqf-lazim-v4.2.1.woff2') format('woff2');
+  font-display:swap;
+}
 /* فونت فعلی مصحف عثمانی؛ تا زمان اتصال متن‌های اختصاصی، سایر گزینه‌ها غیرفعال‌اند */
 #quranFont{flex:1 1 100%;width:100%;min-width:0}
 .translation{border-top:1px solid var(--line);padding-top:10px;line-height:2;font-size:17px;color:var(--translation-color)}
