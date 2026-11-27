@@ -1930,7 +1930,12 @@ document.getElementById("barakatJuzSelect")?.remove();
 
 
       cards.forEach((other) => other.classList.toggle("selected", other === card));
-      localStorage.setItem("selectedReciter", edition === "ar.abdulbasit" ? "ar.abdulbasitmurattal" : edition);
+      const selectedEdition = edition === "ar.abdulbasit" ? "ar.abdulbasit" : edition;
+      localStorage.setItem("selectedReciter", selectedEdition);
+      if (RECITER_AUDIO_FOLDERS[selectedEdition]) {
+        selectedReciter = selectedEdition;
+        syncReaderReciter();
+      }
       const surahNumber = Number(byId("surah")?.value) || 1;
       const surahName = byId("surah")?.selectedOptions?.[0]?.textContent || ("سورهٔ " + surahNumber);
 
