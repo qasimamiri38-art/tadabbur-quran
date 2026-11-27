@@ -193,3 +193,26 @@ Two additional source-checked entries were added to the dua library:
 - Asking Allah for pardon and well-being in religion, worldly life, family, and wealth, with protection from every direction — Sunan Abi Dawud 5074. Sunnah.com displays the Arabic matn and grades it Sahih according to al-Albani: https://sunnah.com/abudawud/43/302
 
 The latter is a morning/evening remembrance according to the report from Ibn Umar. Keep its source and grade visible in the app. The Dari rendering is explanatory and should receive editorial review before release.
+
+
+## Expanded dua library source audit (2026-11-27)
+
+The dua library was expanded with the following entries. Each card displays its source link in the app. Quranic entries are identified by surah and ayah; hadith-based entries retain their collection and number.
+
+- Three Quls recited morning and evening (Surahs al-Ikhlas, al-Falaq, an-Nas, each three times): Sunan Abi Dawud 5082, graded Hasan by al-Albani: https://sunnah.com/abudawud/43/310
+- “Bismillah alladhi la yadurru...” three times morning and evening: Sunan Abi Dawud 5088, graded Sahih by al-Albani: https://sunnah.com/abudawud:5088
+- Ayat al-Kursi before sleep: Qur'an 2:255; report in Sahih al-Bukhari 2311: https://sunnah.com/bukhari:2311
+- Before eating: saying Bismillah, based on Sahih al-Bukhari 5376: https://sunnah.com/bukhari:5376
+- If Bismillah was forgotten at the beginning of eating: “Bismillahi awwalahu wa akhirahu,” Sunan Abi Dawud 3767, graded Sahih by al-Albani: https://sunnah.com/abudawud:3767
+- Before entering the toilet: Sahih al-Bukhari 142 and Sahih Muslim 375: https://sunnah.com/bukhari:142
+- On leaving the toilet: “Ghufranaka,” Jami at-Tirmidhi 7, graded Sahih by al-Albani: https://sunnah.com/tirmidhi:7
+- Seeking refuge from the punishment of Hell, punishment of the grave, trials of life and death, and the Dajjal, before salām in prayer: Sahih Muslim 588: https://sunnah.com/muslim:588
+- Remembrance during distress: Sahih al-Bukhari 6346 and Sahih Muslim 2730: https://sunnah.com/bukhari:6346
+- Seeking refuge from worry, grief, incapacity, laziness, cowardice, miserliness, debt burden, and domination by people: Sahih al-Bukhari 6369: https://sunnah.com/bukhari:6369
+- Prayer for parents: Qur'an 17:24: https://quran.com/17/24
+- Prayer for establishing prayer among oneself and descendants: Qur'an 14:40: https://quran.com/14/40
+- Prayer for forgiveness for believers and removal of rancour: Qur'an 59:10: https://quran.com/59/10
+
+A report in Jami at-Tirmidhi 284 for a longer supplication between the two prostrations was checked but not added because the Sunnah.com page grades that report Da'if according to Darussalam: https://sunnah.com/tirmidhi:284. This preserves the project's rule not to present a weak report as established without qualification.
+
+The new Dari translations are explanatory renderings, not a published named translation. Arabic wording and diacritics, especially long Qur'anic passages, should receive final review by a qualified Arabic/Dari editor before public scholarly endorsement. The collection is now broader but should not be described as every transmitted dhikr or every variant in the hadith literature.
