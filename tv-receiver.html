@@ -10,11 +10,11 @@
 :root{color-scheme:light}
 *{box-sizing:border-box}
 html,body{width:100%;height:100%;margin:0;overflow:hidden}
-body{display:grid;place-items:center;background:#08150e url("./hero-quran.png") center center / cover fixed no-repeat;color:#18372b;font-family:Tahoma,Arial,sans-serif}
-.frame{width:min(96vw,1720px);height:min(94vh,1000px);display:flex;flex-direction:column;align-items:stretch;gap:clamp(8px,1.4vh,16px);padding:clamp(16px,2.5vh,30px) clamp(20px,3vw,48px);background:rgba(255,255,255,.92);border:1px solid #d8b66b;border-radius:22px;box-shadow:0 12px 44px rgba(0,0,0,.28)}
-.cast-mode #tvPairPanel{display:none!important}.cast-mode .frame{width:96vw;height:94vh;background:rgba(255,255,255,.94)}
+body{display:grid;place-items:stretch;background:#08150e url("./hero-quran.png") center center / cover fixed no-repeat;color:#18372b;font-family:Tahoma,Arial,sans-serif}
+.frame{width:100vw;height:100vh;height:100dvh;min-height:100%;display:flex;flex-direction:column;align-items:stretch;gap:clamp(8px,1.4vh,16px);padding:clamp(14px,2vh,26px) clamp(18px,2.5vw,40px);background:rgba(255,255,255,.94);border:0;border-radius:0;box-shadow:none}
+.cast-mode #tvPairPanel{display:none!important}.cast-mode .frame{width:100vw;height:100vh;height:100dvh;background:rgba(255,255,255,.96)}
 .brand{display:flex;align-items:center;justify-content:center;gap:14px;text-align:center;flex:0 0 auto}
-.brand img{width:clamp(42px,4vw,62px);height:clamp(42px,4vw,62px);object-fit:contain}
+.brand img{width:clamp(42px,4vw,62px);height:clamp(42px,4vw,62px);object-fit:contain;max-width:12vw}
 h1{margin:0;color:#174b35;font-size:clamp(22px,2.4vw,36px);font-weight:700}
 .sub{margin:3px 0 0;color:#6b786f;font-size:clamp(11px,1vw,15px)}
 .now{font-size:clamp(17px,1.8vw,27px);color:#876b2f;text-align:center}
@@ -43,7 +43,8 @@ h1{margin:0;color:#174b35;font-size:clamp(22px,2.4vw,36px);font-weight:700}
 .ghn{color:#e87519}
 .hint{font-size:clamp(10px,.9vw,14px);color:#718076;text-align:center;flex:0 0 auto}
 cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-events:none;left:-10px;bottom:-10px}
-@media(max-width:700px){.frame{height:96vh;width:97vw;padding:12px;border-radius:14px}.tv-ayah{font-size:clamp(23px,5vw,34px)}}</style>
+@media(max-width:700px){.frame{height:100vh;height:100dvh;width:100vw;padding:12px;border-radius:0}.tv-ayah{font-size:clamp(23px,5vw,34px)}}
+img,video{max-width:100%;object-fit:contain}</style>
 </head>
 <body>
 <main class="frame">
