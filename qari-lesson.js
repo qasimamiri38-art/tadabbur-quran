@@ -4,7 +4,7 @@
   const API = "https://api.alquran.cloud/v1";
   const DARI = "https://quranenc.com/api/v1/translation/sura/dari_badkhashani/";
   const RECITERS = [
-    ["ar.abdulbasitmurattal", "استاد عبدالباسط عبدالصمد"],
+    ["ar.abdulbasit", "استاد عبدالباسط عبدالصمد"],
     ["ar.alafasy", "استاد مشاری بن راشد العفاسی"],
     ["ar.husary", "استاد محمود خلیل الحصری"]
   ];
