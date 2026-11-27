@@ -21,10 +21,10 @@ button.primary{background:linear-gradient(145deg,#216344,#16452f);border-color:#
 .reader-controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}.reader-controls button{min-width:150px}.status{text-align:center;color:var(--gold);font-size:17px;padding:8px}
 .ayah-list{height:calc(100% - 145px);overflow-y:auto;background:rgba(7,18,12,.52);border:1px solid var(--line);border-radius:18px;padding:14px 26px}
 .ayah{border-bottom:1px solid rgba(216,182,107,.2);padding:14px 10px;text-align:center}.ayah.active{background:rgba(255,224,138,.18);border-radius:12px}
-.ayah-content{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);direction:rtl;align-items:center;gap:24px}
-.arabic{font:34px/2.15 UthmanicHafs,"Amiri Quran",serif;color:#fff1d5;margin:0;text-align:right}
-.translation{font-size:19px;line-height:2;color:#e0d7c6;margin:0;text-align:right;border-right:2px solid var(--gold);padding-right:18px}
+.ayah-content{display:grid;grid-template-columns:minmax(0,1fr);direction:rtl;align-items:stretch;gap:8px}
+.arabic{font:36px/2.1 UthmanicHafs,"Amiri Quran",serif;color:#fff1d5;margin:0;text-align:center}
+.translation{font-size:20px;line-height:1.9;color:#e0d7c6;margin:0;text-align:center;border-right:0;border-top:1px solid var(--gold);padding:10px 8px 2px}
 .ayah-number{font:14px Vazirmatn;color:var(--gold);display:block;margin:0 8px 6px}
 footer{text-align:center;color:#8e9b8f;font-size:12px;padding-top:8px}
-@media (min-width:1500px){.arabic{font-size:42px}.translation{font-size:22px}.surah-item{font-size:22px}.ayah-content{gap:38px}}
-@media (max-width:1100px){.ayah-content{grid-template-columns:1fr;gap:4px}.translation{border-right:0;border-top:1px solid var(--gold);padding:8px 0 0}.arabic{text-align:center}.translation{text-align:center}}
+@media (min-width:1500px){.arabic{font-size:46px}.translation{font-size:25px}.surah-item{font-size:22px}.ayah-content{gap:12px}}
+@media (max-width:1100px){.ayah-content{grid-template-columns:1fr;gap:6px}.arabic{text-align:center}.translation{text-align:center}}
