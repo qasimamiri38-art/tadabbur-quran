@@ -19,7 +19,31 @@ nav{padding:12px 0;border-bottom:1px solid var(--line);margin-bottom:14px}
 button,select,input{font:inherit;color:var(--ink);background:#202821;border:1px solid var(--line);border-radius:11px;padding:10px 12px}
 button{cursor:pointer}button.active{border-color:var(--gold);color:var(--gold)}button.primary{background:var(--green);border-color:#39795b}
 select{flex:1;min-width:0}input{flex:2;min-width:170px}
-.tools{margin-top:10px}.status{text-align:center;color:var(--gold);padding:12px;min-height:35px}
+.tools{margin-top:10px}.reciter-picker{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  flex:1 0 100%;width:100%;padding:10px 12px;
+  border:1px solid rgba(210,177,99,.28);border-radius:14px;
+  background:rgba(25,39,30,.7);box-sizing:border-box
+}
+.reciter-picker label{flex:0 0 auto;font-weight:600;white-space:nowrap}
+.reciter-picker #quranReciter{
+  flex:0 1 360px;width:360px;min-width:250px;max-width:100%;
+  text-align:right;direction:rtl;white-space:normal;
+  min-height:48px;box-sizing:border-box
+}
+.reciter-picker #readerReciterStatus{
+  flex:1 1 220px;min-width:180px;line-height:1.7;
+  white-space:normal;text-align:right
+}
+.reciter-picker #tvModeToggle{flex:0 0 auto}
+@media(max-width:650px){
+ .reciter-picker{align-items:stretch}
+ .reciter-picker label{flex-basis:100%}
+ .reciter-picker #quranReciter{flex:1 1 100%;width:100%;min-width:0}
+ .reciter-picker #readerReciterStatus{flex:1 1 100%;min-width:0}
+ .reciter-picker #tvModeToggle{width:100%}
+}
+.status{text-align:center;color:var(--gold);padding:12px;min-height:35px}
 .heading{text-align:center;margin:14px}.heading h2{font:30px "Amiri Quran",serif;color:var(--gold);margin:0}.heading p,.muted{color:var(--muted);font-size:13px}
 .ayah{background:linear-gradient(145deg,#1b241f,#151b17);border:1px solid #55482e;border-radius:15px;padding:16px;margin:12px 0}
 .ayah-top{display:flex;justify-content:space-between;gap:8px;align-items:center;color:var(--gold);font-size:13px}
@@ -548,14 +572,16 @@ setTimeout(() => {
   </select>
 </div>
 <div class="tools">
-  <label for="quranReciter">قاری تلاوت:</label>
-  <select id="quranReciter" aria-label="انتخاب قاری تلاوت قرآن">
-    <option value="ar.alafasy">استاد مشاری بن راشد العفاسی</option>
-    <option value="ar.abdulbasit">استاد عبدالباسط عبدالصمد</option>
-    <option value="ar.husary">استاد محمود خلیل الحصری</option>
-  </select>
-  <span id="readerReciterStatus" class="muted" aria-live="polite">قاری انتخاب‌شده: مشاری العفاسی</span>
-  <button id="tvModeToggle" type="button" class="primary">📺 نمایش تلویزیونی</button>
+  <div class="reciter-picker">
+    <label for="quranReciter">قاری تلاوت:</label>
+    <select id="quranReciter" aria-label="انتخاب قاری تلاوت قرآن">
+      <option value="ar.alafasy">استاد مشاری بن راشد العفاسی</option>
+      <option value="ar.abdulbasit">استاد عبدالباسط عبدالصمد</option>
+      <option value="ar.husary">استاد محمود خلیل الحصری</option>
+    </select>
+    <span id="readerReciterStatus" class="muted" aria-live="polite">قاری انتخاب‌شده: مشاری العفاسی</span>
+    <button id="tvModeToggle" type="button" class="primary">📺 نمایش تلویزیونی</button>
+  </div>
   <input id="search" type="search" placeholder="جست‌وجو در آیات این سوره…"><button id="smaller">A−</button><button id="larger">A+</button><button id="resume">ادامه مطالعه</button><button id="playSurah" class="primary">▶ پخش کامل سوره</button>
 </div>
 <div id="status" class="status" role="status">در حال بارگذاری قرآن…</div><div id="heading" class="heading"></div><div id="verses"></div>
