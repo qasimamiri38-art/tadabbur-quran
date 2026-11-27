@@ -931,15 +931,24 @@ async function playAudio(number){
 
       a.src=ayahAudioUrl;
       a.load();
-if("mediaSession" in navigator){
- navigator.mediaSession.metadata=new MediaMetadata({
-  title:"تلاوت قرآن کریم",
-  artist:"تدبّر القرآن",
-  album:"قرآن کریم"
- });
- navigator.mediaSession.setActionHandler("play",()=>a.play());
- navigator.mediaSession.setActionHandler("pause",()=>a.pause());
- navigator.mediaSession.playbackState="playing";
+// Media Session is optional: some Safari/iPadOS versions reject
+// unsupported actions. Never let that prevent Quran audio playback.
+try {
+  const mediaSession = navigator.mediaSession;
+  if (mediaSession && typeof mediaSession.setActionHandler === "function") {
+    if (typeof MediaMetadata !== "undefined") {
+      mediaSession.metadata = new MediaMetadata({
+        title: "تلاوت قرآن کریم",
+        artist: "تدبّر القرآن",
+        album: "قرآن کریم"
+      });
+    }
+    try { mediaSession.setActionHandler("play", () => { a.play().catch(() => {}); }); } catch (_) {}
+    try { mediaSession.setActionHandler("pause", () => a.pause()); } catch (_) {}
+    try { mediaSession.playbackState = "playing"; } catch (_) {}
+  }
+} catch (_) {
+  // Playback continues even when media controls are unavailable.
 }
 
       await a.play();
