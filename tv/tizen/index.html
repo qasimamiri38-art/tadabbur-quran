@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>تدبر القرآن</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <img src="icon.svg" alt="" class="logo">
+  <div><h1>تَدَبُّرُ القُرآن</h1><p>قرآن کریم · ترجمهٔ دری · تلاوت</p></div>
+  <div class="top-status" id="networkStatus">در حال اتصال…</div>
+</header>
+<main>
+  <section id="home" class="screen active">
+    <h2>به تدبر القرآن خوش آمدید</h2>
+    <p class="lead">قرآن را بخوانید، بشنوید و در آیات آن تدبر کنید.</p>
+    <div class="home-grid">
+      <button class="tile primary" id="openSurahs">📖 فهرست سوره‌ها</button>
+      <button class="tile" id="resume">▶ ادامهٔ تلاوت</button>
+      <button class="tile" id="openReciters">🎙 انتخاب قاری</button>
+      <button class="tile" id="openAbout">ℹ دربارهٔ برنامه</button>
+    </div>
+    <p class="hint">برای حرکت از کلیدهای جهت‌دار ریموت و برای انتخاب دکمهٔ OK را بزنید.</p>
+  </section>
+
+  <section id="surahScreen" class="screen">
+    <div class="screen-head"><h2>فهرست سوره‌ها</h2><button class="small" id="homeFromSurahs">خانه</button></div>
+    <div class="browse-layout">
+      <div id="surahList" class="surah-list" tabindex="0" aria-label="فهرست سوره‌ها"></div>
+      <aside class="side-info">
+        <h3 id="selectedSurahName">سوره را انتخاب کنید</h3>
+        <p id="selectedSurahMeta">برای مشاهده و شروع تلاوت، OK را بزنید.</p>
+        <button class="primary" id="readSelected">خواندن و پخش سوره</button>
+      </aside>
+    </div>
+  </section>
+
+  <section id="reciterScreen" class="screen">
+    <div class="screen-head"><h2>کتابخانهٔ قاریان</h2><button class="small" id="homeFromReciters">خانه</button></div>
+    <div class="reciter-list">
+      <button data-reciter="ar.alafasy">استاد مشاری بن راشد العفاسی</button>
+      <button data-reciter="ar.abdulbasit">استاد عبدالباسط عبدالصمد</button>
+      <button data-reciter="ar.husary">استاد محمود خلیل الحصری</button>
+    </div>
+    <p id="reciterStatus" class="hint">قاری را انتخاب کنید.</p>
+  </section>
+
+  <section id="readerScreen" class="screen">
+    <div class="screen-head"><div><h2 id="readerTitle">سورهٔ فاتحه</h2><p id="readerSubtitle"></p></div><button class="small" id="backToSurahs">فهرست سوره‌ها</button></div>
+    <div class="reader-controls">
+      <button id="prevSurah">سورهٔ قبلی</button>
+      <button id="playPause" class="primary">▶ پخش</button>
+      <button id="stopPlayback">■ توقف</button>
+      <button id="nextSurah">سورهٔ بعدی</button>
+    </div>
+    <div id="readerStatus" class="status">در انتظار انتخاب سوره…</div>
+    <div id="ayahList" class="ayah-list"></div>
+  </section>
+
+  <section id="aboutScreen" class="screen">
+    <h2>دربارهٔ تدبر القرآن</h2>
+    <p class="lead">به نیت فهم، تدبر و عمل به آیات قرآن کریم.</p>
+    <p>نسخهٔ تلویزیونی در حال توسعه است. ترجمهٔ دری بدخشیانی و سه قاری برگزیده در این نسخه در نظر گرفته شده‌اند.</p>
+    <button id="backHome" class="primary">بازگشت به خانه</button>
+  </section>
+</main>
+<footer>تدبر القرآن · نسخهٔ آزمایشی Samsung Tizen</footer>
+<script src="app.js"></script>
+</body>
+</html>
