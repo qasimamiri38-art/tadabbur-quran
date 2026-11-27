@@ -9,7 +9,7 @@
   const CUSTOM_CAST_RECEIVER = window.TADABBUR_CAST_RECEIVER_ID || "";
   const RECITERS = {
     "ar.alafasy": { name: "استاد مشاری بن راشد العفاسی", bitrate: 128, timingId: 7 },
-    "ar.abdulbasit": { name: "استاد عبدالباسط عبدالصمد", bitrate: 192, timingId: 2 },
+    "ar.abdulbasit": { name: "استاد عبدالباسط عبدالصمد", bitrate: 192, timingId: 1 },
     "ar.husary": { name: "استاد محمود خلیل الحصری", bitrate: 128, timingId: 6 }
   };
   const $ = id => document.getElementById(id);
