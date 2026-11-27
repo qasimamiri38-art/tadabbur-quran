@@ -4,8 +4,8 @@
   if (window.__tadabburTvConnectInstalled) return;
   window.__tadabburTvConnectInstalled = true;
 
-  const DEFAULT_CAST_RECEIVER = "CC1AD845";
-  // After registering tv-receiver.html in Google Cast Console, place its app ID in tv-cast-config.js.
+  // A custom receiver is required to show Tadabbur Quran's own TV screen.
+  // Never silently fall back to Google's audio-only Default Media Receiver.
   const CUSTOM_CAST_RECEIVER = window.TADABBUR_CAST_RECEIVER_ID || "";
   const RECITERS = {
     "ar.alafasy": { name: "استاد مشاری بن راشد العفاسی", bitrate: 128, timingId: 7 },
@@ -64,7 +64,7 @@
       '<div id="tadabburIndependentCode" style="grid-column:1/-1;display:none;text-align:center;padding:12px;border:1px dashed #d9b66c;border-radius:12px;line-height:1.9"></div>',
       '<div class="tv-volume"><span>صدای تلویزیون</span><input id="tadabburTvVolume" type="range" min="0" max="1" step="0.05" value="0.8" disabled></div>',
       '<div id="tvConnectStatus" role="status" aria-live="polite">برای Google Cast از Chrome سازگار استفاده کن؛ در آیفون و آیپد گزینهٔ AirPlay را آزمایش کن.</div>',
-      '<div class="tv-compat">پشتیبانی فعلی این نسخه: Google Cast در مرورگرهای پشتیبانی‌شده و AirPlay در Safari روی دستگاه‌های اپل. پخش مستقل با صفحهٔ اختصاصی تدبر القرآن برای تلویزیون‌های Samsung و LG در مرحلهٔ گیرنده‌های اختصاصی قرار دارد.</div>',
+      '<div class="tv-compat">برای نمایش متن قرآن روی تلویزیون، گیرندهٔ اختصاصی Google Cast تدبر القرآن لازم است. AirPlay فعلی فقط صدای تلاوت را منتقل می‌کند. تلویزیون Samsung سازگار با Google Cast می‌تواند پس از ثبت گیرنده، صفحهٔ اختصاصی را نمایش دهد.</div>',
       '<audio id="audio" controls preload="none" style="grid-column:1/-1;width:100%;min-width:0"></audio>'
     ].join("");
     anchor.insertAdjacentElement("afterend", panel);
@@ -303,9 +303,15 @@
   function initializeCast() {
     if (!window.cast || !window.cast.framework || !window.chrome || !window.chrome.cast) return;
     try {
+      if (!CUSTOM_CAST_RECEIVER) {
+        const castSlot = $("tvCastSlot");
+        if (castSlot) castSlot.classList.remove("is-ready");
+        setStatus("برای نمایش تصویر و متن قرآن، گیرندهٔ اختصاصی تدبر القرآن باید یک‌بار در Google Cast Console ثبت شود. تا آن زمان پخش صوتی عمومی جایگزین نمی‌شود.");
+        return;
+      }
       castContext = cast.framework.CastContext.getInstance();
       castContext.setOptions({
-        receiverApplicationId: CUSTOM_CAST_RECEIVER || DEFAULT_CAST_RECEIVER,
+        receiverApplicationId: CUSTOM_CAST_RECEIVER,
         autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
       });
       remotePlayer = new cast.framework.RemotePlayer();
@@ -357,7 +363,9 @@
       return;
     }
     if (!castReady || !castContext) {
-      if (audio && typeof audio.webkitShowPlaybackTargetPicker === "function") {
+      if (!CUSTOM_CAST_RECEIVER) {
+        setStatus("گیرندهٔ تصویری تدبر القرآن هنوز ثبت نشده است؛ AirPlay فقط صدا را منتقل می‌کند و صفحهٔ قرآن را نشان نمی‌دهد.");
+      } else if (audio && typeof audio.webkitShowPlaybackTargetPicker === "function") {
         setStatus("ابتدا دکمهٔ AirPlay را بزن و تلویزیون را انتخاب کن؛ سپس پخش را آغاز کن.");
       } else {
         setStatus("این مرورگر AirPlay یا Google Cast را پشتیبانی نمی‌کند. از Safari در دستگاه اپل یا Chrome و گیرندهٔ Cast استفاده کن.");
