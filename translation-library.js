@@ -144,10 +144,6 @@
     });
 
     download.addEventListener("click", async () => {
-      if (activeKey === DEFAULT_KEY) {
-        setStatus("ترجمهٔ بدخشیانی فعلاً از منبع اصلی برنامه دریافت می‌شود؛ برای آفلاین‌سازی باید نسخهٔ مجاز و کامل آن جداگانه فراهم شود.");
-        return;
-      }
       download.disabled = true;
       const selected = allTranslations.find(item => item.key === activeKey);
       let done = 0;
