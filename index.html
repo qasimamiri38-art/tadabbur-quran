@@ -499,7 +499,16 @@ setTimeout(() => {
     <option value="">بدون تفسیر</option>
   </select>
 </div>
-<div class="tools"><input id="search" type="search" placeholder="جست‌وجو در آیات این سوره…"><button id="smaller">A−</button><button id="larger">A+</button><button id="resume">ادامه مطالعه</button><button id="playSurah" class="primary">▶ پخش کامل سوره</button></div>
+<div class="tools">
+  <label for="quranReciter">قاری تلاوت:</label>
+  <select id="quranReciter" aria-label="انتخاب قاری تلاوت قرآن">
+    <option value="ar.alafasy">استاد مشاری بن راشد العفاسی</option>
+    <option value="ar.abdulbasit">استاد عبدالباسط عبدالصمد</option>
+    <option value="ar.husary">استاد محمود خلیل الحصری</option>
+  </select>
+  <span id="readerReciterStatus" class="muted" aria-live="polite">قاری انتخاب‌شده: مشاری العفاسی</span>
+  <input id="search" type="search" placeholder="جست‌وجو در آیات این سوره…"><button id="smaller">A−</button><button id="larger">A+</button><button id="resume">ادامه مطالعه</button><button id="playSurah" class="primary">▶ پخش کامل سوره</button>
+</div>
 <div id="status" class="status" role="status">در حال بارگذاری قرآن…</div><div id="heading" class="heading"></div><div id="verses"></div>
 </section>
 <section id="memorize" class="hidden">
@@ -806,8 +815,36 @@ if (selectedReciter !== savedAudioReciter) {
   localStorage.setItem("selectedReciter", selectedReciter);
 }
 
+const RECITER_AUDIO_FOLDERS = {
+  "ar.alafasy": "Alafasy_128kbps",
+  "ar.abdulbasit": "Abdul_Basit_Murattal_192kbps",
+  "ar.husary": "Husary_128kbps"
+};
+const RECITER_DISPLAY_NAMES = {
+  "ar.alafasy": "استاد مشاری بن راشد العفاسی",
+  "ar.abdulbasit": "استاد عبدالباسط عبدالصمد",
+  "ar.husary": "استاد محمود خلیل الحصری"
+};
+const quranReciterSelect = $("quranReciter");
+function syncReaderReciter() {
+  if (quranReciterSelect) quranReciterSelect.value = selectedReciter;
+  const label = $("readerReciterStatus");
+  if (label) label.textContent = "قاری انتخاب‌شده: " + (RECITER_DISPLAY_NAMES[selectedReciter] || "مشاری العفاسی");
+}
+if (quranReciterSelect) {
+  quranReciterSelect.value = selectedReciter;
+  quranReciterSelect.addEventListener("change", () => {
+    selectedReciter = quranReciterSelect.value;
+    localStorage.setItem("selectedReciter", selectedReciter);
+    syncReaderReciter();
+    if (activePlaybackGlobal !== null) stopQuranPlayback("قاری تغییر کرد؛ برای آغاز تلاوت تازه دکمهٔ پخش را لمس کن.");
+    else status("قاری تلاوت انتخاب شد: " + RECITER_DISPLAY_NAMES[selectedReciter]);
+  });
+}
+syncReaderReciter();
+
 const reciterNames = {
-  "عبدالباسط عبدالصمد": "ar.abdulbasitmurattal",
+  "عبدالباسط عبدالصمد": "ar.abdulbasit",
   "مشاری العفاسی": "ar.alafasy",
   "محمود خلیل الحصری": "ar.husary"
 };
@@ -1234,13 +1271,11 @@ async function playAudio(number) {
           Number(firstVerse.surah) !== 1 &&
           Number(firstVerse.surah) !== 9) {
         setActive(firstVerse);
-        const basmalaFolder = selectedReciter === "ar.abdulbasit"
-          ? "Abdul_Basit_Murattal_192kbps"
-          : "Alafasy_128kbps";
-        const basmalaAudioUrl =
-          (selectedReciter === "ar.abdulbasit" || selectedReciter === "ar.alafasy")
-            ? "https://verse.mp3quran.net/data/" + basmalaFolder + "/001000.mp3"
-            : "https://cdn.islamic.network/quran/audio/128/" + selectedReciter + "/1.mp3";
+        const basmalaFolder = RECITER_AUDIO_FOLDERS[selectedReciter] || RECITER_AUDIO_FOLDERS["ar.alafasy"];
+        // EveryAyah stores the separate surah opening as SSS000.mp3.
+        // Use this surah's own opening file, not Al-Fatiha's 001000.mp3.
+        const basmalaAudioUrl = "https://everyayah.com/data/" +
+          basmalaFolder + "/" + String(firstVerse.surah).padStart(3, "0") + "000.mp3";
 
         status("در حال پخش بسم‌الله الرحمن الرحیم");
         a.onended = () => {
@@ -1286,15 +1321,10 @@ async function playAudio(number) {
       document.getElementById("ayah-" + v.surah + "-" + v.n)
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
 
-      const ayahFolder = selectedReciter === "ar.abdulbasit"
-        ? "Abdul_Basit_Murattal_192kbps"
-        : "Alafasy_128kbps";
-      const ayahAudioUrl =
-        (selectedReciter === "ar.abdulbasit" || selectedReciter === "ar.alafasy")
-          ? "https://verse.mp3quran.net/data/" + ayahFolder + "/" +
-            String(v.surah).padStart(3, "0") +
-            String(v.n).padStart(3, "0") + ".mp3"
-          : "https://cdn.islamic.network/quran/audio/128/" + selectedReciter + "/" + v.global + ".mp3";
+      const ayahFolder = RECITER_AUDIO_FOLDERS[selectedReciter] || RECITER_AUDIO_FOLDERS["ar.alafasy"];
+      const ayahAudioUrl = "https://everyayah.com/data/" + ayahFolder + "/" +
+        String(v.surah).padStart(3, "0") +
+        String(v.n).padStart(3, "0") + ".mp3";
 
       a.onended = () => {
         if (runId !== playbackRunId) return;
