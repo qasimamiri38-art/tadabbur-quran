@@ -22,6 +22,8 @@ h1{margin:0;color:#174b35;font-size:clamp(22px,2.4vw,36px);font-weight:700}
 .ayah-scroll{flex:1 1 auto;min-height:0;width:100%;overflow:auto;display:flex;flex-direction:column;justify-content:center;gap:clamp(5px,1vh,12px);padding:6px clamp(6px,1.5vw,20px);scrollbar-width:thin;scrollbar-color:#c8b783 transparent}
 .tv-ayah{font-family:"UthmanicHafs",serif;font-size:clamp(25px,3vw,46px);line-height:1.95;text-align:center;color:#1d382c;padding:0 0 7px;border-bottom:1px solid #edf0eb}
 .tv-ayah:last-child{border-bottom:0}
+.tv-word{display:inline;border-radius:7px;padding:0 .035em;transition:background-color .12s ease,color .12s ease,box-shadow .12s ease}
+.tv-word-active{color:#173b2a!important;background:#ffe08a;box-shadow:0 0 0 3px rgba(255,224,138,.65);border-radius:7px;text-shadow:none}
 .ayah-number{font-family:Tahoma,Arial,sans-serif;font-size:.36em;color:#94773b;border:1px solid #d7c99f;border-radius:50%;display:inline-grid;place-items:center;width:2em;height:2em;vertical-align:middle;margin:0 .3em;direction:ltr}
 .tajweed-legend{display:flex;justify-content:center;flex-wrap:wrap;gap:8px 18px;color:#65736a;font-size:clamp(10px,.9vw,13px)}
 .tajweed-legend span{white-space:nowrap}
@@ -73,7 +75,7 @@ cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-ev
     "ar.abdulbasit":"استاد عبدالباسط عبدالصمد",
     "ar.husary":"استاد محمود خلیل الحصری"
   };
-  let requestId=0;
+  let requestId=0, wordSpans=[], wordWeights=[], totalWordWeight=0, lastActiveWord=-1, progressTimer=null;
   function tajweedFragment(source){
     const fragment=document.createDocumentFragment();
     const pattern=/\[([a-z])(?::\d+)?\[([^\]]*)\]/g;
@@ -90,12 +92,38 @@ cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-ev
     if(last<(source||"").length) fragment.appendChild(document.createTextNode(source.slice(last)));
     return fragment;
   }
+  function wrapWords(root){
+    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+    const nodes=[];
+    while(walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(node=>{
+      const parts=node.nodeValue.split(/(\s+)/);
+      if(parts.length===1) return;
+      const fragment=document.createDocumentFragment();
+      parts.forEach(part=>{
+        if(!part) return;
+        if(/^\s+$/.test(part)){fragment.appendChild(document.createTextNode(part));return;}
+        const word=document.createElement("span");
+        word.className="tv-word";
+        word.textContent=part;
+        const clean=part.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g,"");
+        word.dataset.weight=String(Math.max(1,Array.from(clean).length));
+        wordSpans.push(word);
+        wordWeights.push(Number(word.dataset.weight));
+        totalWordWeight+=Number(word.dataset.weight);
+        fragment.appendChild(word);
+      });
+      node.parentNode.replaceChild(fragment,node);
+    });
+  }
   function renderAyahs(ayahs){
     ayahBox.replaceChildren();
+    wordSpans=[];wordWeights=[];totalWordWeight=0;lastActiveWord=-1;
     ayahs.forEach(ayah=>{
       const line=document.createElement("div");
       line.className="tv-ayah";
       line.appendChild(tajweedFragment(ayah.text || ""));
+      wrapWords(line);
       const number=document.createElement("span");
       number.className="ayah-number";
       number.textContent=String(ayah.numberInSurah || "");
@@ -103,6 +131,39 @@ cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-ev
       line.appendChild(number);
       ayahBox.appendChild(line);
     });
+  }
+  function updateWordCursor(){
+    if(!wordSpans.length||!totalWordWeight) return;
+    let current=0,duration=0;
+    try{
+      current=Number(player.getCurrentTimeSec())||0;
+      duration=Number(player.getDurationSec())||0;
+    }catch(_){return;}
+    if(!(duration>0)) return;
+    const target=current/duration*totalWordWeight;
+    let sum=0,index=wordWeights.length-1;
+    for(let i=0;i<wordWeights.length;i++){
+      sum+=wordWeights[i];
+      if(target<sum){index=i;break;}
+    }
+    if(index===lastActiveWord) return;
+    if(lastActiveWord>=0) wordSpans[lastActiveWord].classList.remove("tv-word-active");
+    lastActiveWord=index;
+    const active=wordSpans[index];
+    if(!active) return;
+    active.classList.add("tv-word-active");
+    const rect=active.getBoundingClientRect();
+    const box=ayahBox.getBoundingClientRect();
+    if(rect.top<box.top+24||rect.bottom>box.bottom-24){
+      active.scrollIntoView({behavior:"smooth",block:"center",inline:"nearest"});
+    }
+  }
+  function startWordCursor(){
+    if(progressTimer) clearInterval(progressTimer);
+    progressTimer=setInterval(updateWordCursor,120);
+  }
+  function stopWordCursor(){
+    if(progressTimer){clearInterval(progressTimer);progressTimer=null;}
   }
   async function loadUthmaniText(surahNumber){
     const thisRequest=++requestId;
@@ -116,6 +177,7 @@ cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-ev
       if(thisRequest!==requestId) return;
       renderAyahs(ayahs);
       ayahBox.scrollTop=0;
+      startWordCursor();
       hint.textContent="رسم‌الخط عثمانی با رنگ‌بندی قواعد تجوید · صدا از تلویزیون پخش می‌شود";
     }catch(error){
       if(thisRequest!==requestId) return;
@@ -134,9 +196,13 @@ cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-ev
     return request;
   });
   player.addEventListener(cast.framework.events.EventType.PLAYER_LOAD_COMPLETE,()=>{
-    hint.textContent="تلاوت آغاز شد · متن عثمانی روی صفحهٔ تلویزیون نمایش داده می‌شود";
+    hint.textContent="نشانگر کلمه همراه پیشرفت تلاوت حرکت می‌کند · متن عثمانی و رنگ‌های تجوید";
+    updateWordCursor();
   });
+  player.addEventListener(cast.framework.events.EventType.PLAY,()=>{startWordCursor();});
+  player.addEventListener(cast.framework.events.EventType.PAUSE,()=>{updateWordCursor();stopWordCursor();});
   player.addEventListener(cast.framework.events.EventType.ENDED,()=>{
+    stopWordCursor();
     hint.textContent="این تلاوت پایان یافت · برای ادامه سورهٔ بعدی را انتخاب کن";
   });
   context.start();
