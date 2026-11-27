@@ -169,3 +169,17 @@ The dua library now distinguishes Quranic supplications (with surah/ayah referen
 - Travel remembrance when mounting: the wording is Qur'an 43:13–14 and its use in the Prophetic travel supplication is reported in Sahih Muslim 1342: https://sunnah.com/muslim:1342
 
 The first implementation intentionally adds only these source-checked examples. It does not yet claim to be a complete morning/evening adhkar collection or a complete travel supplication sequence. Translations shown in the app are concise Dari renderings for comprehension, not a published named translation. Verify wording and translation editorially before release; retain the source links beside each hadith-based entry.
+
+
+## Additional Prophetic adhkar added to the dua library (2026-11-27)
+
+The following entries were added to `index.html`, with a source link displayed on each card:
+
+- Leaving home: “Bismillah, tawakkaltu 'ala Allah, la hawla wa la quwwata illa billah” — Sunan Abi Dawud 5095; graded Sahih by al-Albani: https://sunnah.com/abudawud/43/323
+- Entering the mosque: “Allahummaftah li abwaba rahmatik” — Sahih Muslim 713a: https://sunnah.com/muslim/6/82
+- Leaving the mosque: “Allahumma inni as'aluka min fadlik” — Sahih Muslim 713a: https://sunnah.com/muslim/6/82
+- After obligatory prayer: seeking forgiveness three times, followed by “Allahumma anta as-salam wa minka as-salam...” — Sahih Muslim 591: https://sunnah.com/muslim:591
+- Post-prayer tasbih: 33 SubhanAllah, 33 Alhamdulillah, 34 Allahu Akbar — Sahih Muslim 596a: https://sunnah.com/muslim:596
+- Supplication for the sick: “Allahumma Rabban-nas, adhhib al-ba's...” — Sahih al-Bukhari 5743: https://sunnah.com/bukhari:5743
+
+Editorial caution: Sunan Abi Dawud 5096, a longer supplication for entering one's home, is graded Da'if by al-Albani on its Sunnah.com entry and was deliberately NOT added as an established Prophetic sunnah: https://sunnah.com/abudawud:5096. The library currently includes an authenticated supplication for leaving home; it does not invent or substitute an entry-home formula. The short Dari renderings in the UI are explanatory translations, not a named published translation. Verify final Dari wording and diacritics with an Arabic/Dari editor before release.
