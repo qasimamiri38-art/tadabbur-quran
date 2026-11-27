@@ -252,14 +252,11 @@
 
     try {
       if (!verse.audioUrl) {
-        const data = await getData(
-          API + "/ayah/" + verse.global + "/" +
-          encodeURIComponent($("qlReciter").value)
-        );
-
-        if (token !== generation || !isPlaying) return;
-        if (!data || !data.audio) throw new Error("فایل صوتی این آیه موجود نیست.");
-        verse.audioUrl = data.audio;
+        const edition = $("qlReciter").value;
+        const bitrate = edition === "ar.abdulbasit" ? 192 : 128;
+        verse.audioUrl =
+          "https://cdn.islamic.network/quran/audio/" +
+          bitrate + "/" + edition + "/" + verse.global + ".mp3";
       }
 
       if (token !== generation || !isPlaying) return;
