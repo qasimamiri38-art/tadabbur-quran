@@ -43,6 +43,7 @@
   audio.preload = "none";
   audio.playsInline = true;
   let unlocked = false;
+  let audioContext = null;
   let stopTimer = null;
   let statusNode = null;
 
@@ -68,15 +69,18 @@
 
     button.addEventListener("click", async () => {
       try {
-        audio.src = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
-        audio.muted = true;
-        await audio.play();
-        audio.pause();
-        audio.currentTime = 0;
-        audio.muted = false;
+        audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
+        await audioContext.resume();
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        gain.gain.value = 0.0001;
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.02);
         unlocked = true;
         button.textContent = "✓ پخش اذان فعال شد";
-        status("پخش اذان کامل و کوتاه برای زمانی که اپ باز و فعال است آماده شد.");
+        status("صدای اعلان‌ها فعال شد؛ اکنون دکمهٔ آزمایش هر نماز را بزن.");
       } catch (error) {
         unlocked = false;
         status("آیفون اجازهٔ پخش خودکار نداد؛ دوباره دکمه را لمس کن.");
@@ -84,6 +88,27 @@
     });
 
     panel.append(button, statusNode);
+
+    PRAYERS.forEach(prayer => {
+      const type = document.getElementById("adhan-type-" + prayer);
+      const sound = document.getElementById("adhan-sound-" + prayer);
+      const row = type && type.closest(".adhan-row");
+      if (!row || row.querySelector(".adhan-test-button")) return;
+      const test = document.createElement("button");
+      test.type = "button";
+      test.className = "adhan-test-button";
+      test.textContent = "▶ آزمایش نوع اعلان";
+      test.style.cssText = "grid-column:1/-1;width:100%;margin-top:6px;";
+      test.addEventListener("click", () => {
+        const settings = read(SETTINGS_KEY);
+        settings[prayer] = settings[prayer] || {};
+        settings[prayer].type = type.value;
+        settings[prayer].sound = sound ? sound.value : "mishary";
+        settings[prayer].enabled = true;
+        playAlert(prayer, settings, true);
+      });
+      row.appendChild(test);
+    });
   }
 
   function currentZone() {
@@ -168,7 +193,26 @@
     }
 
     if (type === "beep") {
-      playAdhan(prayer, item, true);
+      if (!unlocked || !audioContext) {
+        status("برای شنیدن اعلان کوتاه، ابتدا دکمهٔ فعال‌سازی صدای اعلان‌ها را لمس کن.");
+        return;
+      }
+      audioContext.resume().then(() => {
+        [0, 0.38].forEach(delay => {
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          oscillator.type = "sine";
+          oscillator.frequency.value = 880;
+          gain.gain.setValueAtTime(0.0001, audioContext.currentTime + delay);
+          gain.gain.exponentialRampToValueAtTime(0.16, audioContext.currentTime + delay + 0.025);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + delay + 0.19);
+          oscillator.connect(gain);
+          gain.connect(audioContext.destination);
+          oscillator.start(audioContext.currentTime + delay);
+          oscillator.stop(audioContext.currentTime + delay + 0.2);
+        });
+        status("اعلان کوتاه: دو صدای زنگ کوتاه پخش شد.");
+      }).catch(() => status("پخش اعلان کوتاه ممکن نشد؛ صدا را دوباره فعال کن."));
       return;
     }
 
@@ -180,14 +224,14 @@
           ? "هشدار لرزشی نماز " + prayer + " اجرا شد."
           : "این دستگاه یا مرورگر از لرزش پشتیبانی نمی‌کند.");
       } else {
-        status("هشدار لرزشی انتخاب شده، اما آیفون/مرورگر این قابلیت را در صفحهٔ وب پشتیبانی نمی‌کند.");
+        status("آیفون و Safari در صفحهٔ وب از فرمان لرزش پشتیبانی نمی‌کنند؛ فقط یادآوری تصویری ممکن است.");
       }
       return;
     }
 
     if (type === "silent") {
       stopCurrentAudio();
-      status("یادآوری بی‌صدای نماز " + prayer + "؛ وقت نماز رسید.");
+      status("🔔 یادآوری بی‌صدای نماز " + prayer + "؛ وقت نماز رسید.");
     }
   }
 
