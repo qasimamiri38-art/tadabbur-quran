@@ -4,6 +4,15 @@ Last reviewed: 2026-11-27
 
 This register separates sources already referenced by the codebase from sources that are only candidates. Do not treat an API being reachable as proof that its content may be redistributed, bundled, or cached indefinitely.
 
+
+## Project ownership and attribution
+
+- **Project:** تدبر القرآن (Tadabbur Quran)
+- **Founder and project owner:** محمد قسیم امیری
+- **Role:** Founder / Project Owner
+
+This identifies the project's founder and owner. It is separate from attribution owed to Quran text publishers, translators, reciters, photographers, font authors, and other third-party rights holders; those credits and licenses must remain attached to the relevant resources.
+
 ## 1. Current repository audit
 
 | Resource | What is present today | Readiness / action |
