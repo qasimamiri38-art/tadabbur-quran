@@ -1879,7 +1879,7 @@ document.getElementById("barakatJuzSelect")?.remove();
     mishary: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Mishary_Al_Afasy_-_HQ_(مشاري_العفاسي).mp3",
     madinah: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Adhan_Al_Haram_Al_Madani_-_Al_Madinah_1_(أذان_الحرم_المدني_-_المدينة_المنورة).mp3",
     makkah: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Ali_Ibn_Ahmad_Mala_1_-_Al_Haram_Al_Maki_(علي_بن_أحمد_ملا_-_الحرم_المكي).mp3",
-    istanbul: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Adhan_Turkey_1_(أذان_تركيا).mp3",
+    istanbul: "./adhan-turkey.mp3",
     alaqsa: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Adhan_Al_Aqsa_-_Jerusalem_(أذان_المسجد_الأقصى_-_القدس).mp3",
     indonesia: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Adhan_Indonesia_(أذان_إندونيسيا).mp3"
   };
@@ -1900,7 +1900,7 @@ document.getElementById("barakatJuzSelect")?.remove();
     mishary: "مشاری العفاسی",
     madinah: "اذان مدینه",
     makkah: "اذان مکه",
-    istanbul: "اذان ترکیه / استانبول",
+    istanbul: "اذان ترکیه / استانبول (صدای دریافتی)",
     alaqsa: "اذان مسجدالاقصی",
     indonesia: "اذان اندونیزیا"
   };
@@ -1923,7 +1923,8 @@ const availableNames = prayer === "Fajr"
   ? {
       mishary: names.mishary,
       madinah: names.madinah,
-      makkah: names.makkah
+      makkah: names.makkah,
+      istanbul: names.istanbul
     }
   : names;
 
@@ -1944,6 +1945,8 @@ select.dispatchEvent(new Event("change"));
 
     btn.addEventListener("click", () => {
       player.pause();
+      player.removeAttribute("src");
+      player.load();
       const fajrAudioFiles = {
   mishary: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Mishary_Rashid_Alafasy_3_-_Fajr_Kuwait_(مشاري_راشد_العفاسي_-_فجر_الكويت).mp3",
   madinah: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Adhan_Fajr_Al_Haram_Al_Madani_(أذان_الفجر_الحرم_المدني).mp3",
@@ -1954,9 +1957,11 @@ player.src = prayer === "Fajr" && fajrAudioFiles[select.value]
   ? fajrAudioFiles[select.value]
   : audioFiles[select.value];
       player.load();
-      title.textContent = "نمونهٔ " + names[select.value];
-      player.play().catch(() => {
-        title.textContent = "برای پخش، دکمهٔ پخش را لمس کن.";
+      title.textContent = "نمونهٔ اذان " + prayer + " · " + names[select.value];
+      player.play().then(() => {
+        title.textContent = "در حال پخش اذان " + prayer + " · " + names[select.value];
+      }).catch(() => {
+        title.textContent = "برای شنیدن اذان، دکمهٔ ▶ پخش را در پخش‌کننده لمس کن.";
       });
       player.scrollIntoView({ behavior: "smooth", block: "nearest" });
     });
