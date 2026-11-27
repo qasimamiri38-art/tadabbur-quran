@@ -183,3 +183,13 @@ The following entries were added to `index.html`, with a source link displayed o
 - Supplication for the sick: “Allahumma Rabban-nas, adhhib al-ba's...” — Sahih al-Bukhari 5743: https://sunnah.com/bukhari:5743
 
 Editorial caution: Sunan Abi Dawud 5096, a longer supplication for entering one's home, is graded Da'if by al-Albani on its Sunnah.com entry and was deliberately NOT added as an established Prophetic sunnah: https://sunnah.com/abudawud:5096. The library currently includes an authenticated supplication for leaving home; it does not invent or substitute an entry-home formula. The short Dari renderings in the UI are explanatory translations, not a named published translation. Verify final Dari wording and diacritics with an Arabic/Dari editor before release.
+
+
+## Further morning and forgiveness supplications (2026-11-27)
+
+Two additional source-checked entries were added to the dua library:
+
+- Sayyid al-Istighfar — Sahih al-Bukhari 6306. The Arabic text follows the Arabic matn shown on Sunnah.com; the explanatory Dari translation is newly written for the app: https://sunnah.com/bukhari:6306
+- Asking Allah for pardon and well-being in religion, worldly life, family, and wealth, with protection from every direction — Sunan Abi Dawud 5074. Sunnah.com displays the Arabic matn and grades it Sahih according to al-Albani: https://sunnah.com/abudawud/43/302
+
+The latter is a morning/evening remembrance according to the report from Ibn Umar. Keep its source and grade visible in the app. The Dari rendering is explanatory and should receive editorial review before release.
