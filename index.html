@@ -997,7 +997,23 @@ if (
 await playNext();
 
   }catch(e){
-status("پخش صوت ممکن نشد: "+e.message);
+ const player = $("audio");
+ const mediaError = player && player.error ? player.error.code : "ندارد";
+ const networkState = player ? player.networkState : "ندارد";
+ const source = player ? (player.currentSrc || player.src || "بدون نشانی") : "پخش‌کننده ساخته نشد";
+ console.error("Tadabbur Quran audio diagnostic", {
+   name: e && e.name,
+   message: e && e.message,
+   mediaError,
+   networkState,
+   source
+ });
+ status(
+   "خطای پخش: " + (e && e.name ? e.name : "نامشخص") +
+   " · " + (e && e.message ? e.message : "بدون توضیح") +
+   " · کد رسانه: " + mediaError +
+   " · وضعیت شبکه: " + networkState
+ );
 }
 }
 
