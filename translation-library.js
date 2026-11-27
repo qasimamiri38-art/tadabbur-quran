@@ -79,12 +79,15 @@
   function fillTranslations(languageCode) {
     const select = $("translation");
     if (!select) return;
-    const list = allTranslations.filter(item => item.language_iso_code === languageCode);
+    const list = languageCode === "dari"
+      ? []
+      : allTranslations.filter(item => item.language_iso_code === languageCode)
+        .sort((a, b) => String(a.title || "").localeCompare(String(b.title || ""), "en", { sensitivity: "base" }));
     select.replaceChildren();
-    if (languageCode === "fa" && !list.some(item => item.key === DEFAULT_KEY)) {
+    if (languageCode === "dari" || (languageCode === "fa" && !list.some(item => item.key === DEFAULT_KEY))) {
       const option = document.createElement("option");
       option.value = DEFAULT_KEY;
-      option.textContent = "فارسی دری — بدخشیانی (ترجمهٔ اصلی برنامه)";
+      option.textContent = "Dari — Badakhshani (main translation)";
       select.append(option);
     }
     list.forEach(item => {
@@ -94,7 +97,7 @@
       select.append(option);
     });
     if (![...select.options].some(option => option.value === activeKey)) {
-      activeKey = languageCode === "fa" ? DEFAULT_KEY : (list[0]?.key || DEFAULT_KEY);
+      activeKey = (languageCode === "fa" || languageCode === "dari") ? DEFAULT_KEY : (list[0]?.key || DEFAULT_KEY);
     }
     select.value = activeKey;
     select.disabled = !select.options.length;
@@ -191,30 +194,34 @@
       allTranslations = json.translations || [];
       if (!allTranslations.length) throw new Error("فهرست ترجمه‌ها خالی است.");
       const languageNames = new Map();
+      const displayNames = new Intl.DisplayNames(["en"], { type: "language" });
       allTranslations.forEach(item => {
         const code = item.language_iso_code;
         if (code && !languageNames.has(code)) {
-          const names = { fa: "فارسی", ps: "پشتو", ar: "عربی", en: "انگلیسی", ur: "اردو", ug: "اویغوری", uz: "ازبکی", tr: "ترکی", fr: "فرانسوی", de: "آلمانی", es: "اسپانیایی", hi: "هندی", bn: "بنگالی", id: "اندونیزیایی", ru: "روسی", zh: "چینی" };
-          languageNames.set(code, names[code] || code.toUpperCase());
+          let fullName = displayNames.of(code);
+          if (!fullName || fullName === code) fullName = item.language || item.language_name || code;
+          languageNames.set(code, fullName);
         }
       });
+      // Badakhshani is a Dari translation and is listed separately from Persian.
+      languageNames.set("dari", "Dari");
       language.replaceChildren();
-      [...languageNames.entries()].sort((a,b) => a[1].localeCompare(b[1], "fa")).forEach(([code,name]) => {
+      [...languageNames.entries()].sort((a,b) => a[1].localeCompare(b[1], "en", { sensitivity: "base" })).forEach(([code,name]) => {
         const option = document.createElement("option");
         option.value = code;
-        option.textContent = name + " (" + code + ")";
+        option.textContent = name;
         language.append(option);
       });
       const initial = allTranslations.find(item => item.key === activeKey);
-      language.value = initial?.language_iso_code || "fa";
+      language.value = activeKey === DEFAULT_KEY ? "dari" : (initial?.language_iso_code || "dari");
       fillTranslations(language.value);
       if (translation) translation.value = activeKey;
-      setStatus("کتابخانه آماده است؛ " + languageNames.size + " زبان و " + allTranslations.length + " ترجمه در فهرست موجود است.");
+      setStatus("Library ready: " + languageNames.size + " languages and " + allTranslations.length + " translations. Language names and translator titles are sorted alphabetically.");
     } catch (error) {
       setStatus("کتابخانهٔ زبان‌ها فعلاً بارگذاری نشد: " + error.message + "؛ ترجمهٔ دری اصلی حفظ شده است.");
-      language.replaceChildren(new Option("فارسی دری (ترجمهٔ اصلی)", "fa"));
-      language.value = "fa";
-      fillTranslations("fa");
+      language.replaceChildren(new Option("Dari", "dari"));
+      language.value = "dari";
+      fillTranslations("dari");
     }
   }
 
