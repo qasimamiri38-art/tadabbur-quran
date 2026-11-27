@@ -1383,12 +1383,45 @@ async function playAudio(number) {
       audioAyahs = ayahs;
     }
 
-    function playCurrentBasmalaOrAyah() {
+    function surahRequiresOpeningBasmala(surahNumber) {
+      // Al-Faatiha contains Bismillah as ayah 1; At-Tawbah has no Bismillah.
+      // Every other surah begins with a separate Bismillah before ayah 1.
+      return Number(surahNumber) !== 1 && Number(surahNumber) !== 9;
+    }
+
+    async function playSurahOpening() {
       if (runId !== playbackRunId) return;
-      // The first-ayah recording from the selected reciter contains the
-      // correct surah opening where applicable; do not request a guessed
-      // standalone Bismillah URL from a different audio directory.
-      playNext().catch(handlePlaybackError);
+      const openingVerse = verses[index];
+      if (!openingVerse || Number(openingVerse.n) !== 1 ||
+          !surahRequiresOpeningBasmala(openingVerse.surah)) {
+        playNext().catch(handlePlaybackError);
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          "https://api.alquran.cloud/v1/surah/1/" + audioEdition
+        );
+        if (!response.ok) throw new Error("فایل بسم‌الله قاری دریافت نشد");
+        const payload = await response.json();
+        const basmalaAudio = payload?.data?.ayahs?.[0]?.audio;
+        if (!basmalaAudio) throw new Error("صدای بسم‌الله قاری موجود نیست");
+        if (runId !== playbackRunId) return;
+
+        status("در حال پخش بسم‌الله با صدای " +
+          (RECITER_DISPLAY_NAMES[selectedReciter] || "قاری انتخاب‌شده"));
+        a.onended = () => {
+          if (runId !== playbackRunId) return;
+          a.onended = null;
+          playNext().catch(handlePlaybackError);
+        };
+        a.onerror = () => handlePlaybackError(new Error("پخش بسم‌الله ناموفق بود"));
+        a.src = basmalaAudio;
+        a.load();
+        await a.play();
+      } catch (error) {
+        handlePlaybackError(error);
+      }
     }
 
     async function playNext() {
@@ -1418,7 +1451,7 @@ async function playAudio(number) {
           return;
         }
         if (runId !== playbackRunId) return;
-        playCurrentBasmalaOrAyah();
+        playSurahOpening();
         return;
       }
 
@@ -1470,24 +1503,7 @@ async function playAudio(number) {
     }
     if (runId !== playbackRunId) return;
 
-    const openingVerse = verses[index];
-    if (Number(openingVerse.n) === 1 &&
-        Number(openingVerse.surah) !== 1 &&
-        Number(openingVerse.surah) !== 9) {
-      try {
-        const fatihaResponse = await fetch(
-          "https://api.alquran.cloud/v1/surah/1/" + audioEdition
-        );
-        if (!fatihaResponse.ok) throw new Error("فایل بسم‌الله قاری دریافت نشد");
-        const fatihaData = await fatihaResponse.json();
-        const basmalaAudio = fatihaData?.data?.ayahs?.[0]?.audio;
-        if (!basmalaAudio) throw new Error("صدای بسم‌الله قاری موجود نیست");
-        if (runId !== playbackRunId) return;
-        status("در حال پخش بسم‌الله با صدای " + (RECITER_DISPLAY_NAMES[selectedReciter] || "قاری انتخاب‌شده"));
-        a.onended = () => {
-          if (runId !== playbackRunId) return;
-          a.onended = null;
-          playCurrentBasmalaOrAyah();
+    playSurahOpening();
         };
         a.onerror = () => handlePlaybackError(new Error("پخش بسم‌الله ناموفق بود"));
         a.src = basmalaAudio;
@@ -1499,7 +1515,7 @@ async function playAudio(number) {
         return;
       }
     }
-    playCurrentBasmalaOrAyah();
+    playSurahOpening();
   } catch (e) {
     stopQuranPlayback("خطای پخش: " + (e?.message || "خطای نامشخص"));
     console.error("Tadabbur Quran playback error", e);
