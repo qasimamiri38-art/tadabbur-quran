@@ -20,6 +20,7 @@ function renderSurahs(){
  state.surahs.forEach(function(s){
   var b=document.createElement("button");b.className="surah-item"+(s.number===state.selected?" selected":"");
   b.textContent=s.number+" · "+s.name+"  ("+s.englishName+")";
+  b.addEventListener("focus",function(){$("selectedSurahName").textContent=s.name;$("selectedSurahMeta").textContent=s.englishName+" · "+s.numberOfAyahs+" آیه";state.selected=s.number;});
   b.dataset.number=s.number;
   b.addEventListener("click",function(){state.selected=s.number;renderSurahs();$("selectedSurahName").textContent=s.name;b.focus();$("selectedSurahMeta").textContent=s.englishName+" · "+s.numberOfAyahs+" آیه";});
   b.addEventListener("dblclick",function(){openSurah(s.number);});
@@ -85,6 +86,7 @@ document.querySelectorAll("[data-reciter]").forEach(function(b){b.addEventListen
 function keyHandler(e){
  var key=e.keyCode;
  if(key===10009||key===27){e.preventDefault();if(state.screen==="readerScreen"){stopAudio();show("surahScreen");}else if(state.screen!=="home")show("home");return;}
+ if(key===13&&state.screen==="surahScreen"){e.preventDefault();openSurah(state.selected);return;}
  if(key===415||key===179){e.preventDefault();if(state.screen==="readerScreen")$("playPause").click();return;}
  if(key===412){e.preventDefault();if(state.screen==="readerScreen")$("prevSurah").click();return;}
  if(key===417){e.preventDefault();if(state.screen==="readerScreen")$("nextSurah").click();return;}
