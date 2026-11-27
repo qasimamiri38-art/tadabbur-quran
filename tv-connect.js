@@ -20,7 +20,7 @@
 
   const style = document.createElement("style");
   style.textContent = [
-    "#tadabburTvConnect{direction:rtl;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:center;margin:12px 0;padding:14px;border:1px solid #b99a5a;border-radius:16px;background:linear-gradient(135deg,#10291d,#17231b);color:#f6eedb}",
+    "#tadabburTvConnect{direction:rtl;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:center;flex:1 0 100%;width:100%;margin:12px 0;padding:14px;border:1px solid #b99a5a;border-radius:16px;background:linear-gradient(135deg,#10291d,#17231b);color:#f6eedb}",
     "#tadabburTvConnect .tv-connect-heading{grid-column:1/-1;color:#e4c77d;font-weight:700;font-size:16px}",
     "#tadabburTvConnect .tv-connect-sub{grid-column:1/-1;color:#c9c4b5;font-size:12px;line-height:1.8}",
     "#tadabburTvConnect button,#tadabburTvConnect google-cast-launcher{min-height:46px;border:1px solid #b99a5a;border-radius:12px;background:#1b563e;color:#fff4df;padding:9px 12px;font:inherit;font-weight:600;cursor:pointer;text-align:center}",
@@ -87,8 +87,8 @@
     }
     try {
       if (!audio.src) {
-        setStatus("ابتدا «پخش سوره روی تلویزیون» را بزن تا فایل صوتی آماده شود؛ سپس AirPlay را انتخاب کن.");
-        return;
+        audio.src = audioUrl();
+        audio.load();
       }
       audio.webkitShowPlaybackTargetPicker();
       setStatus("فهرست دستگاه‌های AirPlay باز شد. تلویزیون سازگار را انتخاب کن.");
