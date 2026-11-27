@@ -395,6 +395,8 @@ main{padding:10px 12px}
 .dua-copy{font-size:13px;padding:7px 12px}
 @media(min-width:760px){.dua-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
+
+.dua-source{font-size:12px;line-height:1.8;color:#c9c1ad}.dua-source a{color:var(--gold);text-decoration:underline}
 </style>
 
 
@@ -747,6 +749,9 @@ setTimeout(() => {
       <button type="button" data-dua-filter="forgiveness">آمرزش</button>
       <button type="button" data-dua-filter="knowledge">علم و آرامش</button>
       <button type="button" data-dua-filter="family">خانواده</button>
+      <button type="button" data-dua-filter="morning">صبح و شام</button>
+      <button type="button" data-dua-filter="travel">سفر</button>
+      <button type="button" data-dua-filter="daily">دعاهای روزانه</button>
     </div>
     <div id="duaList" class="dua-list">
       <article class="dua-card" data-category="guidance" data-search="ربنا آتنا فی الدنیا حسنة آخرت خیر دنیا">
@@ -785,9 +790,38 @@ setTimeout(() => {
         <p class="dua-fa" dir="rtl">پروردگارا، از همسران و فرزندان‌مان مایهٔ روشنی چشم به ما عطا کن و ما را پیشوای پرهیزگاران قرار ده.</p>
         <button type="button" class="dua-copy">کپی متن عربی</button>
       </article>
+      <article class="dua-card" data-category="morning" data-search="اللهم بك أصبحنا بك أمسينا صبح شام بیداری روزانه ابو داود 5068">
+        <div class="dua-card-top"><span>ذکر هنگام صبح</span><small>سنن ابی‌داود، حدیث ۵۰۶۸</small></div>
+        <p class="dua-ar" dir="rtl">اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ النُّشُورُ</p>
+        <p class="dua-fa" dir="rtl">خدایا، به یاری تو صبح کردیم و به یاری تو شام می‌کنیم؛ به خواست تو زنده می‌شویم و می‌میریم و بازگشت به سوی توست.</p>
+        <p class="muted">برای شام، در روایت آمده است: «اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ النُّشُورُ».</p>
+        <p class="dua-source"><a href="https://sunnah.com/abudawud/43/296" target="_blank" rel="noopener">مشاهدهٔ منبع حدیث در سنن ابی‌داود</a> · درجه: صحیح، به تصحیح آلبانی</p>
+        <button type="button" class="dua-copy">کپی متن عربی</button>
+      </article>
+      <article class="dua-card" data-category="daily" data-search="باسمك اللهم أموت وأحيا خواب شب هنگام خواب بخاری 6324">
+        <div class="dua-card-top"><span>دعای پیش از خواب</span><small>صحیح بخاری، حدیث ۶۳۲۴</small></div>
+        <p class="dua-ar" dir="rtl">بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا</p>
+        <p class="dua-fa" dir="rtl">خدایا، با نام تو می‌میرم و زنده می‌شوم.</p>
+        <p class="dua-source"><a href="https://sunnah.com/bukhari:6324" target="_blank" rel="noopener">مشاهدهٔ منبع حدیث در صحیح بخاری</a> · حدیث صحیح</p>
+        <button type="button" class="dua-copy">کپی متن عربی</button>
+      </article>
+      <article class="dua-card" data-category="daily" data-search="الحمد لله الذي أحيانا بعد ما أماتنا بیدار شدن خواب بخاری 6324">
+        <div class="dua-card-top"><span>دعای پس از بیدار شدن</span><small>صحیح بخاری، حدیث ۶۳۲۴</small></div>
+        <p class="dua-ar" dir="rtl">الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا، وَإِلَيْهِ النُّشُورُ</p>
+        <p class="dua-fa" dir="rtl">ستایش خدایی را که پس از میراندن ما، ما را زنده ساخت و بازگشت به سوی اوست.</p>
+        <p class="dua-source"><a href="https://sunnah.com/bukhari:6324" target="_blank" rel="noopener">مشاهدهٔ منبع حدیث در صحیح بخاری</a> · حدیث صحیح</p>
+        <button type="button" class="dua-copy">کپی متن عربی</button>
+      </article>
+      <article class="dua-card" data-category="travel" data-search="سبحان الذي سخر لنا هذا سفر وسیله نقلیه سفر مسلم 1342 زینت سفر">
+        <div class="dua-card-top"><span>ذکر هنگام سوارشدن برای سفر</span><small>قرآن، سورهٔ زخرف، آیات ۱۳–۱۴؛ صحیح مسلم ۱۳۴۲</small></div>
+        <p class="dua-ar" dir="rtl">سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ ۝ وَإِنَّا إِلَىٰ رَبِّنَا لَمُنْقَلِبُونَ</p>
+        <p class="dua-fa" dir="rtl">پاک و منزّه است آن‌که این را برای ما رام ساخت، و ما توان رام‌ساختن آن را نداشتیم؛ و ما به‌راستی به سوی پروردگارمان بازمی‌گردیم.</p>
+        <p class="dua-source"><a href="https://sunnah.com/muslim:1342" target="_blank" rel="noopener">روایت سفر در صحیح مسلم، حدیث ۱۳۴۲</a> · متن این ذکر از آیات ۱۳ و ۱۴ سورهٔ زخرف است.</p>
+        <button type="button" class="dua-copy">کپی متن عربی</button>
+      </article>
     </div>
     <p id="duaEmpty" class="muted" hidden>دعایی با این جست‌وجو پیدا نشد.</p>
-    <p class="muted" style="margin-top:14px">یادداشت: این بخش در نسخهٔ نخست شامل دعاهای قرآنی است. ترجمه‌ها برای فهم آسان به دری نوشته شده‌اند؛ متن عربی همراه نشانی آیه ارائه شده است.</p>
+    <p class="muted" style="margin-top:14px">یادداشت: دعاهای قرآنی از آیات قرآن و دعاهای نبوی از منابع حدیثی با نشانی و درجهٔ روایت درج می‌شوند. ترجمه‌های دری برای فهم آسان تنظیم شده‌اند؛ در موارد اختلاف نسخه، متن عربی منبع معیار است.</p>
   </div>
 </section>
 
