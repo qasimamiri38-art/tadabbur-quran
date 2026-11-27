@@ -117,3 +117,26 @@ The existing repository files were inspected directly through their Git blobs. T
 ### Next validation step
 
 Obtain the exact official Tanzil Uthmani Version 1.1 source and its unmodified copyright block. Compare the existing repository's canonical verse strings against the official file using a documented mapping that treats opening basmalas separately. Report every mismatch without automatically correcting the Quran text. Only after a zero-unexplained-difference review should the selected file be marked as the production canonical text.
+
+
+## 7. Reciter photo inventory and rights review (2026-11-27)
+
+The reciter gallery should use real, clean portraits with no embedded names, captions, watermarks, or promotional text. Preserve the existing local images until they are visually inspected; do not overwrite them based only on filenames.
+
+| Reciter | Candidate image/source | Rights / current decision |
+|---|---|---|
+| Mishary bin Rashid Alafasy (مشاري بن راشد العفاسي) | Wikimedia Commons file page: https://commons.wikimedia.org/wiki/File:%D0%9C%D0%B8%D1%88%D0%B0%D1%80%D0%B8_%D0%A0%D0%B0%D1%88%D0%B8%D0%B4.jpg | Commons page states the copyright holder permits unrestricted redistribution, commercial use, and modification. Candidate may be used after checking the actual image, attribution/permission evidence, and suitability for the app. |
+| Abdul Basit Abdus Samad (عبدالباسط عبدالصمد) | Wikimedia Commons portrait from 1955: https://commons.wikimedia.org/wiki/File:Abdel_Basit_Abdel_Samad_1955.png | Commons page states public-domain status under Egyptian and US rules, but author is unknown and source is a cropped 1955 magazine/newspaper image. Candidate only; inspect image and legal basis before bundling. An alternate 1966 South Africa photo is also listed as public domain: https://commons.wikimedia.org/wiki/File:Abdul_Basit_Abd_us-Samad_in_South_Africa_in_1966_(3).jpg |
+| Mahmoud Khalil Al-Husary (محمود خليل الحصري) | Wikimedia Commons portrait: https://commons.wikimedia.org/wiki/File:Hussary.jpg | Uploader explicitly dedicated their own work to the public domain. Candidate may be used after image inspection and recording the creator credit/rights statement. |
+| Barakatullah Salim (برکت‌الله سلیم) | Background/identity reference: https://www.afghan-bios.info/index.php/database/5478-saleem-barakatullah ; news reference: https://tolonews.com/afghanistan-187173 ; a portrait appears in the Islamic Bulletin reciter list: https://islamicbulletin.org/?page_id=12001 | No independently verified reuse license for a portrait found in this review. Do not copy the Islamic Bulletin image into the app without permission. Seek family/estate, broadcaster, or photographer permission, or locate a clearly licensed portrait. |
+
+### Implementation status
+
+- This is a source-and-rights shortlist, not a claim that image files have been downloaded, installed, or tested in the app.
+- No remote image hotlink should be treated as a permanent production asset. For approved images, retain the original file, source page, creator, exact license/permission evidence, retrieval date, and checksum in the repository.
+- Crop/resize copies for the UI only after permission is confirmed; retain an unmodified source master. Do not add names or text into the image pixels; display names as normal app text beside/below the image.
+- Before committing binary portraits, visually inspect the exact image and confirm it depicts the intended reciter, is a single-person portrait, is clear enough for mobile/TV cards, and has no unwanted writing or watermark.
+
+### Immediate next action
+
+Inspect the four existing repository image files (alafasy.jpg, abdulbasit.jpg, husary.jpg, barakatullah.jpg) and the archive reciter_photos_four.zip. Compare them with the candidate source pages above, then keep, replace, or hold each image based on visual quality and documented rights. The repository file audit must be completed before changing the app's image paths.
