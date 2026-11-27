@@ -2,13 +2,14 @@
 <widget xmlns="http://www.w3.org/ns/widgets"
  xmlns:tizen="http://tizen.org/ns/widgets"
  id="http://tadabbur-quran.app/tizen"
- version="0.1.0" viewmodes="maximized">
+ version="0.1.1" viewmodes="maximized">
   <name>Tadabbur Quran</name>
   <content src="index.html"/>
   <icon src="icon.svg"/>
   <description>تدبر القرآن کریم با ترجمهٔ دری و تلاوت قاریان</description>
   <access origin="https://api.alquran.cloud" subdomains="true"/>
   <access origin="https://quranenc.com" subdomains="true"/>
+  <access origin="https://cdn.islamic.network" subdomains="true"/>
   <access origin="https://fonts.googleapis.com" subdomains="true"/>
   <access origin="https://fonts.gstatic.com" subdomains="true"/>
   <access origin="https://verses.quran.foundation" subdomains="true"/>
