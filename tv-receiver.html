@@ -76,7 +76,7 @@ cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-ev
   let requestId=0;
   function tajweedFragment(source){
     const fragment=document.createDocumentFragment();
-    const pattern=/\\[([a-z])(?::\\d+)?\\[([^\\]]*)\\]/g;
+    const pattern=/\[([a-z])(?::\d+)?\[([^\]]*)\]/g;
     const classes={h:"ham_wasl",s:"slnt",l:"slnt",n:"madda_normal",p:"madda_permissible",q:"qlq",o:"madda_pbligatory",c:"ikhf_shfw",f:"ikhf",w:"idghm_shfw",i:"iqlb",a:"idgh_ghn",u:"idgh_w_ghn",d:"idgh_mus",b:"idgh_mus",g:"ghn"};
     let last=0,match;
     while((match=pattern.exec(source||""))){
