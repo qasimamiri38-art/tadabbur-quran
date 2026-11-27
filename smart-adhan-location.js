@@ -122,6 +122,9 @@
       status.textContent = "موقعیت‌یابی در این مرورگر پشتیبانی نمی‌شود.";
       return;
     }
+    const preferences = read(KEY);
+    preferences.enabled = true;
+    write(preferences);
     if (watchId !== null) navigator.geolocation.clearWatch(watchId);
     status.textContent = "تشخیص مکان تا وقتی اپ باز و فعال باشد روشن است.";
     watchId = navigator.geolocation.watchPosition((position) => {
