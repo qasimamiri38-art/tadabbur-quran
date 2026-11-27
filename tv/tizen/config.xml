@@ -12,7 +12,7 @@
   <access origin="https://fonts.googleapis.com" subdomains="true"/>
   <access origin="https://fonts.gstatic.com" subdomains="true"/>
   <access origin="https://verses.quran.foundation" subdomains="true"/>
-  <tizen:application id="QuranTV01.Tadabbur" package="QuranTV01" required_version="5.5"/>
+  <tizen:application id="QuranTV001.Tadabbur" package="QuranTV001" required_version="5.5"/>
   <tizen:profile name="tv"/>
   <tizen:setting screen-orientation="landscape"
     context-menu="disable" background-support="disable"
