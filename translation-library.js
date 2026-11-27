@@ -164,7 +164,7 @@
       const selected = allTranslations.find(item => item.key === activeKey);
       setStatus("Selected: " + (selected?.title || "Dari — Badakhshani"));
       // The original reader change handler reloads the current surah once.
-    });
+    }, true);
 
     download.addEventListener("click", async () => {
       download.disabled = true;
