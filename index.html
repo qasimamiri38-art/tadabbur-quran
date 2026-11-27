@@ -931,7 +931,6 @@ async function loadSurah() {
     render();
 
     write("tadabbur-last", { surah: n, ayah: 1 });
-    $("connection").textContent = "قرآن و ترجمه دری دریافت شد";
 
   } catch (e) {
     status("دریافت نشد: " + e.message);
