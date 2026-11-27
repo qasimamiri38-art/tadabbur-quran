@@ -46,6 +46,7 @@
   let audioContext = null;
   let stopTimer = null;
   let statusNode = null;
+  let settingsToggle = null;
 
   function status(message) {
     if (statusNode) statusNode.textContent = message;
@@ -87,6 +88,24 @@
       }
     });
 
+    const heading = panel.querySelector("h2");
+    settingsToggle = document.createElement("button");
+    settingsToggle.type = "button";
+    settingsToggle.id = "adhanSettingsToggle";
+    settingsToggle.className = "secondary";
+    settingsToggle.textContent = "− بستن تنظیمات";
+    settingsToggle.style.cssText = "display:block;width:100%;margin:10px 0;";
+    settingsToggle.setAttribute("aria-expanded", "true");
+    settingsToggle.addEventListener("click", () => {
+      const collapsed = settingsToggle.getAttribute("aria-expanded") === "true";
+      Array.from(panel.children).forEach(child => {
+        if (child !== heading && child !== settingsToggle) child.hidden = collapsed;
+      });
+      settingsToggle.setAttribute("aria-expanded", String(!collapsed));
+      settingsToggle.textContent = collapsed ? "+ بازکردن تنظیمات" : "− بستن تنظیمات";
+    });
+    if (heading && heading.nextSibling) panel.insertBefore(settingsToggle, heading.nextSibling);
+    else panel.appendChild(settingsToggle);
     panel.append(button, statusNode);
 
     PRAYERS.forEach(prayer => {
@@ -219,8 +238,7 @@
       banner.setAttribute("role", "status");
       banner.style.cssText = "position:sticky;top:8px;z-index:9999;margin:10px 0;padding:14px;border:1px solid #d8b66b;border-radius:12px;background:#17251d;color:#f5eddd;text-align:center;font-weight:600;";
       banner.textContent = "🔔 یادآوری بی‌صدا: وقت نماز " + prayer + " رسید.";
-      const panel = document.getElementById("adhanSettings");
-      if (panel && !banner.parentNode) panel.prepend(banner);
+      if (!banner.parentNode) document.body.prepend(banner);
     }
   }
 
