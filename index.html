@@ -27,6 +27,7 @@ select{flex:1;min-width:0}input{flex:2;min-width:170px}
 
 .arabic{font:30px/2.15 "Amiri Quran",serif;text-align:justify;margin:12px 0;color:var(--arabic-color)}
 .arabic.indopak{font-family:"Noto Nastaliq Urdu","Amiri Quran",serif;line-height:2.6;text-align:right}
+.arabic.mushaf{font-family:"UthmanicHafs","Amiri Quran",serif;line-height:2.35;text-align:justify}
 /* فونت‌های قرآنی: بارگذاری از CDN رسمی مستندات Quran Foundation */
 @font-face{
   font-family:'UthmanicHafs';
@@ -328,7 +329,7 @@ setTimeout(() => {
   <option value="dari_badkhashani">ترجمه دری بدخشیانی</option>
 </select>
 
-  <select id="quranFont" aria-label="رسم‌الخط قرآن"><option value="uthmanic" selected>عثمانی (حفص)</option><option value="indopak">هندی ـ پاکستانی (حفص نستعلیق)</option><option value="tajweed" disabled>مصحف تجویدی (به‌زودی)</option><option value="mushaf" disabled>مصحف (به‌زودی)</option></select>
+  <select id="quranFont" aria-label="رسم‌الخط قرآن"><option value="uthmanic" selected>عثمانی (حفص)</option><option value="indopak">هندی ـ پاکستانی (حفص نستعلیق)</option><option value="tajweed" disabled>مصحف تجویدی (در حال آماده‌سازی)</option><option value="mushaf">مصحف مدینه (حفص)</option></select>
   <select id="tafsir">
     <option value="">بدون تفسیر</option>
   </select>
@@ -765,8 +766,9 @@ async function loadSurah() {
     ];
 
     const selectedScript = $("quranFont")?.value || "uthmanic";
-    const scriptUrl = selectedScript === "indopak"
-      ? "https://quran-json.risanb.com/text/hafs-nastaliq/chapters/" + n + ".json"
+    const scriptId = selectedScript === "indopak" ? "hafs-nastaliq" : selectedScript === "mushaf" ? "qpc-hafs" : null;
+    const scriptUrl = scriptId
+      ? "https://quran-json.risanb.com/text/" + scriptId + "/chapters/" + n + ".json"
       : null;
 
     const [data, dariByAya, scriptResponse] = await Promise.all([
@@ -788,9 +790,9 @@ async function loadSurah() {
     ) || editions[0];
 
     const scriptVerses = scriptResponse?.verses;
-    if (selectedScript === "indopak" &&
+    if (scriptId &&
         (!Array.isArray(scriptVerses) || scriptVerses.length !== ar?.ayahs?.length)) {
-      throw new Error("تعداد آیات متن هندی‌ـ‌پاکستانی با متن حفص برابر نیست؛ رسم‌الخط تغییر داده نشد.");
+      throw new Error("تعداد آیات رسم‌الخط انتخاب‌شده با متن حفص برابر نیست؛ نمایش تغییر داده نشد.");
     }
 
     const tf = editions.find(x =>
@@ -805,7 +807,7 @@ async function loadSurah() {
       global: a.number,
       n: a.numberInSurah,
       surah: n,
-      arabic: selectedScript === "indopak" ? scriptVerses[i].text : a.text,
+      arabic: scriptId ? scriptVerses[i].text : a.text,
       translation:
         dariByAya.get(Number(a.numberInSurah)) || "",
       tafsir:
@@ -852,7 +854,8 @@ const saved=read("tadabbur-saved",[]);
 content.className="ayah-content";
 
 const ar=document.createElement("p");
-ar.className="arabic"+(($("quranFont")?.value==="indopak")?" indopak":"");
+const activeScript=$("quranFont")?.value;
+ ar.className="arabic"+(activeScript==="indopak"?" indopak":activeScript==="mushaf"?" mushaf":"");
 ar.style.fontSize=fontSize+"px";
 ar.textContent=(v.n===1 && Number(v.surah)!==1 && Number(v.surah)!==9 ? v.arabic.replace(/^بِسْمِ.*?الرَّحِيمِ\s*/,"") : v.arabic)+" ۞";
 content.append(ar);
