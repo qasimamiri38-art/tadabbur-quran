@@ -1504,18 +1504,6 @@ async function playAudio(number) {
     if (runId !== playbackRunId) return;
 
     playSurahOpening();
-        };
-        a.onerror = () => handlePlaybackError(new Error("پخش بسم‌الله ناموفق بود"));
-        a.src = basmalaAudio;
-        a.load();
-        await a.play();
-        return;
-      } catch (error) {
-        handlePlaybackError(error);
-        return;
-      }
-    }
-    playSurahOpening();
   } catch (e) {
     stopQuranPlayback("خطای پخش: " + (e?.message || "خطای نامشخص"));
     console.error("Tadabbur Quran playback error", e);
