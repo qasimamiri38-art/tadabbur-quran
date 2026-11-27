@@ -36,12 +36,18 @@
   function classify(position) {
     const saved = read(KEY);
     const here = { lat: position.coords.latitude, lon: position.coords.longitude };
-    for (const zone of ["home", "work"]) {
-      const place = saved[zone];
-      if (place && Number.isFinite(place.lat) && Number.isFinite(place.lon) &&
-          distanceMeters(here, place) <= ZONE_RADIUS_METERS) return zone;
-    }
-    return "other";
+    const matches = ["home", "work"]
+      .filter((zone) => {
+        const place = saved[zone];
+        return place && Number.isFinite(place.lat) && Number.isFinite(place.lon);
+      })
+      .map((zone) => ({
+        zone,
+        distance: distanceMeters(here, saved[zone])
+      }))
+      .filter((item) => item.distance <= ZONE_RADIUS_METERS)
+      .sort((a, b) => a.distance - b.distance);
+    return matches.length ? matches[0].zone : "other";
   }
 
   function zoneLabel(zone) {
@@ -90,7 +96,7 @@
       onError(error.code === 1
         ? "اجازهٔ موقعیت داده نشد؛ از تنظیمات دستگاه اجازه بده."
         : "موقعیت دریافت نشد؛ GPS و اینترنت را بررسی کن.");
-    }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 60000 });
+    }, { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 });
   }
 
   function savePlace(zone, status) {
@@ -99,12 +105,16 @@
       saved[zone] = {
         lat: position.coords.latitude,
         lon: position.coords.longitude,
+        accuracy: Math.round(position.coords.accuracy || 0),
         savedAt: new Date().toISOString()
       };
       write(saved);
-      status.textContent = "موقعیت " + zoneLabel(zone) + " فقط روی همین دستگاه ذخیره شد.";
       refreshLabels();
-      updateStatus(classify(position), "تشخیص مکان انجام شد. برای حفظ حریم خصوصی، مختصات به سرور فرستاده نمی‌شود.");
+      const accuracy = Math.round(position.coords.accuracy || 0);
+      const detected = classify(position);
+      updateStatus(detected, "موقعیت " + zoneLabel(zone) + " با دقت تقریبی " + accuracy +
+        " متر ذخیره شد. مکان فعلی: " + zoneLabel(detected) +
+        ". مختصات فقط روی همین دستگاه می‌ماند.");
     }, (message) => { status.textContent = message; });
   }
 
@@ -113,8 +123,7 @@
     const home = $("smartAdhanHomeLabel");
     const work = $("smartAdhanWorkLabel");
     if (home) home.textContent = saved.home ? "خانه: ذخیره شده" : "خانه: هنوز ثبت نشده";
-    if (work) work.textContent = saved.work ? "محل کار: ذخیره نشده" : "محل کار: هنوز ثبت نشده";
-    if (work && saved.work) work.textContent = "محل کار: ذخیره شده";
+    if (work) work.textContent = saved.work ? "محل کار: ذخیره شده" : "محل کار: هنوز ثبت نشده";
   }
 
   function startMonitoring(status) {
@@ -133,7 +142,7 @@
         (zone === "home" ? "؛ حالت خانه (اذان کامل)" : "؛ حالت آرام و بی‌صدا"));
     }, () => {
       updateStatus("unknown", "موقعیت فعلی در دسترس نیست؛ تنظیم قبلی حفظ شد.");
-    }, { enableHighAccuracy: true, maximumAge: 60000, timeout: 20000 });
+    }, { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 });
   }
 
   function buildPanel() {
