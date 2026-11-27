@@ -193,42 +193,53 @@ cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-ev
   async function loadUthmaniText(surahNumber, timingReciterId, expectedAudioUrl){
     const thisRequest=++requestId;
     currentSurah=surahNumber;
-    ayahBox.innerHTML='<div class="tv-ayah">در حال آماده‌سازی متن عثمانی و زمان‌بندی کلمات…</div>';
+    ayahBox.innerHTML='<div class="tv-ayah">در حال آماده‌سازی متن عثمانی…</div>';
     try{
-      const timingUrl="https://api.quran.com/api/v4/chapter_recitations/"+timingReciterId+"/"+surahNumber+"?segments=true";
-      const responses=await Promise.all([
-        fetch("https://api.alquran.cloud/v1/surah/"+surahNumber+"/quran-tajweed"),
-        fetch(timingUrl,{headers:{Accept:"application/json"}})
-      ]);
-      if(!responses[0].ok) throw new Error("متن عثمانی دریافت نشد");
-      if(!responses[1].ok) throw new Error("زمان‌بندی دقیق کلمات دریافت نشد");
-      const [textResult,timingResult]=await Promise.all(responses.map(r=>r.json()));
+      const textResponse=await fetch("https://api.alquran.cloud/v1/surah/"+surahNumber+"/quran-tajweed");
+      if(!textResponse.ok) throw new Error("متن عثمانی دریافت نشد");
+      const textResult=await textResponse.json();
       const ayahs=textResult&&textResult.data&&Array.isArray(textResult.data.ayahs)?textResult.data.ayahs:[];
-      const file=timingResult&&timingResult.audio_file;
-      const timestamps=file&&Array.isArray(file.timestamps)?file.timestamps:[];
-      const hasWords=timestamps.some(v=>Array.isArray(v.segments)&&v.segments.length);
-      if(!ayahs.length||!file||!hasWords) throw new Error("زمان‌بندی کلمه‌به‌کلمه برای این تلاوت موجود نیست");
-      const normalize=u=>{try{const x=new URL(u);return x.host+x.pathname;}catch(_){return String(u||"");}};
-      if(expectedAudioUrl&&normalize(file.audio_url)!==normalize(expectedAudioUrl)){
-        throw new Error("فایل صوتی و زمان‌بندی از یک منبع نیستند؛ برای جلوگیری از نشانگر نادرست، همگام‌سازی متوقف شد");
-      }
+      if(!ayahs.length) throw new Error("متن آیات در دسترس نیست");
       if(thisRequest!==requestId) return;
-      renderTimedAyahs(ayahs,timestamps,surahNumber);
+      renderTimedAyahs(ayahs,[],surahNumber);
       ayahBox.scrollTop=0;
-      startWordCursor();
-      hint.textContent="نشانگر کلمه با زمان‌بندی اختصاصی همین قاری هماهنگ است";
+      if(!timingReciterId){
+        hint.textContent="تلاوت فعال است · زمان‌بندی دقیق کلمات برای این منبع موجود نیست";
+        return;
+      }
+      try{
+        const timingUrl="https://api.quran.com/api/v4/chapter_recitations/"+timingReciterId+"/"+surahNumber+"?segments=true";
+        const timingResponse=await fetch(timingUrl,{headers:{Accept:"application/json"}});
+        if(!timingResponse.ok) throw new Error("دادهٔ زمان‌بندی کلمات دریافت نشد");
+        const timingResult=await timingResponse.json();
+        const file=timingResult&&timingResult.audio_file;
+        const timestamps=file&&Array.isArray(file.timestamps)?file.timestamps:[];
+        const hasWords=timestamps.some(v=>Array.isArray(v.segments)&&v.segments.length);
+        if(!file||!hasWords) throw new Error("زمان‌بندی کلمه‌به‌کلمه برای این قاری موجود نیست");
+        const normalize=u=>{try{const x=new URL(u);return x.host+x.pathname;}catch(_){return String(u||"");}};
+        if(expectedAudioUrl&&normalize(file.audio_url)!==normalize(expectedAudioUrl)){
+          throw new Error("فایل صوتی و زمان‌بندی همسان نیستند");
+        }
+        if(thisRequest!==requestId) return;
+        renderTimedAyahs(ayahs,timestamps,surahNumber);
+        startWordCursor();
+        hint.textContent="نشانگر کلمه با زمان‌بندی اختصاصی همین قاری هماهنگ است";
+      }catch(timingError){
+        stopWordCursor();
+        hint.textContent="تلاوت ادامه دارد؛ نشانگر دقیق این قاری فعلاً در دسترس نیست";
+      }
     }catch(error){
       if(thisRequest!==requestId) return;
       stopWordCursor();
-      ayahBox.innerHTML='<div class="tv-ayah">متن قرآن نمایش داده شد، اما زمان‌بندی دقیق کلمات دریافت نشد. نشانگر تقریبی اجرا نمی‌شود.</div>';
-      hint.textContent=error.message||"همگام‌سازی دقیق در دسترس نیست";
+      ayahBox.innerHTML='<div class="tv-ayah">متن قرآن دریافت نشد. اتصال اینترنت تلویزیون را بررسی کن.</div>';
+      hint.textContent=error.message||"دریافت متن ناموفق بود";
     }
   }
   player.setMessageInterceptor(cast.framework.messages.MessageType.LOAD,request=>{
     const metadata=request.media && request.media.metadata ? request.media.metadata : {};
     const custom=request.media && request.media.customData ? request.media.customData : {};
     const number=Number(custom.surahNumber)||1;
-    const timingReciterId=Number(custom.timingReciterId)||7;
+    const timingReciterId=Number(custom.timingReciterId)||0;
     surah.textContent=custom.surahName || metadata.title || "تلاوت قرآن کریم";
     reciter.textContent=custom.reciterName || metadata.artist || names[custom.reciter] || "قاری تدبر القرآن";
     basmala.style.display=(number===1 || number===9)?"none":"block";
