@@ -82,54 +82,72 @@ select{flex:1;min-width:0}input{flex:2;min-width:170px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px;margin:12px 0;line-height:2}
 .empty{text-align:center;color:var(--muted);padding:28px}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
-/* حالت نمایش تلویزیونی: متن عثمانی بزرگ و خوانا، بدون کنترل‌های مزاحم */
+/* نمایش تلویزیونی: تصویر قرآن به‌عنوان زیر‌بنا + متن عثمانی خوانا */
 .istiadhah{
   direction:rtl;text-align:center;color:#d8b66b;
   font-family:"UthmanicHafs","Amiri Quran",serif;
   font-size:clamp(20px,2.3vw,34px);line-height:1.9;
   padding:10px 12px 2px;
 }
-body.tv-mode{background:radial-gradient(ellipse at 50% 12%,#244331 0,#10251b 48%,#07110c 100%);overflow-x:hidden}
+body.tv-mode{
+  background:#08150e url("./hero-quran.png") center center / cover fixed no-repeat;
+  overflow-x:hidden;min-height:100vh;position:relative
+}
+body.tv-mode:before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(4,15,9,.62),rgba(5,17,11,.78) 48%,rgba(4,13,8,.7));
+}
+body.tv-mode main,body.tv-mode #tvModeExit{position:relative;z-index:1}
 body.tv-mode header,body.tv-mode nav,body.tv-mode .selectors,
 body.tv-mode .tools,body.tv-mode #status,body.tv-mode footer,
 body.tv-mode .ayah-top,body.tv-mode .translation,body.tv-mode .tafsir,
 body.tv-mode #audio{display:none!important}
-body.tv-mode main{max-width:1800px;width:100%;padding:2.5vh 4vw}
+body.tv-mode main{max-width:1800px;width:100%;padding:2vh 4vw}
 body.tv-mode #reader{display:block!important}
-body.tv-mode #heading{margin:1vh auto 3vh}
-body.tv-mode #heading h2{font-size:clamp(34px,4vw,62px);color:#e2c77e}
-body.tv-mode #heading p{font-size:clamp(15px,1.6vw,24px)}
-body.tv-mode #verses{max-width:1600px;margin:auto;padding:2vh 3vw;
-  border:2px solid rgba(216,182,107,.62);border-radius:28px;
-  background:linear-gradient(145deg,rgba(25,48,35,.92),rgba(9,22,15,.96));
-  box-shadow:0 0 70px rgba(216,182,107,.12);position:relative}
+body.tv-mode #heading{margin:0 auto 1.2vh;text-shadow:0 2px 14px #000}
+body.tv-mode #heading h2{font-size:clamp(30px,3.1vw,52px);color:#f0d58e}
+body.tv-mode #heading p{font-size:clamp(13px,1.15vw,19px);color:#f2e7ce}
+body.tv-mode #verses{
+  max-width:1600px;margin:auto;padding:1vh 2.2vw;
+  border:1px solid rgba(216,182,107,.65);border-radius:24px;
+  background:linear-gradient(145deg,rgba(11,29,19,.58),rgba(5,18,11,.68));
+  box-shadow:0 12px 60px rgba(0,0,0,.32);position:relative;
+  backdrop-filter:blur(2px)
+}
 body.tv-mode #verses:before{
-  content:"";position:absolute;inset:14px;border:1px solid rgba(216,182,107,.22);
-  border-radius:20px;pointer-events:none
+  content:"";position:absolute;inset:9px;border:1px solid rgba(216,182,107,.25);
+  border-radius:17px;pointer-events:none
 }
 body.tv-mode .basmala{font-family:"UthmanicHafs","Amiri Quran",serif;
-  font-size:clamp(30px,3.4vw,54px);color:#f0d58e;padding:1.5vh 0 2vh}
-body.tv-mode .istiadhah{font-size:clamp(20px,2.1vw,32px);padding:1vh 0;color:#d8b66b}
-body.tv-mode .ayah{background:transparent;border:0;border-bottom:1px solid rgba(216,182,107,.18);
-  border-radius:0;margin:0;padding:1.2vh 1vw;break-inside:avoid}
-body.tv-mode .ayah-content{display:block!important}
+  font-size:clamp(27px,2.7vw,44px);color:#f7dda0;padding:.7vh 0 1vh;margin:0}
+body.tv-mode .istiadhah{font-size:clamp(18px,1.7vw,27px);padding:.4vh 0;color:#e1c47e}
+body.tv-mode .ayah{
+  background:transparent;border:0;border-bottom:1px solid rgba(216,182,107,.2);
+  border-radius:0;margin:0;padding:.25vh .7vw;min-height:0;break-inside:avoid
+}
+body.tv-mode .ayah-content{display:block!important;margin:0;padding:0}
 body.tv-mode .arabic,body.tv-mode .arabic.mushaf,body.tv-mode .arabic.tajweed{
   font-family:"UthmanicHafs","Amiri Quran",serif!important;
-  font-size:clamp(30px,3.4vw,58px)!important;line-height:2.05;
-  text-align:center;color:#fff2d7;margin:0;padding:1vh 0
+  font-size:clamp(25px,2.45vw,43px)!important;line-height:1.62;
+  text-align:center;color:#fff2d7;margin:0;padding:.35vh 0
 }
 #tvModeExit{display:none}
 body.tv-mode #tvModeExit{
   display:block;position:fixed;z-index:99999;top:14px;left:14px;
-  padding:10px 18px;background:rgba(8,20,13,.88);color:#f0d58e;
-  border:1px solid #c9a653;border-radius:999px;font-size:16px
+  padding:9px 16px;background:rgba(8,20,13,.9);color:#f0d58e;
+  border:1px solid #c9a653;border-radius:999px;font-size:15px
 }
 @media(min-width:1000px){
  body.tv-mode #verses{max-width:92vw}
- body.tv-mode .arabic,body.tv-mode .arabic.mushaf,body.tv-mode .arabic.tajweed{font-size:clamp(38px,3.7vw,66px)!important}
+ body.tv-mode .arabic,body.tv-mode .arabic.mushaf,body.tv-mode .arabic.tajweed{font-size:clamp(32px,2.7vw,48px)!important}
+}
+@media(max-width:700px){
+ body.tv-mode main{padding:7vh 3vw 2vh}
+ body.tv-mode #verses{padding:1vh 2vw}
+ body.tv-mode .arabic,body.tv-mode .arabic.mushaf,body.tv-mode .arabic.tajweed{font-size:clamp(25px,5vw,34px)!important}
 }
 @media(prefers-reduced-motion:no-preference){body.tv-mode #verses{animation:tvFadeIn .45s ease-out}}
-@keyframes tvFadeIn{from{opacity:.65;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes tvFadeIn{from{opacity:.7;transform:translateY(5px)}to{opacity:1;transform:none}}
 @media(min-width:720px){main{padding:22px}.selectors{display:grid;grid-template-columns:1fr 1fr 1fr}.arabic{font-size:34px}.ayah{padding:22px}}
 .basmala{
   direction:rtl;
@@ -581,6 +599,7 @@ setTimeout(() => {
     </select>
     <span id="readerReciterStatus" class="muted" aria-live="polite">قاری انتخاب‌شده: مشاری العفاسی</span>
     <button id="tvModeToggle" type="button" class="primary">📺 نمایش تلویزیونی</button>
+    <button id="tvConnectHelp" type="button">📡 راهنمای اتصال واقعی تلویزیون</button>
   </div>
   <input id="search" type="search" placeholder="جست‌وجو در آیات این سوره…"><button id="smaller">A−</button><button id="larger">A+</button><button id="resume">ادامه مطالعه</button><button id="playSurah" class="primary">▶ پخش کامل سوره</button>
 </div>
@@ -1489,6 +1508,23 @@ async function playAudio(number) {
 
 // TV display mode: force the verified Uthmanic Hafs font and remove controls.
 const tvModeButton = $("tvModeToggle");
+const tvConnectHelp = $("tvConnectHelp");
+if (tvConnectHelp) {
+  tvConnectHelp.addEventListener("click", () => {
+    let panel = document.getElementById("tvConnectGuide");
+    if (!panel) {
+      panel = document.createElement("section");
+      panel.id = "tvConnectGuide";
+      panel.setAttribute("role", "dialog");
+      panel.setAttribute("aria-modal", "true");
+      panel.style.cssText = "position:fixed;z-index:100000;inset:0;background:rgba(0,0,0,.78);display:grid;place-items:center;padding:20px";
+      panel.innerHTML = '<div dir="rtl" style="max-width:560px;width:100%;background:#14271c;border:1px solid #c9a653;border-radius:20px;padding:24px;color:#f7efd9;line-height:2.1;box-shadow:0 18px 60px #0008"><h2 style="color:#e2c77e;margin-top:0">اتصال واقعی به تلویزیون</h2><p><b>برای Apple TV یا تلویزیون دارای AirPlay:</b></p><ol><li>آیپد و تلویزیون را به یک شبکهٔ Wi‑Fi وصل کن.</li><li>در آیپد از گوشهٔ بالای صفحه به پایین بکش تا Control Center باز شود.</li><li>گزینهٔ Screen Mirroring / انعکاس صفحه را بزن.</li><li>نام تلویزیون را انتخاب کن؛ سپس همین صفحهٔ قرآن را در حالت نمایش تلویزیونی باز کن.</li></ol><p><b>اگر تلویزیون Chromecast دارد:</b> از برنامهٔ Google Home یا قابلیت Cast دستگاه/مرورگر استفاده کن. این صفحهٔ وب به‌تنهایی نمی‌تواند بدون گیرندهٔ ثبت‌شدهٔ Google Cast مستقیماً تلویزیون را جفت کند.</p><p style="color:#d9c58f">نکته: دکمهٔ «نمایش تلویزیونی» ظاهر قرآن را آماده می‌کند؛ اتصال بی‌سیم از منوی دستگاه انجام می‌شود.</p><button id="closeTvGuide" type="button" style="width:100%;padding:12px;border-radius:12px;background:#176044;color:white;border:1px solid #c9a653">متوجه شدم</button></div>';
+      document.body.appendChild(panel);
+      panel.addEventListener("click", event => { if (event.target === panel) panel.remove(); });
+      panel.querySelector("#closeTvGuide").addEventListener("click", () => panel.remove());
+    }
+  });
+}
 const tvModeExit = document.createElement("button");
 tvModeExit.id = "tvModeExit";
 tvModeExit.type = "button";
