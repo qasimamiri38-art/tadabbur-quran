@@ -16,7 +16,7 @@
   const SETTINGS_KEY = "tadabburAdhanSettings";
   const LOCATION_KEY = "tadabburSmartAdhanLocations";
   const FIRED_KEY = "tadabburShortAdhanLastFired";
-  const SHORT_SECONDS = 30;
+  const SHORT_SECONDS = 6.5;
 
   const audioFiles = {
     mishary: "https://raw.githubusercontent.com/Kiwifu/adhan-mp3/main/Mishary_Al_Afasy_-_HQ_(مشاري_العفاسي).mp3",
@@ -161,13 +161,13 @@
 
     audio.play().then(() => {
       status(shortMode
-        ? "اعلان کوتاه اذان " + prayer + " در حال پخش است (۳۰ ثانیه)."
+        ? "دو تکبیر آغاز اذان " + prayer + " در حال پخش است."
         : "اذان کامل " + prayer + " در حال پخش است.");
       if (shortMode) {
         stopTimer = setTimeout(() => {
           audio.pause();
           audio.currentTime = 0;
-          status("پخش اعلان کوتاه پایان یافت.");
+          status("پخش دو تکبیر پایان یافت.");
         }, SHORT_SECONDS * 1000);
       }
     }).catch(() => {
@@ -193,26 +193,8 @@
     }
 
     if (type === "beep") {
-      if (!unlocked || !audioContext) {
-        status("برای شنیدن اعلان کوتاه، ابتدا دکمهٔ فعال‌سازی صدای اعلان‌ها را لمس کن.");
-        return;
-      }
-      audioContext.resume().then(() => {
-        [0, 0.38].forEach(delay => {
-          const oscillator = audioContext.createOscillator();
-          const gain = audioContext.createGain();
-          oscillator.type = "sine";
-          oscillator.frequency.value = 880;
-          gain.gain.setValueAtTime(0.0001, audioContext.currentTime + delay);
-          gain.gain.exponentialRampToValueAtTime(0.16, audioContext.currentTime + delay + 0.025);
-          gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + delay + 0.19);
-          oscillator.connect(gain);
-          gain.connect(audioContext.destination);
-          oscillator.start(audioContext.currentTime + delay);
-          oscillator.stop(audioContext.currentTime + delay + 0.2);
-        });
-        status("اعلان کوتاه: دو صدای زنگ کوتاه پخش شد.");
-      }).catch(() => status("پخش اعلان کوتاه ممکن نشد؛ صدا را دوباره فعال کن."));
+      // Play the opening two Takbirs from the selected Adhan recording.
+      playAdhan(prayer, item, true);
       return;
     }
 
@@ -232,6 +214,13 @@
     if (type === "silent") {
       stopCurrentAudio();
       status("🔔 یادآوری بی‌صدای نماز " + prayer + "؛ وقت نماز رسید.");
+      const banner = document.getElementById("adhanSilentReminder") || document.createElement("div");
+      banner.id = "adhanSilentReminder";
+      banner.setAttribute("role", "status");
+      banner.style.cssText = "position:sticky;top:8px;z-index:9999;margin:10px 0;padding:14px;border:1px solid #d8b66b;border-radius:12px;background:#17251d;color:#f5eddd;text-align:center;font-weight:600;";
+      banner.textContent = "🔔 یادآوری بی‌صدا: وقت نماز " + prayer + " رسید.";
+      const panel = document.getElementById("adhanSettings");
+      if (panel && !banner.parentNode) panel.prepend(banner);
     }
   }
 
