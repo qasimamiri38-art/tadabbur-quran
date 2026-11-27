@@ -269,8 +269,17 @@ document.addEventListener("DOMContentLoaded", () => {
         
       }
 
+      const notificationTags = {};
+      document.querySelectorAll("[data-notify-tag]").forEach((control) => {
+        const key = control.dataset.notifyTag;
+        const saved = localStorage.getItem("tadabbur-" + key);
+        if (saved !== null) control.checked = saved === "true";
+        notificationTags[key] = control.checked ? "true" : "false";
+      });
+      OneSignal.User.addTags(notificationTags);
+
       status.textContent =
-        "ثبت دستگاه موفق بود؛ اعلان اذان آماده است.";
+        "ثبت دستگاه موفق بود؛ اعلان‌ها و دسته‌بندی پیام‌ها آماده‌اند.";
 
     } catch (error) {
       console.error("OneSignal registration:", error);
@@ -280,6 +289,24 @@ document.addEventListener("DOMContentLoaded", () => {
     } finally {
       button.disabled = false;
     }
+  });
+});
+
+// Keep each device's notification categories in sync with OneSignal tags.
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("[data-notify-tag]").forEach((control) => {
+    const key = control.dataset.notifyTag;
+    const saved = localStorage.getItem("tadabbur-" + key);
+    if (saved !== null) control.checked = saved === "true";
+    control.addEventListener("change", () => {
+      localStorage.setItem("tadabbur-" + key, String(control.checked));
+      if (!oneSignalInstance) return;
+      if (control.checked) {
+        oneSignalInstance.User.addTag(key, "true");
+      } else {
+        oneSignalInstance.User.addTag(key, "false");
+      }
+    });
   });
 });
 
@@ -553,8 +580,15 @@ setTimeout(() => {
     </div>
   </div>
   <p class="muted">تنظیمات هر نماز مستقل است.</p><p id="adhanSaveStatus" class="muted">تنظیمات اذان آماده است.</p>
+  <div class="adhan-row" style="margin:12px 0">
+    <h3>نوع پیام‌های صفحهٔ قفل</h3>
+    <label><input type="checkbox" data-notify-tag="notify_adhan" checked> 🔔 اذان و نماز</label>
+    <label><input type="checkbox" data-notify-tag="notify_quran" checked> 📖 یادآوری تلاوت قرآن</label>
+    <label><input type="checkbox" data-notify-tag="notify_learning" checked> 🌱 آموزش و تدبر</label>
+    <p class="muted">پس از فعال‌سازی اعلان، انتخاب‌های شما برای هدف‌گیری پیام‌ها ثبت می‌شود.</p>
+  </div>
   <button id="enableAdhanNotifications" class="primary">
-  🔔 فعال‌سازی اعلان اذان
+  🔔 فعال‌سازی اعلان‌ها
 </button>
 <p id="onesignalStatus" class="muted">
   برای دریافت اعلان اذان، دکمه را بزنید.
