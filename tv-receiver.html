@@ -50,6 +50,13 @@ cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-ev
     <img src="./icon-512.png" alt="نشان تدبر القرآن">
     <div><h1>تَدَبُّرُ القُرآن</h1><p class="sub">قرآن کریم · رسم‌الخط عثمانی با رنگ‌بندی تجوید</p></div>
   </header>
+  <section id="tvPairPanel" style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;padding:12px;border:1px solid #d7c99f;border-radius:14px;background:#f5f8f5">
+    <label for="tvPairCode">کد اتصال آیپد</label>
+    <input id="tvPairCode" inputmode="text" maxlength="16" placeholder="کد ۱۶ رقمی" style="width:220px;padding:12px;border:1px solid #c7b98f;border-radius:10px;text-align:center;font-size:20px;letter-spacing:3px;text-transform:uppercase">
+    <button id="tvPairJoin" type="button" style="padding:12px 18px;border:0;border-radius:10px;background:#1b563e;color:white;font-size:16px">اتصال</button>
+    <button id="tvStandalonePlay" type="button" disabled style="padding:12px 18px;border:0;border-radius:10px;background:#876b2f;color:white;font-size:16px">▶ شروع تلاوت روی تلویزیون</button>
+    <span id="tvPairStatus" style="width:100%;text-align:center;color:#52665a">برای پخش مستقل، کد را از آیپد وارد کن. پس از شروع، آیپد را می‌توانی ببندی.</span>
+  </section>
   <div id="tvSurah" class="now">در انتظار اتصال دستگاه فرستنده…</div>
   <div id="tvReciter" class="reciter">سه قاری برگزیدهٔ تدبر القرآن</div>
   <div id="tvBasmala" class="basmala">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
@@ -59,6 +66,8 @@ cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-ev
   <div class="tajweed-legend" aria-label="راهنمای رنگ‌های تجوید"><span><i style="background:#dd0008"></i>قلقله</span><span><i style="background:#4050ff"></i>مد</span><span><i style="background:#169200"></i>ادغام</span><span><i style="background:#9400a8"></i>اخفاء</span><span><i style="background:#e87519"></i>غنه</span></div><footer class="hint" id="tvHint">صدای تلاوت از تلویزیون پخش می‌شود · کنترل از موبایل یا ریموت تلویزیون</footer>
 </main>
 <cast-media-player></cast-media-player>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./tv-standalone-receiver.js?v=1"></script>
 <script>
 (function(){
   "use strict";
@@ -258,6 +267,6 @@ cast-media-player{position:absolute;width:1px;height:1px;opacity:.001;pointer-ev
   });
   context.start();
 })();
-</script>>
+</script>
 </body>
 </html>
