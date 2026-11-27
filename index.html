@@ -141,6 +141,125 @@ nav {
 .home-panel[hidden]{display:none}
 .home-button{background:#078e5d;border:1px solid #1ac58a;color:white;border-radius:12px;padding:10px 15px}
 @media(max-width:600px){.home-tiles{gap:6px}.home-tile{font-size:12px;padding:12px 3px}}
+
+/* Adhan settings: responsive cards for phone, tablet and desktop */
+#adhanSettings{
+  background:linear-gradient(155deg,#19251e 0%,#131d18 100%);
+  border:1px solid rgba(210,177,99,.48);
+  border-radius:22px;
+  padding:clamp(16px,2.4vw,28px);
+  box-shadow:0 14px 34px rgba(0,0,0,.22);
+}
+#adhanSettings>h2{font-size:clamp(23px,3vw,30px);margin:0 0 6px}
+#adhanSettings>p.muted{font-size:14px;line-height:1.9}
+#adhanPrayerOptions{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));
+  gap:14px;
+  margin-top:18px;
+}
+#adhanPrayerOptions .adhan-row{
+  display:grid;
+  grid-template-columns:minmax(104px, .72fr) minmax(0,1.28fr);
+  align-items:center;
+  gap:10px 12px;
+  min-width:0;
+  margin:0;
+  padding:17px;
+  border:1px solid rgba(210,177,99,.24);
+  border-radius:17px;
+  background:linear-gradient(145deg,rgba(35,49,40,.94),rgba(25,36,29,.96));
+}
+#adhanPrayerOptions .adhan-row h3{
+  grid-column:1/-1;
+  margin:0 0 3px;
+  padding-bottom:9px;
+  border-bottom:1px solid rgba(210,177,99,.22);
+  color:var(--gold);
+  font-size:19px;
+}
+#adhanPrayerOptions .adhan-row label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  color:var(--ink);
+  font-size:14px;
+  line-height:1.6;
+}
+#adhanPrayerOptions .adhan-row label:first-of-type{
+  grid-column:1/-1;
+  justify-self:start;
+  padding:7px 11px;
+  border:1px solid rgba(210,177,99,.25);
+  border-radius:999px;
+  background:rgba(9,18,13,.24);
+}
+#adhanPrayerOptions .adhan-row label:nth-of-type(2),
+#adhanPrayerOptions .adhan-row label:nth-of-type(3){
+  color:var(--muted);
+}
+#adhanPrayerOptions .adhan-row select{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  margin:0;
+  font-size:15px;
+  min-height:46px;
+  border-radius:12px;
+  border-color:rgba(210,177,99,.38);
+  background:#202b24;
+}
+#adhanPrayerOptions .adhan-row button{
+  grid-column:2;
+  width:100%;
+  margin:0!important;
+  min-height:43px;
+  border-radius:12px;
+  background:#254b38;
+  border:1px solid #477c5b;
+  color:#f6edda;
+}
+#adhanSettings #adhanSaveStatus{
+  padding:9px 12px;
+  border-radius:10px;
+  background:rgba(9,18,13,.24);
+}
+#adhanSettings>.adhan-row{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:10px 16px;
+  padding:16px;
+  border:1px solid rgba(210,177,99,.25);
+  border-radius:16px;
+  background:rgba(35,49,40,.72);
+}
+#adhanSettings>.adhan-row h3{width:100%;margin:0;color:var(--gold)}
+#adhanSettings>.adhan-row label{display:flex;align-items:center;gap:7px}
+#adhanSettings #enableAdhanNotifications{width:100%;max-width:360px;min-height:48px}
+#adhanSettings #onesignalStatus{overflow-wrap:anywhere;line-height:1.8}
+#adhanSettings audio{display:block;width:100%;margin:14px 0;min-height:42px}
+#adhanSettings button:focus-visible,
+#adhanSettings select:focus-visible,
+#adhanSettings input:focus-visible{
+  outline:3px solid var(--gold);
+  outline-offset:3px;
+}
+@media(max-width:520px){
+  #adhanPrayerOptions{grid-template-columns:1fr}
+  #adhanPrayerOptions .adhan-row{
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+  #adhanPrayerOptions .adhan-row h3,
+  #adhanPrayerOptions .adhan-row label:first-of-type,
+  #adhanPrayerOptions .adhan-row button{grid-column:1}
+  #adhanPrayerOptions .adhan-row label:nth-of-type(2),
+  #adhanPrayerOptions .adhan-row label:nth-of-type(3){margin-top:3px}
+  #adhanSettings #enableAdhanNotifications{max-width:none}
+}
+
 </style>
 
 
