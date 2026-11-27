@@ -19,6 +19,11 @@
   let castReady = false;
   let activeSession = false;
   let airPlayActive = false;
+  let airPlayQueue = [];
+  let airPlayQueueKey = "";
+  let airPlayQueuePromise = null;
+  let airPlayIndex = 0;
+  let airPlayPreparing = false;
 
   const style = document.createElement("style");
   style.textContent = [
@@ -80,8 +85,9 @@
     if (!button) return;
     const audio = $("audio");
     const supported = !!(audio && typeof audio.webkitShowPlaybackTargetPicker === "function");
-    button.disabled = !supported;
+    button.disabled = !supported || airPlayPreparing;
     if (!supported) button.title = "AirPlay از این مرورگر پشتیبانی نمی‌شود؛ Safari روی iPhone یا iPad را امتحان کن.";
+    else if (airPlayPreparing) button.title = "فایل صوتی سوره در حال آماده‌سازی است.";
   }
   function openAirPlayPicker() {
     const audio = $("audio");
@@ -90,16 +96,18 @@
       return;
     }
     try {
-      const source = audioUrl();
-      if (!audio.src || audio.dataset.tvSource !== source) {
-        audio.pause();
-        audio.src = source;
-        audio.dataset.tvSource = source;
-        audio.preload = "auto";
-        audio.load();
+      if (!airPlayQueue.length || airPlayQueueKey !== airPlayQueueKeyForSelection()) {
+        prepareAirPlayQueue().catch(() => {});
+        setStatus("فایل‌های صوتی معتبر در حال آماده‌سازی است؛ پس از آماده‌شدن دوباره AirPlay را بزن.");
+        return;
       }
+      audio.pause();
+      audio.src = airPlayQueue[0];
+      audio.dataset.tvSource = airPlayQueueKey;
+      audio.preload = "auto";
+      audio.load();
       audio.webkitShowPlaybackTargetPicker();
-      setStatus("فهرست AirPlay باز شد. تلویزیون را انتخاب کن؛ پس از اتصال، دکمهٔ «پخش سوره روی تلویزیون» فعال می‌شود.");
+      setStatus("انتخابگر AirPlay باز شد. تلویزیون را انتخاب کن؛ سپس پخش سوره را بزن.");
     } catch (error) {
       setStatus("AirPlay باز نشد: " + (error.message || "دوباره تلاش کن."));
     }
@@ -118,10 +126,67 @@
     const edition = (select && select.value) || localStorage.getItem("selectedReciter") || "ar.alafasy";
     return RECITERS[edition] ? { edition, ...RECITERS[edition] } : { edition: "ar.alafasy", ...RECITERS["ar.alafasy"] };
   }
-  function audioUrl() {
-    const surah = selectedSurah();
-    const reciter = currentReciter();
-    return "https://cdn.islamic.network/quran/audio-surah/" + reciter.bitrate + "/" + reciter.edition + "/" + surah.number + ".mp3";
+  function audioEdition() {
+    const edition = currentReciter().edition;
+    return edition === "ar.abdulbasit" ? "ar.abdulbasitmurattal" : edition;
+  }
+  function airPlayQueueKeyForSelection() {
+    return selectedSurah().number + "|" + audioEdition();
+  }
+  async function prepareAirPlayQueue() {
+    const key = airPlayQueueKeyForSelection();
+    if (airPlayQueueKey === key && airPlayQueue.length) return airPlayQueue;
+    if (airPlayQueuePromise) return airPlayQueuePromise;
+    airPlayPreparing = true;
+    updateAirPlayAvailability();
+    setStatus("در حال آماده‌سازی فایل‌های صوتی معتبر سوره برای AirPlay…");
+    airPlayQueuePromise = (async () => {
+      const response = await fetch("https://api.alquran.cloud/v1/surah/" + selectedSurah().number + "/" + audioEdition(), {
+        headers: { Accept: "application/json" }
+      });
+      if (!response.ok) throw new Error("منبع صوتی قرآن پاسخ نداد (" + response.status + ").");
+      const payload = await response.json();
+      const ayahs = payload && payload.data && Array.isArray(payload.data.ayahs) ? payload.data.ayahs : [];
+      const urls = ayahs.map(item => item && item.audio).filter(Boolean);
+      if (!urls.length || urls.length !== ayahs.length) throw new Error("فایل‌های صوتی کامل این سوره برای قاری انتخاب‌شده پیدا نشد.");
+      airPlayQueue = urls;
+      airPlayQueueKey = key;
+      airPlayIndex = 0;
+      const audio = $("audio");
+      if (audio) {
+        audio.pause();
+        audio.src = urls[0];
+        audio.dataset.tvSource = key;
+        audio.load();
+      }
+      setStatus("فایل‌های صوتی معتبر آماده شد. اکنون AirPlay را بزن و تلویزیون را انتخاب کن.");
+      return urls;
+    })().catch(error => {
+      airPlayQueue = [];
+      airPlayQueueKey = "";
+      setStatus("آماده‌سازی AirPlay ناموفق بود: " + (error.message || error));
+      throw error;
+    }).finally(() => {
+      airPlayPreparing = false;
+      airPlayQueuePromise = null;
+      updateAirPlayAvailability();
+    });
+    return airPlayQueuePromise;
+  }
+  function playNextAirPlayAyah() {
+    const audio = $("audio");
+    if (!audio || !airPlayQueue.length) return;
+    airPlayIndex += 1;
+    if (airPlayIndex >= airPlayQueue.length) {
+      syncRemoteControls();
+      setStatus("تلاوت سوره به پایان رسید.");
+      return;
+    }
+    audio.src = airPlayQueue[airPlayIndex];
+    audio.load();
+    audio.play().then(syncRemoteControls).catch(error => {
+      setStatus("پخش آیهٔ بعدی ناموفق بود: " + (error.message || error));
+    });
   }
 
   async function fetchTimedChapterAudio(surahNumber, reciter) {
@@ -181,16 +246,15 @@
     const audio = $("audio");
     if (isAirPlayActive()) {
       try {
-        const source = audioUrl();
-        if (!audio.src || audio.dataset.tvSource !== source) {
-          audio.pause();
-          audio.src = source;
-          audio.dataset.tvSource = source;
-          audio.load();
-        }
+        if (!airPlayQueue.length || airPlayQueueKey !== airPlayQueueKeyForSelection()) await prepareAirPlayQueue();
+        airPlayIndex = 0;
+        audio.onended = playNextAirPlayAyah;
+        audio.onerror = () => setStatus("فایل صوتی آیه بارگذاری نشد؛ منبع صوتی یا اتصال اینترنت را بررسی کن.");
+        audio.src = airPlayQueue[0];
+        audio.dataset.tvSource = airPlayQueueKey;
         await audio.play();
         syncRemoteControls();
-        setStatus("تلاوت از طریق AirPlay روی تلویزیون پخش می‌شود؛ کنترل توقف و ادامه فعال است.");
+        setStatus("تلاوت سوره از طریق AirPlay آغاز شد؛ توقف و ادامه از همین دستگاه فعال است.");
       } catch (error) {
         setStatus("پخش AirPlay آغاز نشد: " + (error.message || "دوباره تلاش کن."));
       }
@@ -333,6 +397,14 @@
   function install() {
     buildPanel();
     loadCastSdk();
+    const surahSelect = $("surah");
+    const reciterSelect = $("quranReciter");
+    const refreshAirPlayQueue = () => {
+      airPlayQueue = []; airPlayQueueKey = "";
+      prepareAirPlayQueue().catch(() => {});
+    };
+    if (surahSelect) surahSelect.addEventListener("change", refreshAirPlayQueue);
+    if (reciterSelect) reciterSelect.addEventListener("change", refreshAirPlayQueue);
     const audio = $("audio");
     if (audio) {
       audio.disableRemotePlayback = false;
@@ -358,6 +430,7 @@
       }
       airPlayActive = audio.webkitCurrentPlaybackTargetIsWireless === true;
       syncRemoteControls();
+      prepareAirPlayQueue().catch(() => {});
     }
   }
 
