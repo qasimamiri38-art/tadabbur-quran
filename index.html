@@ -1340,7 +1340,7 @@ if(quranFontControl){
     loadSurah();
   };
 }
-$("surah").onchange=()=>{$("search").value="";loadSurah()};
+$("surah").onchange=()=>{if(activePlaybackGlobal!==null)stopQuranPlayback("با تغییر سوره، تلاوت قبلی متوقف شد.");$("search").value="";loadSurah()};
 const translationControl=$("translation");
 if(translationControl){
   translationControl.onchange=()=>{
@@ -1359,12 +1359,16 @@ if(tafsirControl){
 $("search").oninput=render;$("larger").onclick=()=>{fontSize=Math.min(46,fontSize+2);document.querySelectorAll(".arabic").forEach(x=>x.style.fontSize=fontSize+"px")};
 $("smaller").onclick=()=>{fontSize=Math.max(22,fontSize-2);document.querySelectorAll(".arabic").forEach(x=>x.style.fontSize=fontSize+"px")};
 $("playSurah").onclick=async()=>{
+ if(activePlaybackGlobal !== null){
+  stopQuranPlayback("تلاوت متوقف شد.");
+  return;
+ }
  const n=Number($("surah").value);
  if(!n)return;
- if(!verses.length || verses[0].surah!==n){
+ if(!verses.length || Number(verses[0].surah)!==n){
   await loadSurah();
  }
- if(verses.length && verses[0].surah===n){
+ if(verses.length && Number(verses[0].surah)===n){
   await playAudio(verses[0].global);
  }else{
   status("متن سوره بارگذاری نشد؛ اینترنت را بررسی کنید.");
