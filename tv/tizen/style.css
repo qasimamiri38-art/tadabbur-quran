@@ -1,5 +1,5 @@
-@font-face{font-family:UthmanicHafs;src:url("https://verses.quran.foundation/fonts/quran/hafs/uthmanic_hafs/UthmanicHafs1Ver18.woff2") format("woff2")}
 @import url('https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Vazirmatn:wght@400;500;600;700&display=swap');
+@font-face{font-family:UthmanicHafs;src:url('https://verses.quran.foundation/fonts/quran/hafs/uthmanic_hafs/UthmanicHafs1Ver18.woff2') format('woff2')}
 :root{--bg:#09150f;--panel:#14251b;--green:#18563c;--gold:#d8b66b;--ink:#f5eddd;--muted:#c2c6bb;--line:#675633}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:radial-gradient(ellipse at top,#173b29,var(--bg) 65%);color:var(--ink);font-family:Vazirmatn,Arial,sans-serif}
 body{display:flex;flex-direction:column;padding:2.5vh 3vw}
