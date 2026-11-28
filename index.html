@@ -551,8 +551,17 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error("اجازه اعلان داده نشد.");
       }
 
-      status.textContent = "اجازه داده شد؛ در حال ثبت دستگاه...";
+      status.textContent = "اجازه داده شد؛ در حال شناسایی امن دستگاه...";
 
+      const deviceId = typeof window.tadabburGetPrayerDeviceId === "function"
+        ? window.tadabburGetPrayerDeviceId()
+        : null;
+      if (!deviceId) {
+        throw new Error("شناسهٔ امن دستگاه ساخته نشد؛ صفحه را تازه‌سازی کنید.");
+      }
+      await OneSignal.login(deviceId);
+
+      status.textContent = "در حال ثبت اشتراک اعلان...";
       await OneSignal.User.PushSubscription.optIn();
 
       const sub = OneSignal.User.PushSubscription;
@@ -576,10 +585,16 @@ document.addEventListener("DOMContentLoaded", () => {
         if (saved !== null) control.checked = saved === "true";
         notificationTags[key] = control.checked ? "true" : "false";
       });
-      OneSignal.User.addTags(notificationTags);
+      await OneSignal.User.addTags(notificationTags);
 
-      status.textContent =
-        "ثبت دستگاه موفق بود؛ اعلان‌ها و دسته‌بندی پیام‌ها آماده‌اند.";
+      if (typeof window.tadabburRegisterPrayerDevice === "function") {
+        const registration = await window.tadabburRegisterPrayerDevice();
+        status.textContent = registration.registered
+          ? "اشتراک OneSignal و ثبت امن دستگاه در سرور موفق بود."
+          : "اشتراک OneSignal ثبت شد؛ برای ثبت زمان‌بندی نماز، ابتدا اوقات نماز را تنظیم کنید.";
+      } else {
+        status.textContent = "اشتراک OneSignal ثبت شد؛ بخش ثبت امن دستگاه هنوز بارگذاری نشده است.";
+      }
 
     } catch (error) {
       console.error("OneSignal registration:", error);
