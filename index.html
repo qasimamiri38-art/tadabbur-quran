@@ -2572,8 +2572,8 @@ document.getElementById("barakatJuzSelect")?.remove();
     });
   }
 
-  // The reader is the starting page, with all other screens reachable from the new menu.
-  showPage("reader");
+  // Open the welcome screen first; the Quran reader remains one tap away.
+  showPage("home");
 })();
 </script>
 <!-- <script src="./qari-audio-fix.js"></script> -->
@@ -2770,6 +2770,6 @@ player.src = prayer === "Fajr" && fajrAudioFiles[select.value]
 <script src="./translation-library.js?v=8"></script>
 <script src="./dua-language.js?v=1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2/dist/umd/supabase.min.js"></script>
-<script src="./presence-counter.js?v=1"></script>
+<script src="./presence-counter.js?v=2"></script>
 </body>
  
