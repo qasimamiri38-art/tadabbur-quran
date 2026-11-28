@@ -742,6 +742,13 @@ setTimeout(() => {
   <div class="panel dua-library">
     <h2 style="color:var(--gold)">🤲 کتابخانهٔ دعاها</h2>
     <p class="muted">دعاهای برگزیده از قرآن کریم؛ متن عربی، ترجمهٔ دری و نشانی سوره و آیه.</p>
+    <label for="duaLanguage" class="muted" style="display:block;margin:10px 0 5px">زبان ترجمهٔ دعاها</label>
+    <select id="duaLanguage" aria-label="زبان ترجمهٔ دعاها" style="width:100%;min-height:48px;margin-bottom:8px">
+      <option value="fa" selected>دری</option>
+      <option value="en">English — selected Qur'anic duas</option>
+      <option value="ru">Русский — избранные мольбы из Корана</option>
+    </select>
+    <p id="duaLanguageStatus" class="muted" role="status">ترجمهٔ دری نمایش داده می‌شود.</p>
     <input id="duaSearch" type="search" placeholder="جست‌وجوی دعا یا موضوع آن..." aria-label="جست‌وجوی دعا" style="width:100%;box-sizing:border-box;margin:8px 0 12px">
     <div class="dua-filters" role="group" aria-label="دسته‌بندی دعاها">
       <button type="button" class="active" data-dua-filter="all">همه</button>
