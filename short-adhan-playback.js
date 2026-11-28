@@ -114,6 +114,7 @@
           unlocked = true;
           button.textContent = "✓ پخش اذان فعال شد";
           status("صدای اعلان‌ها فعال شد؛ اکنون دکمهٔ آزمایش هر نماز را بزن.");
+          checkPrayerTimes();
         } catch (error) {
           unlocked = false;
           status("آیفون اجازهٔ پخش خودکار نداد؛ دوباره دکمه را لمس کن.");
@@ -188,8 +189,8 @@
 
   function playAdhan(prayer, item, shortMode) {
     if (!unlocked) {
-      status("وقت نماز رسید؛ برای شنیدن اذان، ابتدا دکمهٔ فعال‌سازی صدا را لمس کن.");
-      return;
+      status("برای پخش اذان، ابتدا دکمهٔ «فعال‌سازی پخش اذان» را لمس کن.");
+      return Promise.resolve(false);
     }
 
     const sound = item.sound || "mishary";
@@ -201,46 +202,50 @@
       status("اذان " + prayer + " پایان یافت.");
     };
     audio.onerror = () => {
-      status("فایل صوتی اذان بارگذاری نشد؛ اتصال اینترنت یا منبع صدا را بررسی کن.");
+      status("فایل صوتی اذان بارگذاری نشد؛ منبع صدا یا اتصال اینترنت را بررسی کن.");
     };
 
-    audio.play().then(() => {
+    return audio.play().then(() => {
       status(shortMode
-        ? "دو تکبیر آغاز اذان " + prayer + " در حال پخش است."
+        ? "اعلان کوتاه اذان " + prayer + " در حال پخش است."
         : "اذان کامل " + prayer + " در حال پخش است.");
       if (shortMode) {
         stopTimer = setTimeout(() => {
           audio.pause();
           audio.currentTime = 0;
-          status("پخش دو تکبیر پایان یافت.");
+          status("پخش اعلان کوتاه پایان یافت.");
         }, SHORT_SECONDS * 1000);
       }
-    }).catch(() => {
-      status("پخش خودکار مسدود شد؛ صفحه را باز نگه دار و دکمهٔ فعال‌سازی صدا را لمس کن.");
+      return true;
+    }).catch((error) => {
+      status("پخش صدا انجام نشد؛ دکمهٔ فعال‌سازی صدا را دوباره لمس کن و اینترنت را بررسی کن.");
+      console.warn("Adhan audio playback failed:", error);
+      return false;
     });
   }
 
-  function playAlert(prayer, settings) {
+  async function playAlert(prayer, settings, testMode) {
     const item = settings[prayer] || {};
     const type = item.type || "silent";
 
-    if (type === "none") return;
+    if (type === "none") {
+      if (testMode) status("برای " + prayer + " گزینهٔ «بدون اعلان» انتخاب شده است.");
+      return true;
+    }
 
     const zone = currentZone();
-    if (zone === "work" || zone === "other") {
+    if (!testMode && (zone === "work" || zone === "other")) {
       status("وقت نماز " + prayer + " رسید؛ به‌دلیل حالت مکان عمومی، صدا پخش نشد.");
-      return;
+      return true;
     }
 
     if (type === "full") {
-      playAdhan(prayer, item, false);
-      return;
+      return await playAdhan(prayer, item, false);
     }
 
     if (type === "beep") {
-      // Play the opening two Takbirs from the selected Adhan recording.
-      playAdhan(prayer, item, true);
-      return;
+      // Short preview from the selected Adhan recording.
+      return await playAdhan(prayer, item, true);
     }
 
     if (type === "vibration") {
@@ -251,9 +256,9 @@
           ? "هشدار لرزشی نماز " + prayer + " اجرا شد."
           : "این دستگاه یا مرورگر از لرزش پشتیبانی نمی‌کند.");
       } else {
-        status("آیفون و Safari در صفحهٔ وب از فرمان لرزش پشتیبانی نمی‌کنند؛ فقط یادآوری تصویری ممکن است.");
+        status("آیفون و Safari در صفحهٔ وب از فرمان لرزش پشتیبانی نمی‌کنند؛ این گزینه روی آیفون قابل اجرا نیست.");
       }
-      return;
+      return true;
     }
 
     if (type === "silent") {
@@ -265,8 +270,14 @@
       banner.style.cssText = "position:sticky;top:8px;z-index:9999;margin:10px 0;padding:14px;border:1px solid #d8b66b;border-radius:12px;background:#17251d;color:#f5eddd;text-align:center;font-weight:600;";
       banner.textContent = "🔔 یادآوری بی‌صدا: وقت نماز " + prayer + " رسید.";
       if (!banner.parentNode) document.body.prepend(banner);
+      return true;
     }
+
+    status("نوع اعلان شناخته نشد؛ تنظیمات نماز را بررسی کن.");
+    return false;
   }
+
+  const prayerAlertsInFlight = Object.create(null);
 
   function checkPrayerTimes() {
     const record = read(TIMES_KEY);
@@ -290,11 +301,24 @@
 
       const key = todayKey + ":" + prayer;
       const delta = now - at.getTime();
-      if (delta >= 0 && delta <= 90000 && fired[key] !== true) {
-        fired[key] = true;
-        localStorage.setItem(FIRED_KEY, JSON.stringify(fired));
-        playAlert(prayer, settings);
-      }
+      if (delta < 0 || delta > 5 * 60 * 1000 || fired[key] === true || prayerAlertsInFlight[key]) continue;
+
+      prayerAlertsInFlight[key] = true;
+      Promise.resolve(playAlert(prayer, settings, false))
+        .then((played) => {
+          // Never mark a sound as delivered until the browser confirms playback.
+          // If iOS audio is still locked, retry while the app remains open.
+          if (played) {
+            fired[key] = true;
+            localStorage.setItem(FIRED_KEY, JSON.stringify(fired));
+          }
+        })
+        .catch((error) => {
+          console.warn("Prayer alert failed:", error);
+        })
+        .finally(() => {
+          delete prayerAlertsInFlight[key];
+        });
     }
   }
 
