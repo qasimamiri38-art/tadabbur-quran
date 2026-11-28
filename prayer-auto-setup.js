@@ -37,6 +37,54 @@
     return id;
   }
 
+  const DEVICE_TOKEN_KEY = "tadabburPrayerDeviceToken";
+  const SUPABASE_FUNCTION_URL = "https://qwneuagotrskouuwikak.supabase.co/functions/v1/prayer-push-register";
+
+  function getDeviceToken() {
+    let token = localStorage.getItem(DEVICE_TOKEN_KEY);
+    if (!token) {
+      if (!window.crypto || !window.crypto.getRandomValues) {
+        throw new Error("این مرورگر برای ثبت امن دستگاه پشتیبانی لازم را ندارد.");
+      }
+      const bytes = new Uint8Array(32);
+      window.crypto.getRandomValues(bytes);
+      token = Array.from(bytes, (value) => value.toString(16).padStart(2, "0")).join("");
+      localStorage.setItem(DEVICE_TOKEN_KEY, token);
+    }
+    return token;
+  }
+
+  async function registerPrayerDevice() {
+    const saved = getPrayerRecord();
+    if (!saved || !saved.date || !saved.timeZone || !saved.timings) {
+      return { registered: false, reason: "no-prayer-times" };
+    }
+
+    const response = await fetch(SUPABASE_FUNCTION_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        device_id: getDeviceId(),
+        device_token: getDeviceToken(),
+        timezone: saved.timeZone,
+        local_date: saved.date,
+        prayer_times: Object.fromEntries(
+          PRAYERS.map((name) => [name, String(saved.timings[name] || "").slice(0, 5)])
+        ),
+        prayer_settings: safeRead(SETTINGS_KEY)
+      })
+    });
+
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || result.ok !== true) {
+      throw new Error(result.error || "ثبت امن دستگاه در سرور انجام نشد.");
+    }
+    return { registered: true };
+  }
+
+  window.tadabburGetPrayerDeviceId = getDeviceId;
+  window.tadabburRegisterPrayerDevice = registerPrayerDevice;
+
   function getTimeZone() {
     try {
       return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
@@ -132,9 +180,11 @@
         typeof item.sound === "string" ? item.sound : "mishary";
     });
 
+    await OneSignalInstance.login(getDeviceId());
     await OneSignalInstance.User.addTags(tags);
+    const registration = await registerPrayerDevice();
 
-    return { synced: true };
+    return { synced: true, deviceRegistered: registration.registered };
   }
   // Expose a safe hook so the existing controls can re-sync after a user changes settings.
   window.tadabburSyncOneSignalPrayer = syncOneSignalTags;
