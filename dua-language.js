@@ -1,4 +1,4 @@
-/* Multilingual dua translations. Arabic source text and references remain untouched. */
+/* Initial multilingual dua translation samples. Arabic source text and references remain untouched; translations require human review. */
 (() => {
   "use strict";
   const translations = {
@@ -47,8 +47,8 @@
     if (status) {
       if (language === "fa") status.textContent = "ترجمهٔ دری نمایش داده می‌شود.";
       else status.textContent = language === "en"
-        ? "English translations are available for the first six Qur'anic duas. Other entries remain in Dari until verified translations are added."
-        : "Русский перевод доступен для первых шести коранических молитв. Остальные тексты пока показаны на дари.";
+        ? "English draft translations are available for the first six Qur'anic duas. Please review them before treating them as an approved religious translation; other entries remain in Dari."
+        : "Черновой русский перевод доступен для первых шести коранических молитв. Перед публикацией как утверждённый религиозный перевод требуется проверка; остальные тексты пока показаны на дари.";
     }
   }
   function init() {
