@@ -50,6 +50,7 @@ select{flex:1;min-width:0}input{flex:2;min-width:170px}
 .actions button{font-size:12px;padding:6px 9px;background:#222b25}
 
 .arabic{font:30px/2.15 "Amiri Quran",serif;text-align:justify;margin:12px 0;color:var(--arabic-color)}
+.arabic.uthmanic{font-family:"UthmanicHafs","Amiri Quran",serif;line-height:2.35;text-align:justify;font-feature-settings:"liga" 1,"kern" 1}
 .arabic.indopak{font-family:"Noto Nastaliq Urdu","Amiri Quran",serif;line-height:2.6;text-align:right}
 .arabic.mushaf{font-family:"UthmanicHafs","Amiri Quran",serif;line-height:2.35;text-align:justify}
 .arabic.tajweed{line-height:2.35;text-align:justify}
@@ -1560,7 +1561,7 @@ content.className="ayah-content";
 
 const ar=document.createElement("p");
 const activeScript=$("quranFont")?.value;
- ar.className="arabic"+(activeScript==="indopak"?" indopak":activeScript==="mushaf"?" mushaf":activeScript==="tajweed"?" tajweed":"");
+ ar.className="arabic"+(activeScript==="indopak"?" indopak":activeScript==="mushaf"?" mushaf":activeScript==="tajweed"?" tajweed":" uthmanic");
 ar.style.fontSize=fontSize+"px";
 const displayArabic = (Number(v.n) === 1 && Number(v.surah) !== 1 && Number(v.surah) !== 9)
   ? removeOpeningBasmala(v.arabic)
