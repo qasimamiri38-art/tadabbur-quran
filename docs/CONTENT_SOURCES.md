@@ -216,3 +216,21 @@ The dua library was expanded with the following entries. Each card displays its 
 A report in Jami at-Tirmidhi 284 for a longer supplication between the two prostrations was checked but not added because the Sunnah.com page grades that report Da'if according to Darussalam: https://sunnah.com/tirmidhi:284. This preserves the project's rule not to present a weak report as established without qualification.
 
 The new Dari translations are explanatory renderings, not a published named translation. Arabic wording and diacritics, especially long Qur'anic passages, should receive final review by a qualified Arabic/Dari editor before public scholarly endorsement. The collection is now broader but should not be described as every transmitted dhikr or every variant in the hadith literature.
+
+## 8. Tanzil Uthmani comparison attempt (2026-11-27)
+
+The repository's current `quran-uthmani.txt` (blob `fcc214311897921d08bbc56879b82aa38328a5f3`) was compared against the Tanzil Uthmani 1.1 text mirror at `iptvchecker/content-tanzil`, whose source manifest identifies the publisher download URL, version 1.1, byte count, SHA-256, and reports a match to the publisher file retrieved 2026-10-08. The publisher's official page remains the controlling source for terms and version information.
+
+Observed structural results:
+- Both files contain 6,236 non-empty verse lines after excluding the mirror's comment/license lines.
+- Only 28 lines are byte-for-byte identical in the same line position.
+- A conservative character normalization (Unicode NFKC, removal of combining marks and tatweel, and normalization of Persian yeh/kaf) yields 3,200 matching lines and 3,036 lines that still differ.
+- The repository text visibly uses different Unicode/orthographic encoding in many places (for example, alternate small-vowel/superscript forms, hamza/maddah encodings, and additional Quranic spacing/control characters). Therefore, the raw and normalized mismatch counts are NOT evidence that the Quran wording is wrong; they show that a direct line comparison is not a valid integrity test for these two differently encoded texts.
+- The existing structured JSON records map each of its 6,236 source lines to a verse, but this comparison did not yet establish a trusted verse-by-verse mapping from each repository record to Tanzil's exact Uthmani encoding, including how opening basmalas are represented.
+
+**Audit status: INCONCLUSIVE — NOT APPROVED AS A ZERO-DIFFERENCE VERIFICATION.** No Quran text file was changed. Do not auto-replace the repository text with Tanzil or apply normalization to the canonical Arabic. Next, establish a documented surah/ayah mapping and compare the intended orthographic profile against the official Tanzil Uthmani 1.1 source (or a qualified Hafs Mushaf review), classify every difference, and obtain a qualified human review before marking the dataset canonical.
+
+Official publisher information:
+- Download and terms: https://tanzil.net/pub/download/index.php
+- Uthmani text description: https://tanzil.net/docs/uthmani
+- Version 1.1 change log: https://tanzil.net/docs/text_updates
