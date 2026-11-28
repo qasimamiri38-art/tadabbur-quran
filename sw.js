@@ -1,5 +1,5 @@
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
-const CACHE = "tadabbur-quran-v49";
+const CACHE = "tadabbur-quran-v50";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -15,7 +15,7 @@ const APP_SHELL = [
   "./qari-audio-fix.js",
   "./prayer-auto-setup.js",
   "./qari-list-design.js",
-  "./short-adhan-playback.js?v=20261127-4",
+  "./short-adhan-playback.js?v=20261127-5",
 ];
 
 self.addEventListener("install", event => {
