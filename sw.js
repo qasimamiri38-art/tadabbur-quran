@@ -1,5 +1,5 @@
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
-const CACHE = "tadabbur-quran-v37";
+const CACHE = "tadabbur-quran-v38";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -11,7 +11,7 @@ const APP_SHELL = [
   "./icon-512.png",
   "./hero-quran.png",
   "./hero-quran-new.jpg",
-  "./presence-counter.js?v=2",
+  "./presence-counter.js?v=3",
   "./qari-audio-fix.js",
   "./qari-list-design.js",
   "./short-adhan-playback.js?v=20261127-4",
