@@ -234,6 +234,24 @@ nav {
   width: 100%;
   min-width: 0;
 }
+
+/* صفحهٔ منابع: کارت‌های روشن و دسته‌بندی‌شده */
+.about-panel{padding:clamp(18px,4vw,30px);line-height:2}
+.about-title{color:var(--gold);font-size:clamp(25px,5vw,34px);margin:0 0 14px}
+.about-intro{font-size:clamp(16px,2.5vw,19px);line-height:2.1;color:var(--ink)}
+.about-founder{margin:24px 0;padding:18px;border:1px solid rgba(216,182,107,.35);border-radius:16px;background:rgba(216,182,107,.055)}
+.about-founder h3,.source-section-title,.about-trust h3{color:var(--gold);font-size:clamp(19px,3.5vw,24px);margin:0 0 12px}
+.about-founder p{margin:5px 0}.founder-name{font-size:21px;font-weight:700}
+.source-section-title{margin-top:28px;padding-bottom:8px;border-bottom:1px solid rgba(216,182,107,.28)}
+.source-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.source-card{min-width:0;padding:16px;border:1px solid rgba(216,182,107,.3);border-radius:16px;background:linear-gradient(145deg,rgba(26,48,35,.82),rgba(14,29,21,.9));display:flex;flex-direction:column;align-items:flex-start;gap:7px}
+.source-card h4{font-size:19px;color:#f1d48f;margin:0}.source-card p{margin:0;line-height:1.95;overflow-wrap:anywhere}
+.source-kicker{font-size:12px;color:#b8c8b9;border:1px solid rgba(216,182,107,.24);border-radius:20px;padding:2px 9px}
+.source-card a{color:var(--gold);text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.source-card-wide{margin-top:10px}.source-note{font-size:13px;color:#b8c5ba;margin-top:8px!important}
+.about-trust{margin-top:26px;padding:18px;border-radius:16px;background:rgba(8,20,14,.65);border:1px solid rgba(216,182,107,.28)}
+@media(max-width:560px){.source-grid{grid-template-columns:1fr}.source-card{padding:15px}.about-panel{padding:16px}}
+
 /* صفحه اصلی تدبر القرآن */
 #home{padding:10px 0 24px}
 .home-welcome{padding:0;background:#0b2119;border:1px solid #b99a58;border-radius:24px;overflow:hidden;margin:12px 0 22px;box-shadow:0 16px 42px rgba(0,0,0,.32)}
@@ -743,32 +761,72 @@ setTimeout(() => {
 </div>
 </section>
 <section id="about" class="hidden">
-<div class="panel">
-<h2 style="color:var(--gold)">درباره برنامه و منابع</h2>
+  <div class="panel about-panel">
+    <h2 class="about-title">دربارهٔ تدبّر القرآن و منابع</h2>
+    <p class="about-intro">هدف «تدبّر القرآن» کمک به خواندن قرآن کریم، فهم ترجمه‌ها، شنیدن تلاوت و اندیشیدن دربارهٔ پیام آیات است.</p>
 
-<p>هدف «تدبّر القرآن» کمک به خواندن قرآن کریم، فهم ترجمه‌ها، شنیدن تلاوت و اندیشیدن درباره پیام آیات است.</p>
-<h3 style="color:var(--gold)">بنیان‌گذار و ایده‌پرداز تدبّر القرآن</h3>
-<p><strong>قسیم امیری</strong></p>
-<p>برای صلح و صلاح مردم افغانستان.</p>
-<h3 style="color:var(--gold)">متن قرآن و ترجمه‌ها</h3>
-<p>متن عثمانی از AlQuran Cloud و متن هندی‌ـ‌پاکستانی حفص نستعلیق از پروژه Quran JSON دریافت می‌شود. منبع و نسخهٔ داده در <a href="https://quran-json.risanb.com/meta/sources.json" target="_blank" rel="noopener" style="color:var(--gold)">فهرست منابع و نسخه‌ها</a> قابل بررسی است. متن هندی‌ـ‌پاکستانی و نسخهٔ مصحف مدینه (QPC Hafs) از داده‌های Qur'anpedia.net با ذکر منبع و نسخه دریافت می‌شوند. <a href="https://github.com/risan/quran-json" target="_blank" rel="noopener" style="color:var(--gold)">مشخصات و مجوز داده‌ها</a>.</p>
-<p>متن عربی قرآن از سرویس AlQuran Cloud دریافت می‌شود. ترجمه و تفسیر، آثار انسانی و علمی‌اند و مشخصات مترجم و مفسر باید برای هر نسخه معرفی شود.</p><p>منبع متن عربی قرآن: <a href="https://tanzil.net/" target="_blank" rel="noopener" style="color:var(--gold)">Tanzil</a> · <a href="https://tanzil.net/docs/" target="_blank" rel="noopener" style="color:var(--gold)">اسناد Tanzil</a></p>
-<p><a style="color:var(--gold)" href="https://alquran.cloud/api" target="_blank" rel="noopener">مستندات منبع داده قرآن</a></p>
+    <div class="about-founder">
+      <h3>بنیان‌گذار و ایده‌پرداز</h3>
+      <p class="founder-name">قسیم امیری</p>
+      <p>برای صلح و صلاح مردم افغانستان.</p>
+    </div>
 
-<h3 style="color:var(--gold)">تلاوت و ترجمهٔ دری افغانستان</h3>
-<p><strong>قاری:</strong> استاد قاری برکت‌الله سلیم</p>
-<p><strong>گویندهٔ ترجمه:</strong> عمر خطاب</p>
-<p><strong>مترجمان متن:</strong> صباح‌الدین کشککی و محمد صدیق راشد سلجوقی</p>
-<p>این مجموعه شامل فایل‌های صوتی MP3 برای سی پارهٔ قرآن است.</p>
-<p><a style="color:var(--gold)" href="https://bayyinat.org/?page_id=336" target="_blank" rel="noopener">مشاهده و شنیدن تلاوت با ترجمه</a></p>
+    <h3 class="source-section-title">منابع متن قرآن و رسم‌الخط</h3>
+    <div class="source-grid">
+      <article class="source-card">
+        <span class="source-kicker">متن عربی و API</span>
+        <h4>AlQuran Cloud</h4>
+        <p>متن عربی قرآن در برنامه از سرویس AlQuran Cloud دریافت می‌شود.</p>
+        <a href="https://alquran.cloud/api" target="_blank" rel="noopener">مستندات API و منبع داده</a>
+      </article>
+      <article class="source-card">
+        <span class="source-kicker">متن و مستندات</span>
+        <h4>Tanzil</h4>
+        <p>منبع و مستندات متن قرآن برای بررسی و تطبیق نسخه‌ها.</p>
+        <a href="https://tanzil.net/" target="_blank" rel="noopener">وب‌سایت Tanzil</a>
+        <a href="https://tanzil.net/docs/" target="_blank" rel="noopener">اسناد و شرایط استفاده</a>
+      </article>
+      <article class="source-card">
+        <span class="source-kicker">رسم‌الخط هندی‌ـ‌پاکستانی</span>
+        <h4>Quran JSON</h4>
+        <p>دادهٔ حفص با رسم‌الخط هندی‌ـ‌پاکستانی؛ مشخصات نسخه و منابع آن قابل بررسی است.</p>
+        <a href="https://quran-json.risanb.com/meta/sources.json" target="_blank" rel="noopener">فهرست منابع و نسخه‌ها</a>
+        <a href="https://github.com/risan/quran-json" target="_blank" rel="noopener">مخزن و مشخصات داده‌ها</a>
+      </article>
+      <article class="source-card">
+        <span class="source-kicker">مصحف مدینه</span>
+        <h4>Qur'anpedia.net</h4>
+        <p>دادهٔ رسم‌الخط مصحف مدینه (QPC Hafs) و اطلاعات منبع و نسخه.</p>
+        <a href="https://quranpedia.net/" target="_blank" rel="noopener">وب‌سایت Qur'anpedia</a>
+      </article>
+    </div>
 
-<p class="muted">این پیوند به منبع اصلی مجموعه هدایت می‌کند. برای میزبانی یا بازنشر فایل‌های صوتی در برنامه، باید اجازهٔ صاحب حق بررسی شود.</p>
+    <h3 class="source-section-title">تلاوت و ترجمهٔ دری افغانستان</h3>
+    <article class="source-card source-card-wide">
+      <span class="source-kicker">مجموعهٔ صوتی سی پاره</span>
+      <h4>مؤسسهٔ بیّنات</h4>
+      <p><strong>قاری:</strong> استاد قاری برکت‌الله سلیم</p>
+      <p><strong>گویندهٔ ترجمه:</strong> عمر خطاب</p>
+      <p><strong>مترجمان متن:</strong> صباح‌الدین کشککی و محمد صدیق راشد سلجوقی</p>
+      <p>این مجموعه شامل فایل‌های صوتی MP3 برای سی پارهٔ قرآن است.</p>
+      <a href="https://bayyinat.org/?page_id=336" target="_blank" rel="noopener">مشاهده و شنیدن تلاوت با ترجمه</a>
+      <p class="source-note">این پیوند به منبع اصلی مجموعه هدایت می‌کند. برای میزبانی یا بازنشر فایل‌های صوتی در برنامه، باید اجازهٔ صاحب حق بررسی شود.</p>
+    </article>
 
-<h3 style="color:var(--gold)">امانت علمی</h3>
-<p>متن عربی قرآن اصل است. ترجمه، برگردان انسانی معنا و تفسیر، شرح و توضیح آیات است. این سه را از یکدیگر جدا نگه می‌داریم و منابع را روشن معرفی می‌کنیم.</p>
+    <h3 class="source-section-title">فونت‌ها و نمایش نوشتار</h3>
+    <article class="source-card source-card-wide">
+      <p>فونت‌های رابط و نوشتار عربی از خانواده‌های Vazirmatn، Amiri Quran، Aref Ruqaa، Noto Nastaliq Urdu و فونت عثمانی حفص استفاده می‌کنند.</p>
+      <a href="https://fonts.google.com/" target="_blank" rel="noopener">کتابخانهٔ Google Fonts</a>
+      <a href="https://verses.quran.foundation/fonts/" target="_blank" rel="noopener">منبع فونت‌های قرآنی Quran Foundation</a>
+    </article>
 
-<p class="muted">برای دریافت داده‌ها و پخش صوت از منابع بیرونی، اتصال اینترنت لازم است.</p>
-</div>
+    <div class="about-trust">
+      <h3>امانت علمی و شفافیت منابع</h3>
+      <p>متن عربی قرآن اصل است. ترجمه، برگردان انسانی معنا و تفسیر، شرح و توضیح آیات است. این سه را از یکدیگر جدا نگه می‌داریم و منابع را روشن معرفی می‌کنیم.</p>
+      <p>نام مترجم، مفسر، نسخهٔ داده و مجوز هر منبع باید همراه همان محتوا بررسی و معرفی شود. پیوندهای این صفحه برای دسترسی به منابع اصلی فراهم شده‌اند.</p>
+      <p class="source-note">برای دریافت داده‌ها و پخش صوت از منابع بیرونی، اتصال اینترنت لازم است.</p>
+    </div>
+  </div>
 </section>
 
 
