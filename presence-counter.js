@@ -55,7 +55,7 @@
     const state = channel.presenceState();
     const count = Object.keys(state || {}).length;
     countNode.textContent = new Intl.NumberFormat("fa-IR").format(count);
-    setStatus("کاربر فعال در همین لحظه");
+    setStatus("اتصال فعال در همین لحظه");
   }
 
   channel
