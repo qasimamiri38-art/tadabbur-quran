@@ -2151,22 +2151,28 @@ if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.ser
         timesBox.hidden = false;
         status.textContent = "اوقات نماز بر اساس موقعیت شما محاسبه شد.";
 
-        const qResponse = await fetch(
-          `https://api.aladhan.com/v1/qibla/${lat}/${lon}`
-        );
-        if (!qResponse.ok) throw new Error("Qibla API error");
-
-        const qResult = await qResponse.json();
-        direction = qResult.data.direction;
-
-        qiblaDegrees.textContent =
-          "جهت قبله: " + direction.toFixed(1) + " درجه از شمال";
-
-        qiblaStatus.textContent =
-          "برای استفاده از قطب‌نما، دکمهٔ فعال‌سازی را بزنید.";
+        // Prayer times are already valid; Qibla is refreshed separately.
+        try {
+          const qResponse = await fetch(
+            `https://api.aladhan.com/v1/qibla/${lat}/${lon}`,
+            { cache: "no-store" }
+          );
+          if (!qResponse.ok) throw new Error("Qibla API error");
+          const qResult = await qResponse.json();
+          direction = Number(qResult.data.direction);
+          if (Number.isFinite(direction)) {
+            qiblaDegrees.textContent =
+              "جهت قبله: " + direction.toFixed(1) + " درجه از شمال";
+            qiblaStatus.textContent =
+              "برای استفاده از قطب‌نما، دکمهٔ فعال‌سازی را بزنید.";
+          }
+        } catch (qiblaError) {
+          qiblaStatus.textContent = "اوقات نماز محاسبه شد؛ تازه‌سازی جهت قبله فعلاً انجام نشد.";
+          console.warn("Qibla refresh failed", qiblaError);
+        }
 
       } catch (error) {
-        status.textContent = "محاسبه انجام نشد؛ اتصال اینترنت را بررسی کنید.";
+        status.textContent = "محاسبهٔ اوقات نماز انجام نشد؛ اجازهٔ موقعیت و اتصال اینترنت را بررسی کنید.";
       } finally {
         locate.disabled = false;
       }
