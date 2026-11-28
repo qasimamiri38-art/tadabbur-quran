@@ -69,6 +69,17 @@ select{flex:1;min-width:0}input{flex:2;min-width:170px}
   src:url('https://verses.quran.foundation/fonts/quran/hafs/uthmanic_hafs/UthmanicHafs1Ver18.woff2') format('woff2');
   font-display:swap;
 }
+/* خوشنویسی عنوان برند؛ سبک عربی هنری با حفظ خوانایی رابط */
+@import url('https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=swap');
+.brand-calligraphy, header h1, .home-cover-content h2{
+  font-family:'Aref Ruqaa','Amiri Quran','Amiri',serif!important;
+  font-weight:700;
+  letter-spacing:0;
+  text-rendering:optimizeLegibility;
+}
+header h1{font-size:clamp(30px,7vw,40px);line-height:1.45;text-shadow:0 2px 10px rgba(216,182,107,.18)}
+.home-cover-content h2{font-size:clamp(40px,8vw,58px);line-height:1.45;text-shadow:0 3px 14px rgba(0,0,0,.8),0 0 18px rgba(216,182,107,.18)}
+
 @font-face{
   font-family:'IndopakNastaleeq';
   src:url('https://verses.quran.foundation/fonts/quran/hafs/nastaleeq/indopak/indopak-nastaleeq-waqf-lazim-v4.2.1.woff2') format('woff2');
