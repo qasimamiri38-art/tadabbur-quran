@@ -1,6 +1,6 @@
 /* Live concurrent visitor counter for Tadabbur Quran.
-   Uses Supabase Realtime Presence: counts active browser/device identities, not downloads. Tabs in the same browser share one identity.
-   A public/publishable key is safe to ship in a browser; never put service_role here. */
+   Counts visible active browser/device identities, not unique people.
+   Tabs in the same browser profile share one identity. */
 (function () {
   "use strict";
 
@@ -21,17 +21,17 @@
       if (!key) {
         key = (window.crypto && crypto.randomUUID)
           ? crypto.randomUUID()
-          : "tab-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
+          : "visitor-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
         localStorage.setItem("tadabbur-live-visitor", key);
       }
       return key;
     } catch (_) {
-      return "tab-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
+      return "visitor-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
     }
   }
 
   if (!window.supabase || typeof window.supabase.createClient !== "function") {
-    setStatus("شمارندهٔ زنده فعلاً در دسترس نیست.");
+    setStatus("شمارندهٔ زنده فعلاً بارگذاری نشده است.");
     return;
   }
 
@@ -41,61 +41,100 @@
       autoRefreshToken: false,
       detectSessionInUrl: false
     },
-    realtime: {
-      params: { eventsPerSecond: 5 }
-    }
+    realtime: { params: { eventsPerSecond: 5 } }
   });
 
-  const sessionKey = makeSessionKey();
   const channel = client.channel("tadabbur-quran-live-users", {
-    config: { presence: { key: sessionKey } }
+    config: { presence: { key: makeSessionKey() } }
   });
+
+  let subscribed = false;
+  let tracked = false;
+  let leaving = false;
 
   function renderCount() {
     const state = channel.presenceState();
     const count = Object.keys(state || {}).length;
     countNode.textContent = new Intl.NumberFormat("fa-IR").format(count);
-    setStatus("اتصال فعال در همین لحظه");
+  }
+
+  async function trackThisPage() {
+    if (!subscribed || tracked || leaving) return;
+    if (document.visibilityState !== "visible" || !navigator.onLine) return;
+    try {
+      await channel.track({
+        online_at: new Date().toISOString(),
+        page: "tadabbur-quran"
+      });
+      tracked = true;
+      renderCount();
+      setStatus("اتصال فعال در همین لحظه");
+    } catch (_) {
+      setStatus("اتصال برقرار است؛ ثبت حضور دوباره تلاش می‌شود.");
+    }
+  }
+
+  async function untrackThisPage() {
+    if (!subscribed || !tracked) return;
+    tracked = false;
+    try {
+      await channel.untrack();
+      renderCount();
+    } catch (_) {
+      // The Realtime server also expires presence after a disconnected client.
+    }
   }
 
   channel
-    .on("presence", { event: "sync" }, renderCount)
+    .on("presence", { event: "sync" }, function () {
+      renderCount();
+      if (document.visibilityState === "visible") trackThisPage();
+    })
     .on("presence", { event: "join" }, renderCount)
     .on("presence", { event: "leave" }, renderCount)
     .subscribe(async function (status) {
       if (status === "SUBSCRIBED") {
-        try {
-          await channel.track({
-            online_at: new Date().toISOString(),
-            page: "tadabbur-quran"
-          });
-          renderCount();
-        } catch (error) {
-          setStatus("اتصال برقرار شد، اما ثبت حضور انجام نشد.");
-        }
+        subscribed = true;
+        await trackThisPage();
+        renderCount();
       } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+        subscribed = false;
+        tracked = false;
         countNode.textContent = "—";
-        setStatus("اتصال شمارنده برقرار نشد؛ بعداً دوباره تلاش می‌شود.");
+        setStatus("اتصال شمارنده برقرار نشد؛ دوباره تلاش می‌شود.");
       } else if (status === "CLOSED") {
+        subscribed = false;
+        tracked = false;
         countNode.textContent = "—";
         setStatus("شمارنده موقتاً قطع شد.");
       }
     });
 
-  // Do not count a tab while it is in the background.
   document.addEventListener("visibilitychange", function () {
     if (document.visibilityState === "hidden") {
-      channel.untrack().catch(function () {});
+      untrackThisPage();
     } else {
-      channel.track({
-        online_at: new Date().toISOString(),
-        page: "tadabbur-quran"
-      }).then(renderCount).catch(function () {});
+      trackThisPage();
     }
   });
 
+  window.addEventListener("online", function () {
+    setStatus("اینترنت وصل شد؛ شمارنده در حال همگام‌سازی است…");
+    trackThisPage();
+  });
+
+  window.addEventListener("offline", function () {
+    setStatus("اینترنت قطع است؛ شمارنده پس از وصل‌شدن دوباره فعال می‌شود.");
+  });
+
   window.addEventListener("pagehide", function () {
-    channel.untrack().catch(function () {});
-    client.removeChannel(channel).catch(function () {});
+    leaving = true;
+    untrackThisPage().finally(function () {
+      client.removeChannel(channel).catch(function () {});
+    });
   }, { once: true });
+
+  window.addEventListener("pageshow", function () {
+    if (document.visibilityState === "visible") trackThisPage();
+  });
 })();
