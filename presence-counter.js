@@ -1,5 +1,5 @@
 /* Live concurrent visitor counter for Tadabbur Quran.
-   Uses Supabase Realtime Presence: counts active browser tabs, not downloads.
+   Uses Supabase Realtime Presence: counts active browser/device identities, not downloads. Tabs in the same browser share one identity.
    A public/publishable key is safe to ship in a browser; never put service_role here. */
 (function () {
   "use strict";
@@ -17,12 +17,12 @@
 
   function makeSessionKey() {
     try {
-      let key = sessionStorage.getItem("tadabbur-live-session");
+      let key = localStorage.getItem("tadabbur-live-visitor");
       if (!key) {
         key = (window.crypto && crypto.randomUUID)
           ? crypto.randomUUID()
           : "tab-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
-        sessionStorage.setItem("tadabbur-live-session", key);
+        localStorage.setItem("tadabbur-live-visitor", key);
       }
       return key;
     } catch (_) {
