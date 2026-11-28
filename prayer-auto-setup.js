@@ -285,6 +285,54 @@
     options.insertAdjacentElement("beforebegin", toggle);
   }
 
+  function getFreshPrayerTimes() {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("این مرورگر از موقعیت‌یابی پشتیبانی نمی‌کند."));
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        try {
+          const url = new URL("https://api.aladhan.com/v1/timings");
+          url.searchParams.set("latitude", String(lat));
+          url.searchParams.set("longitude", String(lon));
+          url.searchParams.set("method", "2");
+          url.searchParams.set("school", "1");
+          const response = await fetch(url.toString(), { cache: "no-store" });
+          if (!response.ok) throw new Error("سرویس اوقات نماز پاسخ نداد؛ اینترنت را بررسی کن.");
+          const payload = await response.json();
+          if (payload.code !== 200 || !payload.data || !payload.data.timings) {
+            throw new Error("اطلاعات معتبر اوقات نماز دریافت نشد.");
+          }
+          resolve({ timings: payload.data.timings, latitude: lat, longitude: lon });
+        } catch (error) {
+          reject(error instanceof Error ? error : new Error("دریافت اوقات نماز انجام نشد."));
+        }
+      }, (error) => {
+        const message = error.code === 1
+          ? "اجازهٔ موقعیت مکانی داده نشده است. در تنظیمات Safari یا iPhone اجازه بده."
+          : error.code === 3
+            ? "دریافت موقعیت بیش از حد طول کشید؛ GPS و اینترنت را بررسی کن."
+            : "موقعیت مکانی دریافت نشد؛ GPS و اجازهٔ مکان را بررسی کن.";
+        reject(new Error(message));
+      }, { enableHighAccuracy: true, timeout: 25000, maximumAge: 0 });
+    });
+  }
+
+  function displayFreshTimings(timings) {
+    DISPLAY_TIMES.forEach((name) => {
+      const field = byId("pt-" + name);
+      if (!field) return;
+      const raw = String(timings[name] || "").trim();
+      const normalized = raw.match(/\\d{1,2}:\\d{2}/);
+      field.textContent = normalized ? normalized[0].padStart(5, "0") : raw;
+    });
+    const box = byId("prayerTimes");
+    if (box) box.hidden = false;
+  }
+
   function addAutoSetupButton() {
     const panel = document.querySelector("#prayer > .panel");
     const locationButton = byId("prayerLocate");
@@ -300,7 +348,7 @@
 
     const note = document.createElement("p");
     note.className = "muted";
-    note.textContent = "یک‌بار بزن؛ موقعیت و اوقات نماز امروز خودکار تنظیم می‌شود. برای کاربران تازه، یادآوری‌ها بی‌صدا هستند.";
+    note.textContent = "با اجازهٔ موقعیت مکانی، اوقات امروز را برای محل فعلی محاسبه و در همین دستگاه ذخیره می‌کند.";
 
     const result = document.createElement("p");
     result.id = "prayerAutoSetupStatus";
@@ -313,37 +361,65 @@
     note.insertAdjacentElement("afterend", result);
 
     button.addEventListener("click", async () => {
-      if (locationButton.disabled) {
-        result.textContent = "دریافت موقعیت در جریان است؛ کمی صبر کن.";
-        return;
-      }
-
       button.disabled = true;
-      result.textContent = "در حال دریافت موقعیت و محاسبهٔ اوقات نماز...";
-      const box = byId("prayerTimes");
-      if (box) box.hidden = true;
-
+      const originalText = button.textContent;
+      button.textContent = "در حال محاسبه…";
+      result.textContent = "در حال دریافت موقعیت مکانی و محاسبهٔ اوقات نماز امروز…";
       try {
-        const freshTimes = waitForFreshTimes();
-        locationButton.click();
-        await freshTimes;
-
-        applyQuietDefaults();
+        const fresh = await getFreshPrayerTimes();
+        displayFreshTimings(fresh.timings);
         saveTodayTimes();
+
+        // Save only the calculated times and timezone; coordinates stay in memory.
+        const saved = safeRead(CACHE_KEY);
+        saved.date = dateInZone(getTimeZone());
+        saved.timeZone = getTimeZone();
+        saved.timings = {};
+        DISPLAY_TIMES.forEach((name) => {
+          const field = byId("pt-" + name);
+          saved.timings[name] = field ? field.textContent.trim() : "";
+        });
+        saved.savedAt = new Date().toISOString();
+        saved.calculationMethod = "AlAdhan method 2; Asr school 1";
+        localStorage.setItem(CACHE_KEY, JSON.stringify(saved));
+
+        status.textContent = "اوقات نماز امروز با موقعیت فعلی محاسبه شد.";
+        result.textContent = "الحمدلله! اوقات نماز تازه دریافت و در همین دستگاه ذخیره شد.";
+
+        // Qibla is optional: it must never cancel successful prayer-time setup.
+        try {
+          const qResponse = await fetch(
+            "https://api.aladhan.com/v1/qibla/" + fresh.latitude + "/" + fresh.longitude,
+            { cache: "no-store" }
+          );
+          if (qResponse.ok) {
+            const qPayload = await qResponse.json();
+            const degrees = qPayload && qPayload.data && Number(qPayload.data.direction);
+            if (Number.isFinite(degrees)) {
+              const qiblaDegrees = byId("qiblaDegrees");
+              const qiblaStatus = byId("qiblaStatus");
+              if (qiblaDegrees) qiblaDegrees.textContent = "جهت قبله: " + degrees.toFixed(1) + " درجه از شمال";
+              if (qiblaStatus) qiblaStatus.textContent = "جهت قبله نیز تازه‌سازی شد.";
+            }
+          }
+        } catch (qiblaError) {
+          console.warn("Qibla refresh skipped; prayer times are already saved.", qiblaError);
+        }
 
         try {
           const sync = await syncOneSignalTags();
-          result.textContent = sync.synced
-            ? "اوقات نماز ذخیره شد و زمان‌ها به دستگاه ناشناس شما در OneSignal ثبت شد. برای دریافت اعلان باید اجازهٔ اعلان را نیز بدهی؛ ارسال خودکار هنگام بسته‌بودن اپ هنوز به زمان‌بندی سرور نیاز دارد."
-            : "اوقات نماز در تلفن ذخیره شد. برای ثبت در OneSignal باید اتصال اینترنت و SDK فعال باشد.";
+          if (sync.synced) {
+            result.textContent += " زمان‌ها برای همگام‌سازی اعلان‌ها نیز ثبت شد؛ ارسال خودکار در پس‌زمینه همچنان به زمان‌بندی سرور نیاز دارد.";
+          }
         } catch (syncError) {
           console.warn("OneSignal prayer sync failed", syncError);
-          result.textContent = "اوقات نماز در تلفن ذخیره شد؛ همگام‌سازی OneSignal انجام نشد. اتصال را بررسی می‌کنیم.";
+          result.textContent += " همگام‌سازی اعلان‌ها انجام نشد، اما اوقات نماز ذخیره شده است.";
         }
       } catch (error) {
         result.textContent = error && error.message ? error.message : "تنظیم خودکار انجام نشد؛ دوباره تلاش کن.";
       } finally {
         button.disabled = false;
+        button.textContent = originalText;
       }
     });
   }
